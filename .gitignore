@@ -1,0 +1,22 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.local
+
+# Dependencies & Build artifacts
+node_modules/
+.nuxt/
+.output/
+dist/
+bin/
+*.exe
+*.test
+*.out
+
+# Data volumes
+redis_data/
+
+# OS files
+.DS_Store
+Thumbs.db
