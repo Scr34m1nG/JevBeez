@@ -19,6 +19,7 @@ type TavilyProvider struct {
 type tavilyRequest struct {
 	APIKey      string `json:"api_key"`
 	Query       string `json:"query"`
+	Topic       string `json:"topic,omitempty"`
 	SearchDepth string `json:"search_depth"`
 	MaxResults  int    `json:"max_results"`
 }
@@ -48,6 +49,7 @@ func (p *TavilyProvider) Search(ctx context.Context, query string) ([]model.Evid
 	payload := tavilyRequest{
 		APIKey:      p.apiKey,
 		Query:       query,
+		Topic:       "news",
 		SearchDepth: "basic",
 		MaxResults:  5,
 	}

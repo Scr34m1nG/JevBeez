@@ -68,6 +68,12 @@ func (m *SearchManager) SearchGrounding(ctx context.Context, article *model.Arti
 
 func (m *SearchManager) buildQuery(article *model.Article) string {
 	title := strings.TrimSpace(article.Title)
+	for _, separator := range []string{" - ", " | ", " – "} {
+		if idx := strings.LastIndex(title, separator); idx > 20 {
+			title = title[:idx]
+		}
+	}
+	title = strings.TrimSpace(title)
 	if len(title) > 120 {
 		title = title[:120]
 	}

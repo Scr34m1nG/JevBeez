@@ -37,8 +37,18 @@
       </h2>
     </div>
 
-    <div class="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 mb-6">
-      <h3 class="text-xs uppercase font-mono tracking-wider text-zinc-400 mb-1.5">Ringkasan Analisis</h3>
+    <div class="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 mb-6 relative group">
+      <div class="flex items-center justify-between mb-1.5">
+        <h3 class="text-xs uppercase font-mono tracking-wider text-zinc-400">Ringkasan Analisis</h3>
+        <button
+          @click="copySummary"
+          type="button"
+          class="text-xs text-zinc-500 hover:text-indigo-400 flex items-center gap-1 transition-colors"
+        >
+          <span v-if="copied">Tersalin!</span>
+          <span v-else>Salin Teks</span>
+        </button>
+      </div>
       <p class="text-sm sm:text-base text-zinc-200 leading-relaxed">
         {{ result.summary }}
       </p>
@@ -98,12 +108,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { VerificationResult } from '~/types'
 
 const props = defineProps<{
   result: VerificationResult
 }>()
+
+const copied = ref(false)
+const copySummary = async () => {
+  const text = `[JevBeez Fact Check]\nStatus: ${verdictLabel.value}\nKeyakinan: ${props.result.confidence}%\nJudul: ${props.result.article_title}\nRingkasan: ${props.result.summary}\nSumber: ${props.result.article_url}`
+  try {
+    await navigator.clipboard.writeText(text)
+    copied.value = true
+    setTimeout(() => { copied.value = false }, 2000)
+  } catch {}
+}
 
 const verdictLabel = computed(() => {
   switch (props.result.verdict) {
