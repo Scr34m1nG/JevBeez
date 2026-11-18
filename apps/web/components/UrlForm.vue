@@ -33,24 +33,6 @@
       Proteksi Cooldown Aktif: Mohon tunggu {{ cooldownSeconds }} detik sebelum pengecekan berikutnya.
     </div>
 
-    <div class="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-zinc-500">
-      <span>Coba tautan contoh:</span>
-      <button
-        type="button"
-        @click="fillExample('https://news.detik.com/berita/d-7647225/bmkg-klarifikasi-isu-gempa-megathrust')"
-        class="px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-200 transition-colors"
-      >
-        Isu Megathrust
-      </button>
-      <button
-        type="button"
-        @click="fillExample('https://www.kompas.com/tren/read/2024/08/15/183000665/ramai-soal-potensi-gempa-megathrust-selat-sunda-dan-mentawai-ini-kata-bmkg')"
-        class="px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-200 transition-colors"
-      >
-        Klarifikasi BMKG
-      </button>
-    </div>
-
     <div v-if="errorMessage" class="mt-3 p-3.5 rounded-xl bg-rose-950/40 border border-rose-900/50 text-rose-300 text-xs sm:text-sm flex items-start gap-2.5">
       <svg class="w-5 h-5 text-rose-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -74,11 +56,6 @@ const emit = defineEmits<{
 }>()
 
 const inputUrl = ref('')
-
-const fillExample = (url: string) => {
-  inputUrl.value = url
-  handleSubmit()
-}
 
 const handleSubmit = () => {
   if (inputUrl.value.trim() && !props.isLoading && props.cooldownSeconds === 0) {
