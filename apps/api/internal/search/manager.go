@@ -67,6 +67,23 @@ func (m *SearchManager) SearchGrounding(ctx context.Context, article *model.Arti
 }
 
 func (m *SearchManager) buildQuery(article *model.Article) string {
+	if article.IsSocial && strings.TrimSpace(article.Content) != "" {
+		content := strings.TrimSpace(article.Content)
+		for _, delim := range []string{"\n", ".", "!"} {
+			if idx := strings.Index(content, delim); idx > 15 {
+				content = content[:idx]
+				break
+			}
+		}
+		content = strings.TrimSpace(content)
+		if len(content) > 120 {
+			content = content[:120]
+		}
+		if len(content) >= 10 {
+			return content
+		}
+	}
+
 	title := strings.TrimSpace(article.Title)
 	for _, separator := range []string{" - ", " | ", " – "} {
 		if idx := strings.LastIndex(title, separator); idx > 20 {

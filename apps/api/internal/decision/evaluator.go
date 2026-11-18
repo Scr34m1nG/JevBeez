@@ -23,6 +23,8 @@ func (e *Evaluator) Evaluate(article *model.Article, evidences []model.Evidence,
 		Evidences:    evidences,
 		RedFlags:     []string{},
 		IsCached:     false,
+		IsSocial:     article.IsSocial,
+		Platform:     article.Platform,
 	}
 
 	if len(evidences) == 0 {

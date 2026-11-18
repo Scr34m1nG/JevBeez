@@ -17,18 +17,28 @@ var (
 type ScraperService struct {
 	firecrawl *FirecrawlScraper
 	local     *LocalScraper
+	social    *SocialScraper
 }
 
 func NewScraperService(firecrawlKey string) *ScraperService {
 	return &ScraperService{
 		firecrawl: NewFirecrawlScraper(firecrawlKey),
 		local:     NewLocalScraper(),
+		social:    NewSocialScraper(),
 	}
 }
 
 func (s *ScraperService) Extract(ctx context.Context, targetURL string) (*model.Article, error) {
 	var article *model.Article
 	var err error
+
+	platform, isSocial := DetectSocialPlatform(targetURL)
+	if isSocial {
+		article, err = s.social.Scrape(ctx, targetURL, platform)
+		if article != nil && err == nil && s.validateArticle(article) == nil {
+			return article, nil
+		}
+	}
 
 	if s.firecrawl.apiKey != "" {
 		article, err = s.firecrawl.Scrape(ctx, targetURL)
@@ -41,6 +51,11 @@ func (s *ScraperService) Extract(ctx context.Context, targetURL string) (*model.
 		}
 	}
 
+	if isSocial && article != nil {
+		article.IsSocial = true
+		article.Platform = platform
+	}
+
 	if err := s.validateArticle(article); err != nil {
 		return nil, err
 	}
@@ -49,7 +64,7 @@ func (s *ScraperService) Extract(ctx context.Context, targetURL string) (*model.
 }
 
 func (s *ScraperService) validateArticle(article *model.Article) error {
-	if article == nil || article.Title == "" || article.Content == "" {
+	if article == nil || article.Content == "" {
 		return ErrEmptyArticle
 	}
 
@@ -61,7 +76,12 @@ func (s *ScraperService) validateArticle(article *model.Article) error {
 		return ErrEmptyArticle
 	}
 
-	if article.WordCount < config.MinArticleWordCount {
+	minWords := config.MinArticleWordCount
+	if article.IsSocial {
+		minWords = config.MinSocialWordCount
+	}
+
+	if article.WordCount < minWords {
 		return ErrInsufficientContent
 	}
 
