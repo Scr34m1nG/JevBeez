@@ -10,7 +10,7 @@
             v-model="inputUrl"
             type="url"
             required
-            placeholder="Tempel tautan berita di sini (cth: https://portalberita.com/artikel)..."
+            placeholder="Tempel tautan berita atau postingan medsos (X, TikTok, IG, FB, YouTube)..."
             :disabled="isLoading || cooldownSeconds > 0"
             class="w-full bg-transparent text-zinc-100 placeholder-zinc-500 text-sm sm:text-base focus:outline-none disabled:opacity-50 py-2"
           />

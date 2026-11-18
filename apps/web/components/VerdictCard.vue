@@ -29,9 +29,17 @@
     </div>
 
     <div class="mb-5">
-      <span class="text-xs font-mono uppercase tracking-wider text-zinc-500 block mb-1">
-        Sumber: {{ result.source_domain }}
-      </span>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          Sumber: {{ result.source_domain }}
+        </span>
+        <span
+          v-if="result.is_social"
+          class="px-2 py-0.5 rounded text-[10px] font-bold font-mono uppercase bg-indigo-950 text-indigo-300 border border-indigo-800/60"
+        >
+          Postingan {{ result.platform || 'Medsos' }}
+        </span>
+      </div>
       <h2 class="text-lg sm:text-xl font-semibold text-zinc-100 leading-snug">
         {{ result.article_title }}
       </h2>

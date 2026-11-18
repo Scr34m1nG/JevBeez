@@ -22,4 +22,6 @@ export interface VerificationResult {
   red_flags: string[]
   evidences: Evidence[]
   is_cached: boolean
+  is_social?: boolean
+  platform?: string
 }
