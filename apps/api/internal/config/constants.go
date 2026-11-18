@@ -15,6 +15,17 @@ const (
 	ResponseHeaderTimeout     = 5 * time.Second
 	MaxScrapeBodyBytes        = 2 * 1024 * 1024
 	MinArticleWordCount       = 80
+	MinSocialWordCount        = 3
+
+	PlatformTwitter   = "twitter"
+	PlatformTikTok    = "tiktok"
+	PlatformYouTube   = "youtube"
+	PlatformInstagram = "instagram"
+	PlatformThreads   = "threads"
+	PlatformFacebook  = "facebook"
+
+	TwitterOEmbedEndpoint = "https://publish.twitter.com/oembed"
+	YouTubeOEmbedEndpoint = "https://www.youtube.com/oembed"
 
 	JevEndpoint               = "https://api.typesafe.ai/v1/systemone"
 	JevDefaultModel           = "jev-latest"

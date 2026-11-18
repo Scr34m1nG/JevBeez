@@ -8,11 +8,13 @@ type Evidence struct {
 }
 
 type Article struct {
-	Title       string `json:"title"`
-	Content     string `json:"content"`
-	URL         string `json:"url"`
-	WordCount   int    `json:"word_count"`
+	Title        string `json:"title"`
+	Content      string `json:"content"`
+	URL          string `json:"url"`
+	WordCount    int    `json:"word_count"`
 	SourceDomain string `json:"source_domain"`
+	IsSocial     bool   `json:"is_social"`
+	Platform     string `json:"platform"`
 }
 
 type JevJudgments struct {
@@ -32,6 +34,8 @@ type VerificationResult struct {
 	RedFlags          []string     `json:"red_flags"`
 	Evidences         []Evidence   `json:"evidences"`
 	IsCached          bool         `json:"is_cached"`
+	IsSocial          bool         `json:"is_social"`
+	Platform          string       `json:"platform"`
 }
 
 type AnalyzeRequest struct {
