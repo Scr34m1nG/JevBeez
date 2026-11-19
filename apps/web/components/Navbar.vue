@@ -7,14 +7,14 @@
         </div>
         <div class="flex items-center gap-1.5 sm:gap-2">
           <span class="font-black text-base sm:text-lg tracking-tight text-black">JevBeez</span>
-          <span class="text-[10px] sm:text-xs px-1.5 py-0.5 rounded bg-white text-black font-mono font-bold border-2 border-black shadow-[1.5px_1.5px_0px_0px_#000]">v1.0</span>
+          <span class="text-[10px] sm:text-xs px-1.5 py-0.5 rounded bg-white text-black font-mono font-bold border-2 border-black shadow-[1.5px_1.5px_0px_0px_#000]">Cek Hoax</span>
         </div>
       </div>
 
       <div class="flex items-center gap-2 sm:gap-3 text-xs shrink-0">
         <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-200 border-2 border-black text-black font-bold shadow-[2px_2px_0px_0px_#000]">
           <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-          <span>Engine Active</span>
+          <span>Sistem Aktif</span>
         </div>
         <span class="px-2.5 py-1 rounded-md bg-violet-200 text-black border-2 border-black font-bold text-[11px] sm:text-xs shadow-[2px_2px_0px_0px_#000] whitespace-nowrap">
           TypeSafe Jev AI
