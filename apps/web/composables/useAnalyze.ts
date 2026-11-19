@@ -2,9 +2,6 @@ import { ref } from 'vue'
 import type { VerificationResult } from '~/types'
 
 export const useAnalyze = () => {
-  const config = useRuntimeConfig()
-  const apiBase = config.public.apiBaseUrl
-
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const result = ref<VerificationResult | null>(null)
@@ -38,7 +35,7 @@ export const useAnalyze = () => {
     error.value = null
 
     try {
-      const response = await fetch(`${apiBase}/api/v1/analyze`, {
+      const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,12 +47,13 @@ export const useAnalyze = () => {
       const data = await response.json()
 
       if (!response.ok) {
+        const errorMsg = data.data?.error || data.error || data.statusMessage || 'Terjadi kesalahan saat memverifikasi artikel.'
         if (response.status === 429) {
-          const cd = data.cooldown_seconds || 15
+          const cd = data.data?.cooldown_seconds || data.cooldown_seconds || 15
           startCooldown(cd)
-          throw new Error(data.error || `Tunggu ${cd} detik sebelum memeriksa lagi.`)
+          throw new Error(errorMsg)
         }
-        throw new Error(data.error || 'Terjadi kesalahan saat memverifikasi artikel.')
+        throw new Error(errorMsg)
       }
 
       result.value = data as VerificationResult
