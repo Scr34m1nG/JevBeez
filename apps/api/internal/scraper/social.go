@@ -185,7 +185,7 @@ func (s *SocialScraper) scrapeOpenGraph(ctx context.Context, targetURL string, p
 		return nil, err
 	}
 
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+	req.Header.Set("User-Agent", "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 
 	resp, err := s.client.Do(req)
@@ -212,20 +212,31 @@ func (s *SocialScraper) scrapeOpenGraph(ctx context.Context, targetURL string, p
 		description = tags["description"]
 	}
 
-	title := tags["og:title"]
-	if title == "" {
-		title = tags["twitter:title"]
+	rawTitle := tags["og:title"]
+	if rawTitle == "" {
+		rawTitle = tags["twitter:title"]
 	}
-	if title == "" {
-		title = fmt.Sprintf("Postingan %s", strings.Title(platform))
+
+	title := fmt.Sprintf("Postingan %s", strings.Title(platform))
+	if rawTitle != "" {
+		if idx := strings.Index(rawTitle, " on Instagram:"); idx != -1 {
+			title = fmt.Sprintf("Postingan Instagram (%s)", strings.TrimSpace(rawTitle[:idx]))
+		} else if idx := strings.Index(rawTitle, " on Threads:"); idx != -1 {
+			title = fmt.Sprintf("Postingan Threads (%s)", strings.TrimSpace(rawTitle[:idx]))
+		} else {
+			title = rawTitle
+		}
 	}
 
 	cleanContent := extractCleanCaption(description)
+	if cleanContent == "" && rawTitle != "" {
+		cleanContent = extractCleanCaption(rawTitle)
+	}
 	if cleanContent == "" {
 		cleanContent = description
 	}
 	if cleanContent == "" {
-		cleanContent = title
+		cleanContent = rawTitle
 	}
 
 	cleanContent = strings.TrimSpace(cleanContent)
@@ -248,12 +259,19 @@ func (s *SocialScraper) scrapeOpenGraph(ctx context.Context, targetURL string, p
 }
 
 func extractCleanCaption(desc string) string {
-	// Format Instagram: "... on Date: \"Caption Here\""
-	if idx := strings.Index(desc, ": \""); idx != -1 && strings.HasSuffix(desc, "\"") {
-		return desc[idx+3 : len(desc)-1]
-	}
-	if idx := strings.Index(desc, ": \u201c"); idx != -1 && strings.HasSuffix(desc, "\u201d") {
-		return desc[idx+4 : len(desc)-3]
+	desc = strings.TrimSpace(desc)
+	for _, marker := range []string{": \"", ": \u201c", ": '"} {
+		if idx := strings.Index(desc, marker); idx != -1 {
+			candidate := strings.TrimSpace(desc[idx+len(marker):])
+			// Strip trailing quotes or quote-dot combinations
+			candidate = strings.TrimSuffix(candidate, "\".")
+			candidate = strings.TrimSuffix(candidate, "\u201d.")
+			candidate = strings.TrimRight(candidate, "\"\u201d\u201c'")
+			candidate = strings.TrimSpace(candidate)
+			if len(candidate) > 0 {
+				return candidate
+			}
+		}
 	}
 	return desc
 }

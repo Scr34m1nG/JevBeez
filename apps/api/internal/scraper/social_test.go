@@ -45,13 +45,18 @@ func TestSocialScraper_ParseInstagramCaption(t *testing.T) {
 	mockHTML := `<!DOCTYPE html>
 <html>
 <head>
-	<meta property="og:title" content="Instagram post by Pemprov DKI" />
-	<meta property="og:description" content="1,200 likes, 45 comments - pemprovdki on November 10, 2026: &#34;Informasi rekayasa lalu lintas dalam rangka perbaikan jalan sudirman.&#34;" />
+	<meta property="og:title" content="TV NASIONAL on Instagram: &#34;Dividio ini terungkap kisah nyata tentang proses vaksinasi memicu alergi.&#34;" />
+	<meta property="og:description" content="61K likes, 4,582 comments - nasional.tv5 on October 10, 2026: &#34;Dividio ini terungkap kisah nyata tentang proses vaksinasi memicu alergi.&#34;. " />
 </head>
 <body></body>
 </html>`
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("User-Agent") != "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)" {
+			// Jika bukan social bot UA, Instagram mengembalikan halaman kosong
+			w.Write([]byte("<html><head><title>Instagram</title></head><body></body></html>"))
+			return
+		}
 		w.Header().Set("Content-Type", "text/html")
 		w.Write([]byte(mockHTML))
 	}))
@@ -63,9 +68,15 @@ func TestSocialScraper_ParseInstagramCaption(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	expectedCaption := "Informasi rekayasa lalu lintas dalam rangka perbaikan jalan sudirman."
+	expectedCaption := "Dividio ini terungkap kisah nyata tentang proses vaksinasi memicu alergi."
 	if !strings.Contains(article.Content, expectedCaption) {
 		t.Errorf("expected content to contain '%s', got '%s'", expectedCaption, article.Content)
+	}
+	if strings.Contains(article.Content, "61K likes") {
+		t.Errorf("expected likes prefix to be stripped from caption, got '%s'", article.Content)
+	}
+	if !strings.Contains(article.Title, "TV NASIONAL") {
+		t.Errorf("expected title to identify author, got '%s'", article.Title)
 	}
 	if !article.IsSocial {
 		t.Errorf("expected article.IsSocial to be true")
