@@ -5,10 +5,12 @@
         <svg class="w-4 h-4 text-zinc-600 md:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
         </svg>
-        Rujukan & Bukti Terkait ({{ evidences.length }})
+        <span class="md:hidden">Rujukan & Bukti Terkait ({{ evidences.length }})</span>
+        <span class="hidden md:inline">Korpus Grounding & Bukti Empiris ({{ evidences.length }} Dokumen)</span>
       </h3>
       <span class="text-[11px] sm:text-xs font-bold text-amber-950 md:text-black bg-amber-400/25 md:bg-amber-200 backdrop-blur-sm md:backdrop-blur-none border border-amber-400/40 md:border-2 md:border-black px-2.5 py-0.5 rounded-full md:rounded-lg shadow-sm md:shadow-[1.5px_1.5px_0px_0px_#000] self-start sm:self-auto">
-        Penelusuran Web Terpercaya
+        <span class="md:hidden">Penelusuran Web Terpercaya</span>
+        <span class="hidden md:inline font-mono">Multi-Source Live Search Grounding</span>
       </span>
     </div>
 
@@ -28,7 +30,8 @@
             rel="noopener noreferrer"
             class="text-xs text-zinc-900 md:text-black font-extrabold md:font-black bg-white/80 hover:bg-white md:bg-white md:hover:bg-amber-200 border border-white/80 md:border-2 md:border-black shadow-sm md:shadow-[1.5px_1.5px_0px_0px_#000] active:scale-95 md:active:translate-x-0.5 md:active:translate-y-0.5 md:active:shadow-none md:active:scale-100 flex items-center gap-1.5 transition-all shrink-0 py-1.5 px-3 rounded-xl md:rounded-lg min-h-[36px]"
           >
-            <span>Buka Sumber Berita</span>
+            <span class="md:hidden">Buka Sumber Berita</span>
+            <span class="hidden md:inline">Akses Dokumen Primer</span>
             <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
