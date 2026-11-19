@@ -1,22 +1,22 @@
 <template>
   <div class="w-full max-w-3xl mx-auto">
-    <div class="mb-2.5 text-center sm:text-left px-1">
-      <span class="text-xs sm:text-sm font-bold text-zinc-700 md:text-zinc-800 inline-flex items-center gap-1.5">
-        <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <!-- Helper Instruction -->
+    <div class="mb-2 px-1 flex items-center justify-between text-xs text-slate-600">
+      <span class="font-medium flex items-center gap-1.5">
+        <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
         </svg>
-        <span class="md:hidden">Salin tautan dari WA, medsos, atau web, lalu tempel di bawah:</span>
-        <span class="hidden md:inline font-mono text-xs uppercase tracking-wider text-black">Input Target URI / Sumber Berita untuk Analisis Grounding:</span>
+        <span class="md:hidden">Tempel tautan berita dari WhatsApp atau browser:</span>
+        <span class="hidden md:inline font-mono">Input Target URI / Sumber Berita untuk Analisis Grounding:</span>
       </span>
     </div>
 
-    <form @submit.prevent="handleSubmit" class="relative group">
-      <!-- Outer wrapper: Glassmorphic on mobile, Neo-Brutalist on desktop -->
-      <div class="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 p-2.5 sm:p-2.5 rounded-3xl bg-white/75 backdrop-blur-xl border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.06)] md:rounded-2xl md:bg-white md:border-2 md:border-black md:shadow-[5px_5px_0px_0px_#000] md:backdrop-blur-none transition-all">
-        <!-- Input section: Frosted container on mobile, flat on desktop -->
-        <div class="flex-1 flex items-center px-3.5 gap-2 min-h-[52px] bg-white/70 backdrop-blur-md rounded-2xl border border-white/90 shadow-sm md:bg-transparent md:backdrop-blur-none md:rounded-none md:border-0 md:shadow-none md:px-3">
-          <svg class="w-5 h-5 text-zinc-500 md:text-zinc-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+    <!-- URL Input Container -->
+    <form @submit.prevent="handleSubmit" class="relative">
+      <div class="bg-white border border-slate-300 focus-within:border-slate-800 focus-within:ring-2 focus-within:ring-slate-900/10 rounded-xl p-2 sm:p-2.5 shadow-sm transition-all flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+        <div class="flex-1 flex items-center px-2 gap-2 min-h-[46px]">
+          <svg class="w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
             v-model="inputUrl"
@@ -24,22 +24,22 @@
             required
             :placeholder="placeholderText"
             :disabled="isLoading || cooldownSeconds > 0"
-            class="w-full bg-transparent text-zinc-900 md:text-black placeholder-zinc-400 md:placeholder-zinc-500 font-medium text-base focus:outline-none disabled:opacity-50 py-2.5"
+            class="w-full bg-transparent text-slate-900 placeholder-slate-400 font-medium text-sm sm:text-base focus:outline-none disabled:opacity-50 py-1"
           />
 
-          <!-- Quick Paste Button (Thumb-friendly for smartphone users) -->
+          <!-- Quick Paste Button -->
           <button
             v-if="!inputUrl && canPaste"
             type="button"
             @click="pasteClipboard"
-            class="px-3 py-1.5 rounded-xl bg-amber-400/90 hover:bg-amber-400 text-amber-950 font-bold border border-amber-300 shadow-sm active:scale-95 transition-all text-xs flex items-center gap-1.5 shrink-0 md:rounded-lg md:bg-amber-300 md:hover:bg-amber-400 md:text-black md:border-2 md:border-black md:font-black md:shadow-[1.5px_1.5px_0px_0px_#000] md:active:translate-x-0.5 md:active:translate-y-0.5 md:active:shadow-none md:active:scale-100"
+            class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-colors flex items-center gap-1.5 shrink-0"
             title="Tempel dari Clipboard"
           >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             <span class="md:hidden">Tempel</span>
-            <span class="hidden md:inline">Paste URI</span>
+            <span class="hidden md:inline">Paste URL</span>
           </button>
 
           <!-- Quick Clear Button -->
@@ -47,11 +47,11 @@
             v-if="inputUrl && !isLoading"
             type="button"
             @click="inputUrl = ''"
-            class="w-8 h-8 rounded-xl bg-zinc-200/70 hover:bg-zinc-200 border border-white/60 text-zinc-600 flex items-center justify-center font-bold transition-all shrink-0 md:rounded-lg md:bg-zinc-200 md:hover:bg-zinc-300 md:border md:border-black md:text-black md:font-black"
+            class="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shrink-0"
             aria-label="Hapus tautan"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -60,36 +60,38 @@
         <button
           type="submit"
           :disabled="isLoading || cooldownSeconds > 0 || !inputUrl.trim()"
-          class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 border border-white/40 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shrink-0 min-h-[50px] md:rounded-xl md:bg-amber-400 md:hover:bg-amber-300 md:text-black md:border-2 md:border-black md:shadow-[3px_3px_0px_0px_#000] md:hover:-translate-x-0.5 md:hover:-translate-y-0.5 md:hover:shadow-[4px_4px_0px_0px_#000] md:active:translate-x-0.5 md:active:translate-y-0.5 md:active:shadow-none md:active:scale-100 md:bg-none md:shadow-[3px_3px_0px_0px_#000]"
+          class="px-5 py-3 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-semibold text-sm sm:text-base flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0 min-h-[46px]"
         >
-          <span v-if="isLoading" class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+          <span v-if="isLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
           <span v-if="isLoading">
-            <span class="md:hidden">Sedang Memeriksa...</span>
+            <span class="md:hidden">Memeriksa Fakta...</span>
             <span class="hidden md:inline font-mono">Mengeksekusi Pipeline Analisis...</span>
           </span>
           <span v-else-if="cooldownSeconds > 0">
-            <span class="md:hidden">Tunggu ({{ cooldownSeconds }}d)</span>
+            <span class="md:hidden">Tunggu ({{ cooldownSeconds }}s)</span>
             <span class="hidden md:inline font-mono">Rate Limit Active ({{ cooldownSeconds }}s)</span>
           </span>
           <span v-else class="flex items-center gap-2">
-            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
-            <span class="md:hidden">Periksa Fakta Sekarang</span>
+            <span class="md:hidden">Periksa Fakta</span>
             <span class="hidden md:inline">Jalankan Verifikasi Fakta</span>
           </span>
         </button>
       </div>
     </form>
 
-    <div v-if="cooldownSeconds > 0" class="mt-3 p-3 rounded-2xl bg-amber-500/15 backdrop-blur-md border border-amber-500/30 text-amber-900 text-center text-xs sm:text-sm font-semibold shadow-sm animate-pulse md:rounded-xl md:bg-amber-100 md:border-2 md:border-black md:text-black md:font-bold md:shadow-[2px_2px_0px_0px_#000] md:backdrop-blur-none">
+    <!-- Cooldown Notification -->
+    <div v-if="cooldownSeconds > 0" class="mt-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-center text-xs sm:text-sm font-medium">
       <span class="md:hidden">Mohon tunggu {{ cooldownSeconds }} detik sebelum memeriksa berita berikutnya.</span>
       <span class="hidden md:inline font-mono">Rate Limiting Terpicu: Cooldown buffer aktif selama {{ cooldownSeconds }} detik guna mencegah over-query ke search engine.</span>
     </div>
 
-    <div v-if="errorMessage" class="mt-3 p-3.5 rounded-2xl bg-rose-500/15 backdrop-blur-md border border-rose-500/30 text-rose-950 text-xs sm:text-sm font-medium shadow-sm flex items-start gap-2.5 break-words md:rounded-xl md:bg-rose-100 md:border-2 md:border-black md:text-black md:shadow-[3px_3px_0px_0px_#000] md:backdrop-blur-none">
+    <!-- Error Alert -->
+    <div v-if="errorMessage" class="mt-3 p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-900 text-xs sm:text-sm flex items-start gap-2.5">
       <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
       <div class="flex-1">
         <span class="hidden md:inline font-mono font-bold text-rose-700 block mb-0.5">[ANALYSIS_PIPELINE_ERROR]</span>
@@ -132,7 +134,7 @@ onMounted(() => {
 const placeholderText = computed(() => {
   return isDesktop.value
     ? 'Masukkan URL artikel berita lengkap (misal: https://mediaberita.com/politik/isu-...)'
-    : 'Ketik atau tempel link berita di sini...'
+    : 'Tempel link berita di sini...'
 })
 
 const pasteClipboard = async () => {
