@@ -14,18 +14,36 @@
         <!-- Badge: Glassmorphism on mobile, Neo-Brutalism on desktop -->
         <div class="inline-flex items-center gap-1.5 sm:gap-2 px-3.5 py-1 rounded-full bg-white/70 backdrop-blur-md border border-white/60 text-zinc-800 text-xs font-bold shadow-sm mb-3 sm:mb-4 md:bg-amber-200 md:backdrop-blur-none md:border-2 md:border-black md:text-black md:shadow-[2px_2px_0px_0px_#000]">
           <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-          AI Fact-Checking Engine Aktif
+          <!-- Mobile simple label -->
+          <span class="md:hidden">AI Fact-Checking Engine Aktif</span>
+          <!-- Desktop technical label -->
+          <span class="hidden md:inline font-mono">System One Decision Engine v1.0 • Calibrated Reasoning</span>
         </div>
 
         <!-- Heading: Gradient glow on mobile, Neo-Brutalist Sticker on desktop -->
         <h1 class="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-zinc-900 md:text-black mb-3 sm:mb-4 leading-tight sm:leading-tight">
-          Cek Kebenaran Berita & <br class="hidden sm:inline" />
-          <span class="bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 bg-clip-text text-transparent md:text-black md:bg-none md:inline-block md:mt-1 md:px-3 md:py-0.5 md:bg-amber-300 md:border-2 md:border-black md:rounded-xl md:shadow-[4px_4px_0px_0px_#000] md:-rotate-1">
+          <!-- Mobile simplified title -->
+          <span class="md:hidden">Cek Kebenaran Berita & <br /></span>
+          <!-- Desktop technical title -->
+          <span class="hidden md:inline">Audit Disinformasi & <br /></span>
+
+          <!-- Mobile highlighted tag -->
+          <span class="md:hidden bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 bg-clip-text text-transparent">
             Pendeteksi Hoax AI
           </span>
+          <!-- Desktop highlighted sticker -->
+          <span class="hidden md:inline-block md:mt-1 md:px-3 md:py-0.5 md:bg-amber-300 md:border-2 md:border-black md:rounded-xl md:shadow-[4px_4px_0px_0px_#000] md:-rotate-1">
+            Verifikasi Klaim Faktual
+          </span>
         </h1>
-        <p class="text-sm sm:text-base text-zinc-700 md:text-zinc-800 font-medium leading-relaxed max-w-xl mx-auto">
+
+        <!-- Mobile: friendly, simple wording for general/older demographic -->
+        <p class="md:hidden text-sm text-zinc-700 font-medium leading-relaxed max-w-xl mx-auto">
           Jangan langsung percaya atau menyebarkan berita ke grup keluarga. Cukup tempel tautan artikel di bawah, AI akan menelusuri sumber rujukan resmi dan menguji kebenarannya.
+        </p>
+        <!-- Desktop: technical, precise, and analytical explanation -->
+        <p class="hidden md:block text-base text-zinc-800 font-medium leading-relaxed max-w-2xl mx-auto">
+          Pipeline verifikasi multi-tahap: ekstraksi payload klaim, live evidence grounding berbasis web crawling, dan inferensi probabilitas kalibrasi melalui TypeSafe Jev Decision Models.
         </p>
       </div>
 
@@ -46,7 +64,8 @@
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            <span>Periksa Berita Lain</span>
+            <span class="md:hidden">Periksa Berita Lain</span>
+            <span class="hidden md:inline">Inisiasi Pemeriksaan Baru</span>
           </button>
         </div>
 
@@ -58,8 +77,14 @@
     <!-- Footer: Glassmorphism on mobile, Neo-Brutalism on desktop -->
     <footer class="border-t border-white/60 bg-white/50 backdrop-blur-md py-5 sm:py-6 text-center text-xs text-zinc-600 font-medium pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] md:border-t-2 md:border-black md:bg-white md:backdrop-blur-none md:text-zinc-700 relative z-10">
       <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
-        <span>© 2026 JevBeez. Rujukan fakta diverifikasi secara langsung (live).</span>
-        <span>Didukung TypeSafe Jev AI, Nuxt 3 & Go Engine</span>
+        <div>
+          <span class="md:hidden">© 2026 JevBeez. Rujukan fakta diverifikasi secara langsung.</span>
+          <span class="hidden md:inline font-mono">© 2026 JevBeez Intelligence System • Live Evidence Grounding & Decision Telemetry</span>
+        </div>
+        <div>
+          <span class="md:hidden">Didukung TypeSafe Jev AI, Nuxt 3 & Go Engine</span>
+          <span class="hidden md:inline font-mono text-[11px]">Architecture: Nuxt 3 Frontend • Go Fiber Core • TypeSafe Jev Probabilistic Engine</span>
+        </div>
       </div>
     </footer>
   </div>

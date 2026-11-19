@@ -8,7 +8,8 @@
         <div class="flex items-center gap-1.5 sm:gap-2">
           <span class="font-black text-base sm:text-lg tracking-tight text-zinc-900 md:text-black">JevBeez</span>
           <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-white/80 backdrop-blur border border-white/60 text-zinc-700 font-semibold shadow-sm md:rounded md:bg-white md:text-black md:font-mono md:font-bold md:border-2 md:border-black md:shadow-[1.5px_1.5px_0px_0px_#000]">
-            Cek Hoax
+            <span class="md:hidden">Cek Hoax</span>
+            <span class="hidden md:inline">Decision Console v1.0</span>
           </span>
         </div>
       </div>
@@ -16,10 +17,12 @@
       <div class="flex items-center gap-2 sm:gap-3 text-xs shrink-0">
         <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 backdrop-blur border border-emerald-500/20 text-emerald-800 font-semibold shadow-sm md:rounded-md md:bg-emerald-200 md:border-2 md:border-black md:text-black md:font-bold md:shadow-[2px_2px_0px_0px_#000]">
           <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-          <span>Sistem Aktif</span>
+          <span class="md:hidden">Sistem Aktif</span>
+          <span class="hidden md:inline font-mono">Engine Online</span>
         </div>
         <span class="px-2.5 py-1 rounded-full bg-white/70 backdrop-blur-md border border-white/60 text-indigo-700 font-bold text-[11px] sm:text-xs shadow-sm md:rounded-md md:bg-violet-200 md:text-black md:border-2 md:border-black md:shadow-[2px_2px_0px_0px_#000] md:backdrop-blur-none whitespace-nowrap">
-          TypeSafe Jev AI
+          <span class="md:hidden">TypeSafe Jev AI</span>
+          <span class="hidden md:inline font-mono">TypeSafe Jev (Calibrated)</span>
         </span>
       </div>
     </div>
