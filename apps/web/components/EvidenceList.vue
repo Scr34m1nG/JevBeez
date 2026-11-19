@@ -23,7 +23,7 @@
             {{ item.source }}
           </span>
           <a
-            :href="item.url"
+            :href="isSafeUrl(item.url) ? item.url : '#'"
             target="_blank"
             rel="noopener noreferrer"
             class="text-xs text-slate-700 hover:text-slate-950 font-medium bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors flex items-center gap-1.5 shrink-0 py-1.5 px-3 rounded-md min-h-[34px]"
@@ -53,4 +53,8 @@ import type { Evidence } from '~/types'
 defineProps<{
   evidences: Evidence[]
 }>()
+
+const isSafeUrl = (url: string) => {
+  return typeof url === 'string' && (url.startsWith('https://') || url.startsWith('http://'))
+}
 </script>

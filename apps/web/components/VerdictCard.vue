@@ -209,7 +209,10 @@ const copySummary = async () => {
 }
 
 const shareToWhatsApp = () => {
-  const message = `📢 *Hasil Cek Fakta JevBeez AI*\n\n*Status:* ${verdictLabel.value}\n*Tingkat Keyakinan:* ${props.result.confidence}%\n*Judul Berita:* "${props.result.article_title}"\n\n*Penjelasan:* \n${props.result.summary}\n\n*Cek kebenaran berita di:* ${props.result.article_url || 'https://jevbeez.com'}`
+  const safeArticleUrl = props.result.article_url && (props.result.article_url.startsWith('https://') || props.result.article_url.startsWith('http://'))
+    ? props.result.article_url
+    : 'https://jevbeez.hityo.cloud'
+  const message = `📢 *Hasil Cek Fakta JevBeez AI*\n\n*Status:* ${verdictLabel.value}\n*Tingkat Keyakinan:* ${props.result.confidence}%\n*Judul Berita:* "${props.result.article_title}"\n\n*Penjelasan:* \n${props.result.summary}\n\n*Cek kebenaran berita di:* ${safeArticleUrl}`
   const encoded = encodeURIComponent(message)
   window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank')
 }
