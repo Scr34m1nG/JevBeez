@@ -42,6 +42,10 @@ func NewClient(apiKey string) *Client {
 }
 
 func (c *Client) Evaluate(ctx context.Context, article *model.Article, evidences []model.Evidence) (*model.JevJudgments, error) {
+	return c.evaluateWithURL(ctx, article, evidences, config.JevEndpoint)
+}
+
+func (c *Client) evaluateWithURL(ctx context.Context, article *model.Article, evidences []model.Evidence, endpoint string) (*model.JevJudgments, error) {
 	if c.apiKey == "" {
 		return nil, errors.New("typesafe api key not configured")
 	}
@@ -57,7 +61,7 @@ func (c *Client) Evaluate(ctx context.Context, article *model.Article, evidences
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, config.JevEndpoint, bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +82,14 @@ func (c *Client) Evaluate(ctx context.Context, article *model.Article, evidences
 	var res systemOneResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, err
+	}
+
+	if res.Error != "" {
+		return nil, fmt.Errorf("typesafe jev error: %s", res.Error)
+	}
+
+	if len(res.Answers) == 0 {
+		return nil, errors.New("typesafe jev returned empty answers")
 	}
 
 	judgments := &model.JevJudgments{

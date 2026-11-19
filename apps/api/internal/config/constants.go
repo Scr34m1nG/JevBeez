@@ -6,6 +6,7 @@ const (
 	DefaultPort              = "8080"
 	DefaultRedisAddr         = "localhost:6379"
 	DefaultCacheTTL          = 1 * time.Hour
+	UnverifiedCacheTTL       = 2 * time.Minute
 	DefaultCooldownDuration  = 15 * time.Second
 	DefaultRequestBurstLimit = 10
 	DefaultExpirationWindow  = 1 * time.Minute

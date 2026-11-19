@@ -55,6 +55,10 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 		})
 	}
 
+	if cached, err := h.cache.Get(c.Context(), normalizedURL); err == nil && cached != nil {
+		return c.JSON(cached)
+	}
+
 	clientIP := c.IP()
 	if allowed, remaining, err := h.cache.CheckAndSetCooldown(c.Context(), clientIP, config.DefaultCooldownDuration); err == nil && !allowed {
 		c.Set("Retry-After", fmt.Sprintf("%.0f", remaining.Seconds()))
@@ -62,10 +66,6 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 			"error":             fmt.Sprintf("Mohon tunggu %.0f detik sebelum melakukan pengecekan berikutnya", remaining.Seconds()),
 			"cooldown_seconds":  int(remaining.Seconds()),
 		})
-	}
-
-	if cached, err := h.cache.Get(c.Context(), normalizedURL); err == nil && cached != nil {
-		return c.JSON(cached)
 	}
 
 	article, err := h.scraper.Extract(c.Context(), normalizedURL)
@@ -101,7 +101,11 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 
 	result := h.evaluator.Evaluate(article, evidences, judgments)
 
-	_ = h.cache.Set(c.Context(), normalizedURL, result, config.DefaultCacheTTL)
+	cacheTTL := config.DefaultCacheTTL
+	if result.Verdict == config.VerdictUnverified {
+		cacheTTL = config.UnverifiedCacheTTL
+	}
+	_ = h.cache.Set(c.Context(), normalizedURL, result, cacheTTL)
 
 	return c.JSON(result)
 }

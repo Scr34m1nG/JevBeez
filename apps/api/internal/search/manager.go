@@ -46,20 +46,23 @@ func (m *SearchManager) SearchGrounding(ctx context.Context, article *model.Arti
 	startIdx := int(atomic.AddUint64(&m.counter, 1) % uint64(n))
 
 	var lastErr error
+	var successfulProviders int
 	for i := 0; i < n; i++ {
 		idx := (startIdx + i) % n
 		provider := m.providers[idx]
 
 		results, err := provider.Search(ctx, query)
-		if err == nil && len(results) > 0 {
-			return results, nil
-		}
-		if err != nil {
+		if err == nil {
+			successfulProviders++
+			if len(results) > 0 {
+				return results, nil
+			}
+		} else {
 			lastErr = err
 		}
 	}
 
-	if lastErr != nil {
+	if successfulProviders == 0 && lastErr != nil {
 		return nil, fmt.Errorf("semua search provider gagal: %w", lastErr)
 	}
 
@@ -67,7 +70,7 @@ func (m *SearchManager) SearchGrounding(ctx context.Context, article *model.Arti
 }
 
 func (m *SearchManager) buildQuery(article *model.Article) string {
-	if article.IsSocial && strings.TrimSpace(article.Content) != "" {
+	if (article.IsSocial || strings.TrimSpace(article.Title) == "") && strings.TrimSpace(article.Content) != "" {
 		content := strings.TrimSpace(article.Content)
 		for _, delim := range []string{"\n", ".", "!"} {
 			if idx := strings.Index(content, delim); idx > 15 {
@@ -76,8 +79,9 @@ func (m *SearchManager) buildQuery(article *model.Article) string {
 			}
 		}
 		content = strings.TrimSpace(content)
-		if len(content) > 120 {
-			content = content[:120]
+		runes := []rune(content)
+		if len(runes) > 120 {
+			content = string(runes[:120])
 		}
 		if len(content) >= 10 {
 			return content
@@ -91,8 +95,9 @@ func (m *SearchManager) buildQuery(article *model.Article) string {
 		}
 	}
 	title = strings.TrimSpace(title)
-	if len(title) > 120 {
-		title = title[:120]
+	runes := []rune(title)
+	if len(runes) > 120 {
+		title = string(runes[:120])
 	}
 	return title
 }

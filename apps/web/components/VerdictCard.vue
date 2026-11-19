@@ -15,22 +15,17 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
 
-          <span class="md:hidden">{{ verdictLabel }}</span>
-          <span class="hidden md:inline font-mono">{{ verdictLabelTechnical }}</span>
+          <span>{{ verdictLabel }}</span>
         </span>
 
         <span v-if="result.is_cached" class="px-2.5 py-1 rounded-md bg-white/80 border border-slate-300 text-slate-700 text-xs font-mono">
-          <span class="md:hidden">Hasil Tersimpan</span>
-          <span class="hidden md:inline">Cache Hit (0ms)</span>
+          Hasil Tersimpan (Cache)
         </span>
       </div>
 
       <!-- Confidence Score -->
       <div class="flex items-center sm:flex-col sm:items-end justify-between text-xs">
-        <span class="text-slate-600 font-medium">
-          <span class="md:hidden">Keyakinan AI:</span>
-          <span class="hidden md:inline font-mono">P(Confidence):</span>
-        </span>
+        <span class="text-slate-600 font-medium">Tingkat Keyakinan:</span>
         <span class="text-xl sm:text-2xl font-bold tabular-nums text-slate-900">
           {{ result.confidence }}%
         </span>
@@ -42,8 +37,7 @@
       <div>
         <div class="flex flex-wrap items-center gap-2 mb-2 text-xs">
           <span class="font-mono text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
-            <span class="md:hidden">Sumber: {{ result.source_domain }}</span>
-            <span class="hidden md:inline">Host: {{ result.source_domain }}</span>
+            Sumber: {{ result.source_domain }}
           </span>
           <span v-if="result.is_social" class="font-mono text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
             {{ result.platform || 'Media Sosial' }}
@@ -57,8 +51,7 @@
       <!-- Analysis Summary -->
       <div class="p-4 sm:p-5 rounded-lg bg-slate-50 border border-slate-200">
         <div class="flex items-center justify-between gap-2 mb-2 text-xs font-semibold text-slate-700">
-          <span class="md:hidden">Ringkasan Analisis Fakta:</span>
-          <span class="hidden md:inline font-mono uppercase tracking-wide">Sintesis Verifikasi Faktual:</span>
+          <span>Ringkasan Analisis Fakta:</span>
         </div>
         <p class="text-sm sm:text-base text-slate-800 leading-relaxed break-words">
           {{ result.summary }}
@@ -74,8 +67,7 @@
             <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.044c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.112.551 4.095 1.517 5.819l-1.617 5.909 6.046-1.587c1.664.908 3.568 1.423 5.597 1.423 6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
             </svg>
-            <span class="md:hidden">Bagikan ke WhatsApp</span>
-            <span class="hidden md:inline">Eksport Ringkasan ke WhatsApp</span>
+            <span>Bagikan ke WhatsApp</span>
           </button>
 
           <button
@@ -89,10 +81,7 @@
             <svg v-else class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
-            <span>
-              <span class="md:hidden">{{ copied ? 'Teks Tersalin!' : 'Salin Teks' }}</span>
-              <span class="hidden md:inline">{{ copied ? 'Data Tersalin ke Clipboard!' : 'Salin Telemetri Hasil' }}</span>
-            </span>
+            <span>{{ copied ? 'Teks Tersalin!' : 'Salin Ringkasan' }}</span>
           </button>
         </div>
       </div>
@@ -103,8 +92,7 @@
           <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <span class="md:hidden">Peringatan Unsur Mencurigakan (Red Flags)</span>
-          <span class="hidden md:inline font-mono uppercase">Indikator Anomali & Risiko Terdeteksi:</span>
+          <span>Peringatan Unsur Mencurigakan (Red Flags)</span>
         </h3>
         <ul class="space-y-1.5 text-xs sm:text-sm text-rose-900">
           <li v-for="(flag, idx) in result.red_flags" :key="idx" class="flex items-start gap-2">
@@ -117,21 +105,15 @@
       <!-- Decision Probability Vectors -->
       <div class="pt-4 border-t border-slate-200">
         <div class="flex items-center justify-between gap-2 mb-3 text-xs">
-          <span class="font-semibold text-slate-700">
-            <span class="md:hidden">Detail Pengujian Fakta AI</span>
-            <span class="hidden md:inline font-mono uppercase">Vektor Probabilitas Kalibrasi Jev Engine</span>
-          </span>
-          <span class="font-mono text-slate-500">TypeSafe Jev v1.0</span>
+          <span class="font-semibold text-slate-700">Detail Pengujian Fakta AI</span>
+          <span class="font-mono text-slate-500">TypeSafe Jev Engine</span>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <!-- Contradicted by Evidence -->
           <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between">
             <div class="flex sm:flex-col items-center sm:items-start justify-between gap-1 mb-2">
-              <span class="text-xs font-medium text-slate-600">
-                <span class="md:hidden">Unsur Bantahan / Bohong</span>
-                <span class="hidden md:inline font-mono">P(Contradicted)</span>
-              </span>
+              <span class="text-xs font-medium text-slate-600">Unsur Bantahan / Bohong</span>
               <span class="text-sm font-bold text-rose-700 tabular-nums">
                 {{ formatPercent(result.judgments.contradicted_by_evidence) }}
               </span>
@@ -144,10 +126,7 @@
           <!-- Supported by Evidence -->
           <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between">
             <div class="flex sm:flex-col items-center sm:items-start justify-between gap-1 mb-2">
-              <span class="text-xs font-medium text-slate-600">
-                <span class="md:hidden">Dukungan Bukti Valid</span>
-                <span class="hidden md:inline font-mono">P(Supported)</span>
-              </span>
+              <span class="text-xs font-medium text-slate-600">Dukungan Bukti Valid</span>
               <span class="text-sm font-bold text-emerald-700 tabular-nums">
                 {{ formatPercent(result.judgments.supported_by_evidence) }}
               </span>
@@ -160,10 +139,7 @@
           <!-- Sensational Framing -->
           <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between">
             <div class="flex sm:flex-col items-center sm:items-start justify-between gap-1 mb-2">
-              <span class="text-xs font-medium text-slate-600">
-                <span class="md:hidden">Bahasa Klikbait / Sensasi</span>
-                <span class="hidden md:inline font-mono">P(Sensationalism)</span>
-              </span>
+              <span class="text-xs font-medium text-slate-600">Bahasa Klikbait / Sensasi</span>
               <span class="text-sm font-bold text-amber-700 tabular-nums">
                 {{ formatPercent(result.judgments.sensational_framing) }}
               </span>
@@ -194,15 +170,6 @@ const verdictLabel = computed(() => {
     case 'VALID': return 'Terbukti Fakta Faktual'
     case 'MISLEADING': return 'Informasi Menyesatkan'
     default: return 'Informasi Belum Terverifikasi'
-  }
-})
-
-const verdictLabelTechnical = computed(() => {
-  switch (props.result.verdict) {
-    case 'HOAX': return 'VERDICT: CONTRADICTED BY EVIDENCE (HOAX)'
-    case 'VALID': return 'VERDICT: EMPIRICALLY SUPPORTED (VALID)'
-    case 'MISLEADING': return 'VERDICT: SENSATIONAL / MANIPULATIVE FRAMING'
-    default: return 'VERDICT: INSUFFICIENT EVIDENCE GROUNDING'
   }
 })
 

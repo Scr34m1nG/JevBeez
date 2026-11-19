@@ -17,6 +17,7 @@ var privateIPBlocks []*net.IPNet
 
 func init() {
 	cidrs := []string{
+		"0.0.0.0/8",
 		"127.0.0.0/8",
 		"10.0.0.0/8",
 		"172.16.0.0/12",
@@ -39,7 +40,7 @@ func IsPrivateIP(ip net.IP) bool {
 	if ip == nil {
 		return true
 	}
-	if ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsPrivate() {
+	if ip.IsUnspecified() || ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsPrivate() {
 		return true
 	}
 	for _, block := range privateIPBlocks {

@@ -217,7 +217,11 @@ func (s *SocialScraper) scrapeOpenGraph(ctx context.Context, targetURL string, p
 		rawTitle = tags["twitter:title"]
 	}
 
-	title := fmt.Sprintf("Postingan %s", strings.Title(platform))
+	platformName := platform
+	if len(platform) > 0 {
+		platformName = strings.ToUpper(platform[:1]) + platform[1:]
+	}
+	title := fmt.Sprintf("Postingan %s", platformName)
 	if rawTitle != "" {
 		if idx := strings.Index(rawTitle, " on Instagram:"); idx != -1 {
 			title = fmt.Sprintf("Postingan Instagram (%s)", strings.TrimSpace(rawTitle[:idx]))

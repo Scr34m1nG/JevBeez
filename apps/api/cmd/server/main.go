@@ -53,6 +53,13 @@ func main() {
 	app := fiber.New(fiber.Config{
 		EnableTrustedProxyCheck: true,
 		ProxyHeader:             fiber.HeaderXForwardedFor,
+		TrustedProxies: []string{
+			"127.0.0.1",
+			"10.0.0.0/8",
+			"172.16.0.0/12",
+			"192.168.0.0/16",
+			"::1",
+		},
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			code := fiber.StatusInternalServerError
 			var e *fiber.Error

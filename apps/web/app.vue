@@ -7,22 +7,15 @@
       <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium mb-4">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          <span class="md:hidden">Pemeriksa Fakta Otomatis</span>
-          <span class="hidden md:inline font-mono">TypeSafe Jev Calibrated Decision Engine</span>
+          <span>Pemeriksa Fakta Otomatis AI</span>
         </div>
 
         <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950 mb-3 sm:mb-4 leading-tight">
-          <span class="md:hidden">Cek Kebenaran Berita</span>
-          <span class="hidden md:inline">Audit Disinformasi & Verifikasi Klaim</span>
+          Cek Kebenaran & Verifikasi Fakta Berita
         </h1>
 
         <p class="text-sm sm:text-base text-slate-600 leading-relaxed max-w-xl mx-auto">
-          <span class="md:hidden">
-            Tempel tautan berita dari grup WA atau media sosial untuk memeriksa kebenaran faktanya sebelum disebarkan.
-          </span>
-          <span class="hidden md:inline">
-            Ekstraksi klaim faktual, live web evidence grounding, dan evaluasi probabilitas kalibrasi berbasis model keputusan Jev.
-          </span>
+          Tempel tautan berita dari grup chat atau media sosial untuk memverifikasi kebenaran klaim berbasis bukti dan model keputusan Jev.
         </p>
       </div>
 
@@ -44,8 +37,7 @@
             <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            <span class="md:hidden">Periksa Tautan Lain</span>
-            <span class="hidden md:inline">Reset & Periksa Dokumen Baru</span>
+            <span>Periksa Tautan Lain</span>
           </button>
         </div>
 
@@ -58,8 +50,7 @@
     <footer class="border-t border-slate-200 bg-white py-6 text-xs text-slate-500 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
         <div>
-          <span class="md:hidden">JevBeez • Verifikasi fakta otomatis berbasis bukti live.</span>
-          <span class="hidden md:inline font-mono">JevBeez Fact Intelligence • Automated Evidence Grounding</span>
+          JevBeez • Verifikasi fakta otomatis berbasis bukti live.
         </div>
         <div class="text-slate-400">
           Nuxt 3 & Go Fiber Core • Powered by TypeSafe Jev

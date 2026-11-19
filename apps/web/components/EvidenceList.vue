@@ -5,12 +5,10 @@
         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
         </svg>
-        <span class="md:hidden">Rujukan & Bukti Terkait ({{ evidences.length }})</span>
-        <span class="hidden md:inline font-mono uppercase tracking-wider text-xs">Korpus Grounding & Bukti Empiris ({{ evidences.length }} Dokumen)</span>
+        <span>Rujukan & Bukti Terkait ({{ evidences.length }})</span>
       </h3>
       <span class="text-xs text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full self-start sm:self-auto font-medium">
-        <span class="md:hidden">Penelusuran Web Terverifikasi</span>
-        <span class="hidden md:inline font-mono">Multi-Source Live Grounding</span>
+        Penelusuran Web Terverifikasi
       </span>
     </div>
 
@@ -30,8 +28,7 @@
             rel="noopener noreferrer"
             class="text-xs text-slate-700 hover:text-slate-950 font-medium bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors flex items-center gap-1.5 shrink-0 py-1.5 px-3 rounded-md min-h-[34px]"
           >
-            <span class="md:hidden">Buka Sumber</span>
-            <span class="hidden md:inline">Akses Dokumen Primer</span>
+            <span>Buka Sumber</span>
             <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>

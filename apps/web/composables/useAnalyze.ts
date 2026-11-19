@@ -44,20 +44,34 @@ export const useAnalyze = () => {
         body: JSON.stringify({ url: rawUrl.trim() })
       })
 
-      const data = await response.json()
+      let data: any = null
+      const contentType = response.headers.get('content-type') || ''
+      if (contentType.includes('application/json')) {
+        try {
+          data = await response.json()
+        } catch {
+          data = null
+        }
+      }
 
       if (!response.ok) {
-        const errorMsg = data.data?.error || data.error || data.statusMessage || 'Terjadi kesalahan saat memverifikasi artikel.'
+        const errorMsg = data?.data?.error || data?.error || data?.statusMessage || (response.status >= 500 ? 'Layanan verifikasi sedang tidak dapat diakses (server error).' : 'Terjadi kesalahan saat memverifikasi artikel.')
         if (response.status === 429) {
-          const cd = data.data?.cooldown_seconds || data.cooldown_seconds || 15
+          const cd = data?.data?.cooldown_seconds || data?.cooldown_seconds || 15
           startCooldown(cd)
           throw new Error(errorMsg)
         }
         throw new Error(errorMsg)
       }
 
+      if (!data) {
+        throw new Error('Format respons dari server tidak valid.')
+      }
+
       result.value = data as VerificationResult
-      startCooldown(15)
+      if (!result.value.is_cached) {
+        startCooldown(15)
+      }
     } catch (err: any) {
       error.value = err.message || 'Gagal terhubung ke server backend.'
     } finally {

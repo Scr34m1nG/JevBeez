@@ -93,8 +93,9 @@ func (p *FirecrawlSearchProvider) Search(ctx context.Context, query string) ([]m
 		if snippet == "" {
 			snippet = item.Markdown
 		}
-		if len(snippet) > 300 {
-			snippet = snippet[:300] + "..."
+		runes := []rune(snippet)
+		if len(runes) > 300 {
+			snippet = string(runes[:300]) + "..."
 		}
 		evidences = append(evidences, model.Evidence{
 			Source:  domain,

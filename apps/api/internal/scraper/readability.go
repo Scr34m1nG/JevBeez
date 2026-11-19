@@ -45,8 +45,11 @@ func (s *LocalScraper) Scrape(ctx context.Context, targetURL string) (*model.Art
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType != "" && !strings.Contains(strings.ToLower(contentType), "text/html") {
-		return nil, errors.New("unsupported content type: must be html")
+	if contentType != "" {
+		ct := strings.ToLower(contentType)
+		if !strings.Contains(ct, "text/html") && !strings.Contains(ct, "application/xhtml+xml") {
+			return nil, errors.New("unsupported content type: must be html")
+		}
 	}
 
 	limitedReader := io.LimitReader(resp.Body, config.MaxScrapeBodyBytes)
