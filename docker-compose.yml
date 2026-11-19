@@ -38,6 +38,8 @@ services:
       context: ./apps/web
       dockerfile: Dockerfile
     container_name: jevbeez-web
+    labels:
+      - "traefik.docker.network=coolify"
     ports:
       - "3000:3000"
     environment:
