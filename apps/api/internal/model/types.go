@@ -41,3 +41,11 @@ type VerificationResult struct {
 type AnalyzeRequest struct {
 	URL string `json:"url"`
 }
+
+type BlockedIPInfo struct {
+	IP        string `json:"ip"`
+	Reason    string `json:"reason"`
+	Payload   string `json:"payload,omitempty"`
+	BlockedAt string `json:"blocked_at"`
+	ExpiresAt string `json:"expires_at"`
+}

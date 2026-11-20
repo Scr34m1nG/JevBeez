@@ -50,6 +50,11 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 
 	normalizedURL, err := security.ValidateAndNormalizeURL(req.URL)
 	if err != nil {
+		if errors.Is(err, security.ErrSelfURL) {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Tautan yang Anda masukkan adalah situs JevBeez ini sendiri. Silakan coba periksa tautan berita dari web lain.",
+			})
+		}
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": fmt.Sprintf("URL tidak valid: %s", err.Error()),
 		})

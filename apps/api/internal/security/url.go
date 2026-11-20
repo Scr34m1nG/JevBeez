@@ -10,6 +10,7 @@ var (
 	ErrInvalidScheme = errors.New("url scheme must be http or https")
 	ErrEmptyHost     = errors.New("url host cannot be empty")
 	ErrInvalidHost   = errors.New("url host must be a valid domain")
+	ErrSelfURL       = errors.New("cannot analyze JevBeez itself, please provide another website URL")
 )
 
 var trackingParams = map[string]struct{}{
@@ -57,6 +58,11 @@ func ValidateAndNormalizeURL(rawURL string) (string, error) {
 
 	if !strings.Contains(host, ".") {
 		return "", ErrInvalidHost
+	}
+
+	if host == "jevbeez.hityo.cloud" || strings.HasSuffix(host, ".jevbeez.hityo.cloud") ||
+		host == "jevbeez.com" || strings.HasSuffix(host, ".jevbeez.com") {
+		return "", ErrSelfURL
 	}
 
 	query := parsed.Query()

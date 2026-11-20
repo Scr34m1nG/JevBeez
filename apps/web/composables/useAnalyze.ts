@@ -8,6 +8,8 @@ export const useAnalyze = () => {
   const result = ref<VerificationResult | null>(null)
   const cooldownSeconds = ref(0)
   const pendingUrl = ref('')
+  const isEasterEgg = ref(false)
+  const selfCheckCount = ref(0)
   let timer: ReturnType<typeof setInterval> | null = null
 
   const startCooldown = (seconds: number) => {
@@ -86,9 +88,26 @@ export const useAnalyze = () => {
           return
         }
 
+        const isSelf = data?.data?.code === 'SELF_CHECK_EASTER_EGG' || (data?.data?.error && data.data.error.includes('INCEPTION'))
+        if (isSelf) {
+          selfCheckCount.value++
+          isEasterEgg.value = true
+          if (selfCheckCount.value === 1) {
+            error.value = '🚨 INCEPTION DETECTED! Anda sedang mengecek website JevBeez di JevBeez sendiri 🪞. AI kami sempat krisis eksistensial menatap cermin... Tenang, kami 100% fakta & bebas hoax! Silakan coba periksa tautan berita dari situs atau media sosial lain ya.'
+          } else if (selfCheckCount.value === 2) {
+            error.value = '👀 Masih ngeyel dicoba lagi? Udah dibilang jangan ngetes web ini sendiri, nanti server kami kena krisis identitas! 🤖💥 Hayuk buruan cari tautan berita lain!'
+          } else {
+            error.value = '🛑 WKWK Ngotot banget ya! Tombol "Periksa Fakta" angkat tangan menyerah menghadapi Anda 🏳️🤣. Serius nih, yuk masukkan tautan berita dari web lain sekarang!'
+          }
+          return
+        }
+
+        isEasterEgg.value = false
         const errorMsg = data?.data?.error || data?.error || data?.message || data?.statusMessage || (response.status >= 500 ? 'Layanan verifikasi sedang tidak dapat diakses (server error).' : 'Terjadi kesalahan saat memverifikasi artikel.')
         throw new Error(errorMsg)
       }
+
+      isEasterEgg.value = false
 
       if (!data) {
         throw new Error('Format respons dari server tidak valid.')
@@ -110,6 +129,7 @@ export const useAnalyze = () => {
     error.value = null
     pendingUrl.value = ''
     isCooldownWaiting.value = false
+    isEasterEgg.value = false
   }
 
   return {
@@ -118,6 +138,7 @@ export const useAnalyze = () => {
     error,
     result,
     cooldownSeconds,
+    isEasterEgg,
     analyze,
     cancelCooldownWait,
     reset

@@ -18,6 +18,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
+            ref="inputEl"
             v-model="inputUrl"
             type="url"
             required
@@ -102,8 +103,37 @@
       Mohon tunggu jeda <strong>{{ cooldownSeconds }} detik</strong> sebelum pemeriksaan berikutnya (atau klik 'Antrekan' untuk otomatis diproses setelah jeda).
     </div>
 
+    <!-- Easter Egg Troll Alert -->
+    <div
+      v-if="errorMessage && isEasterEgg"
+      class="mt-3 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 text-amber-950 text-xs sm:text-sm shadow-sm"
+    >
+      <div class="flex items-start gap-3">
+        <div class="text-2xl shrink-0 select-none">
+          🪞
+        </div>
+        <div class="flex-1 space-y-2">
+          <div class="font-bold text-amber-900 flex items-center gap-1.5">
+            <span>Waduh, Kena Prank Cermin! 🤖</span>
+          </div>
+          <p class="leading-relaxed font-medium">
+            {{ errorMessage }}
+          </p>
+          <div class="pt-1">
+            <button
+              type="button"
+              @click="clearAndFocus"
+              class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs transition-colors shadow-sm inline-flex items-center gap-1.5"
+            >
+              <span>Siap, coba web lain 🫡</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Error Alert -->
-    <div v-if="errorMessage" class="mt-3 p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-900 text-xs sm:text-sm flex items-start gap-2.5">
+    <div v-else-if="errorMessage" class="mt-3 p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-900 text-xs sm:text-sm flex items-start gap-2.5">
       <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
@@ -122,6 +152,7 @@ const props = defineProps<{
   isCooldownWaiting?: boolean
   cooldownSeconds: number
   errorMessage?: string | null
+  isEasterEgg?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -129,6 +160,7 @@ const emit = defineEmits<{
   (e: 'cancel-queue'): void
 }>()
 
+const inputEl = ref<HTMLInputElement | null>(null)
 const inputUrl = ref('')
 const canPaste = ref(false)
 
@@ -137,6 +169,11 @@ onMounted(() => {
     canPaste.value = true
   }
 })
+
+const clearAndFocus = () => {
+  inputUrl.value = ''
+  inputEl.value?.focus()
+}
 
 const pasteClipboard = async () => {
   try {

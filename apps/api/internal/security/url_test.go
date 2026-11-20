@@ -44,6 +44,16 @@ func TestValidateAndNormalizeURL(t *testing.T) {
 			rawURL:    "",
 			expectErr: true,
 		},
+		{
+			name:      "rejects self url jevbeez",
+			rawURL:    "https://jevbeez.hityo.cloud/article/1",
+			expectErr: true,
+		},
+		{
+			name:      "rejects self subdomain url jevbeez",
+			rawURL:    "https://app.jevbeez.hityo.cloud/check",
+			expectErr: true,
+		},
 	}
 
 	for _, tc := range tests {

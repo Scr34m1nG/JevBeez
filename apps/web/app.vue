@@ -25,6 +25,7 @@
         :is-cooldown-waiting="isCooldownWaiting"
         :cooldown-seconds="cooldownSeconds"
         :error-message="error"
+        :is-easter-egg="isEasterEgg"
         @submit="analyze"
         @cancel-queue="cancelCooldownWait"
       />
@@ -71,6 +72,7 @@ const {
   error,
   result,
   cooldownSeconds,
+  isEasterEgg,
   analyze,
   cancelCooldownWait,
   reset

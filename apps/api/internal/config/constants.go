@@ -8,6 +8,7 @@ const (
 	DefaultCacheTTL          = 1 * time.Hour
 	UnverifiedCacheTTL       = 2 * time.Minute
 	DefaultCooldownDuration  = 15 * time.Second
+	DefaultBlockDuration     = 24 * time.Hour
 	DefaultRequestBurstLimit = 10
 	DefaultExpirationWindow  = 1 * time.Minute
 
