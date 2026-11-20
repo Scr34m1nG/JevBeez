@@ -20,3 +20,4 @@ redis_data/
 # OS files
 .DS_Store
 Thumbs.db
+screenshot-*.png
