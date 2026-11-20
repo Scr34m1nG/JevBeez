@@ -40,6 +40,10 @@ function getButtonTextForDodge(count: number): string {
   return 'Tangkap!'
 }
 
+function shouldResetAndClearOnFinalDodge(dodgeCount: number): boolean {
+  return dodgeCount >= 4
+}
+
 describe('isSelfUrl self-check detector', () => {
   it('detects primary production domain', () => {
     expect(isSelfUrl('https://jevbeez.hityo.cloud')).toBe(true)
@@ -70,7 +74,6 @@ describe('Dodge button mechanics', () => {
     expect(jump1).toEqual({ x: 35, y: -22 })
     expect(jump2).toEqual({ x: -20, y: 18 })
     expect(jump3).toEqual({ x: 45, y: 15 })
-    // Ensure positions move in opposite quadrants
     expect(Math.sign(jump1.x)).not.toBe(Math.sign(jump2.x))
   })
 
@@ -80,5 +83,12 @@ describe('Dodge button mechanics', () => {
     expect(getButtonTextForDodge(2)).toBe('Kejar aku!')
     expect(getButtonTextForDodge(3)).toBe('Hampir!')
     expect(getButtonTextForDodge(4)).toBe('Tangkap!')
+  })
+
+  it('triggers immediate reset and clean start on final dodge without extra troll screens', () => {
+    expect(shouldResetAndClearOnFinalDodge(1)).toBe(false)
+    expect(shouldResetAndClearOnFinalDodge(2)).toBe(false)
+    expect(shouldResetAndClearOnFinalDodge(3)).toBe(false)
+    expect(shouldResetAndClearOnFinalDodge(4)).toBe(true)
   })
 })

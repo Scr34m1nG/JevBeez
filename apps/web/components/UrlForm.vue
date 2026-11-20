@@ -204,6 +204,10 @@ const clearAndFocus = () => {
   inputEl.value?.focus()
 }
 
+defineExpose({
+  clearAndFocus
+})
+
 const pasteClipboard = async () => {
   try {
     const text = await navigator.clipboard.readText()

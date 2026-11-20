@@ -146,6 +146,8 @@ export const useAnalyze = () => {
     pendingUrl.value = ''
     isCooldownWaiting.value = false
     isEasterEgg.value = false
+    selfCheckCount.value = 0
+    showSelfCheckModal.value = false
   }
 
   return {

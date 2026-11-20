@@ -4,32 +4,14 @@
       <div
         v-if="visible"
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
-        @click.self="handleBackdropClick"
+        @click.self="handleClose"
       >
         <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" />
 
         <div
           class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-visible transform transition-all"
         >
-          <!-- Troll Phase: "eits ga kena" -->
-          <div v-if="trollRevealed" class="p-8 text-center space-y-4">
-            <div class="text-6xl select-none animate-bounce">😏</div>
-            <h3 class="text-2xl font-extrabold text-slate-900">
-              Eits... ga kena!
-            </h3>
-            <p class="text-sm text-slate-600 leading-relaxed">
-              Udah dibilang, JevBeez ga bisa ngecek dirinya sendiri. Nice try though! 🫡
-            </p>
-            <button
-              @click="handleClose"
-              class="mt-3 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition-colors"
-            >
-              Oke oke, saya nyerah 🏳️
-            </button>
-          </div>
-
-          <!-- Confirmation Phase -->
-          <div v-else class="p-6 sm:p-8 space-y-5">
+          <div class="p-6 sm:p-8 space-y-5">
             <div class="text-center space-y-3">
               <div class="text-5xl select-none">🤔</div>
               <h3 class="text-lg sm:text-xl font-bold text-slate-900">
@@ -90,9 +72,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'dismiss'): void
+  (e: 'caught-and-reset'): void
 }>()
 
-const trollRevealed = ref(false)
 const dodgeCount = ref(0)
 const offsetX = ref(0)
 const offsetY = ref(0)
@@ -134,7 +116,6 @@ const dodgeStyle = computed(() => {
 
 watch(() => props.visible, (val) => {
   if (val) {
-    trollRevealed.value = false
     resetDodge()
   }
 })
@@ -145,11 +126,16 @@ const resetDodge = () => {
   offsetY.value = 0
 }
 
+const handleCatchAndReset = () => {
+  resetDodge()
+  emit('caught-and-reset')
+}
+
 const triggerDodge = () => {
   dodgeCount.value++
   if (dodgeCount.value >= 4) {
-    // After 4 agile dodges, user finally catches it or clicks -> show troll screen
-    trollRevealed.value = true
+    // Selesai dodge / tertangkap: langsung hapus link & mulai dari awal
+    handleCatchAndReset()
     return
   }
 
@@ -162,7 +148,6 @@ const triggerDodge = () => {
   ]
 
   const nextDir = directions[(dodgeCount.value - 1) % directions.length]
-  // Add slight random jitter
   const jitterX = Math.floor((Math.random() - 0.5) * 8)
   const jitterY = Math.floor((Math.random() - 0.5) * 6)
 
@@ -180,26 +165,19 @@ const handlePointerAction = () => {
   if (dodgeCount.value < 4) {
     triggerDodge()
   } else {
-    trollRevealed.value = true
+    handleCatchAndReset()
   }
 }
 
 const handleClick = () => {
   if (dodgeCount.value >= 4) {
-    trollRevealed.value = true
+    handleCatchAndReset()
   }
 }
 
 const handleClose = () => {
-  trollRevealed.value = false
   resetDodge()
   emit('dismiss')
-}
-
-const handleBackdropClick = () => {
-  if (!trollRevealed.value) {
-    handleClose()
-  }
 }
 </script>
 

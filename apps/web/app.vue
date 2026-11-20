@@ -21,6 +21,7 @@
 
       <!-- Main Input Form -->
       <UrlForm
+        ref="urlFormRef"
         :is-loading="isLoading"
         :is-cooldown-waiting="isCooldownWaiting"
         :is-blocked="isBlocked"
@@ -56,6 +57,7 @@
     <SelfCheckModal
       :visible="showSelfCheckModal"
       @dismiss="dismissSelfCheckModal"
+      @caught-and-reset="handleCaughtAndReset"
     />
 
     <!-- Footer -->
@@ -73,7 +75,10 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useAnalyze } from '~/composables/useAnalyze'
+
+const urlFormRef = ref<{ clearAndFocus: () => void } | null>(null)
 
 const {
   isLoading,
@@ -91,4 +96,9 @@ const {
   dismissSelfCheckModal,
   reset
 } = useAnalyze()
+
+const handleCaughtAndReset = () => {
+  reset()
+  urlFormRef.value?.clearAndFocus()
+}
 </script>
