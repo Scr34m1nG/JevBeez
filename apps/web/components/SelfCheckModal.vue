@@ -9,7 +9,7 @@
         <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" />
 
         <div
-          class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all"
+          class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-visible transform transition-all"
         >
           <!-- Troll Phase: "eits ga kena" -->
           <div v-if="trollRevealed" class="p-8 text-center space-y-4">
@@ -155,16 +155,16 @@ const triggerDodge = () => {
 
   // Pre-calculated agile jump directions so it darts away unpredictably within modal bounds
   const directions = [
-    { x: 55, y: -25 },
-    { x: -55, y: 20 },
-    { x: 50, y: 25 },
-    { x: -50, y: -20 }
+    { x: 35, y: -22 },
+    { x: -20, y: 18 },
+    { x: 45, y: 15 },
+    { x: -15, y: -20 }
   ]
 
   const nextDir = directions[(dodgeCount.value - 1) % directions.length]
   // Add slight random jitter
-  const jitterX = Math.floor((Math.random() - 0.5) * 12)
-  const jitterY = Math.floor((Math.random() - 0.5) * 10)
+  const jitterX = Math.floor((Math.random() - 0.5) * 8)
+  const jitterY = Math.floor((Math.random() - 0.5) * 6)
 
   offsetX.value = nextDir.x + jitterX
   offsetY.value = nextDir.y + jitterY
