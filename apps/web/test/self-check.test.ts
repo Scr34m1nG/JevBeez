@@ -24,10 +24,10 @@ function isSelfUrl(inputUrl: string): boolean {
 
 function calculateDodgeOffset(dodgeCount: number): { x: number; y: number } {
   const directions = [
-    { x: 90, y: -30 },
-    { x: -90, y: 25 },
-    { x: 75, y: 35 },
-    { x: -80, y: -35 }
+    { x: 55, y: -25 },
+    { x: -55, y: 20 },
+    { x: 50, y: 25 },
+    { x: -50, y: -20 }
   ]
   return directions[(dodgeCount - 1) % directions.length]
 }
@@ -67,9 +67,9 @@ describe('Dodge button mechanics', () => {
     const jump2 = calculateDodgeOffset(2)
     const jump3 = calculateDodgeOffset(3)
 
-    expect(jump1).toEqual({ x: 90, y: -30 })
-    expect(jump2).toEqual({ x: -90, y: 25 })
-    expect(jump3).toEqual({ x: 75, y: 35 })
+    expect(jump1).toEqual({ x: 55, y: -25 })
+    expect(jump2).toEqual({ x: -55, y: 20 })
+    expect(jump3).toEqual({ x: 50, y: 25 })
     // Ensure positions move in opposite quadrants
     expect(Math.sign(jump1.x)).not.toBe(Math.sign(jump2.x))
   })

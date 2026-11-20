@@ -153,18 +153,18 @@ const triggerDodge = () => {
     return
   }
 
-  // Pre-calculated agile jump directions so it darts away unpredictably
+  // Pre-calculated agile jump directions so it darts away unpredictably within modal bounds
   const directions = [
-    { x: 90, y: -30 },
-    { x: -90, y: 25 },
-    { x: 75, y: 35 },
-    { x: -80, y: -35 }
+    { x: 55, y: -25 },
+    { x: -55, y: 20 },
+    { x: 50, y: 25 },
+    { x: -50, y: -20 }
   ]
 
   const nextDir = directions[(dodgeCount.value - 1) % directions.length]
   // Add slight random jitter
-  const jitterX = Math.floor((Math.random() - 0.5) * 20)
-  const jitterY = Math.floor((Math.random() - 0.5) * 15)
+  const jitterX = Math.floor((Math.random() - 0.5) * 12)
+  const jitterY = Math.floor((Math.random() - 0.5) * 10)
 
   offsetX.value = nextDir.x + jitterX
   offsetY.value = nextDir.y + jitterY
