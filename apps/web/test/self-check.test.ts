@@ -36,12 +36,11 @@ function getButtonTextForDodge(count: number): string {
   if (count === 0) return 'Ya, periksa!'
   if (count === 1) return 'Eits...!'
   if (count === 2) return 'Kejar aku!'
-  if (count === 3) return 'Hampir!'
-  return 'Tangkap!'
+  return 'Hampir!'
 }
 
 function shouldResetAndClearOnFinalDodge(dodgeCount: number): boolean {
-  return dodgeCount >= 4
+  return dodgeCount >= 3
 }
 
 describe('isSelfUrl self-check detector', () => {
@@ -82,13 +81,12 @@ describe('Dodge button mechanics', () => {
     expect(getButtonTextForDodge(1)).toBe('Eits...!')
     expect(getButtonTextForDodge(2)).toBe('Kejar aku!')
     expect(getButtonTextForDodge(3)).toBe('Hampir!')
-    expect(getButtonTextForDodge(4)).toBe('Tangkap!')
   })
 
   it('triggers immediate reset and clean start on final dodge without extra troll screens', () => {
     expect(shouldResetAndClearOnFinalDodge(1)).toBe(false)
     expect(shouldResetAndClearOnFinalDodge(2)).toBe(false)
-    expect(shouldResetAndClearOnFinalDodge(3)).toBe(false)
+    expect(shouldResetAndClearOnFinalDodge(3)).toBe(true)
     expect(shouldResetAndClearOnFinalDodge(4)).toBe(true)
   })
 })

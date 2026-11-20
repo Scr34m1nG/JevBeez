@@ -29,9 +29,8 @@
                 <button
                   type="button"
                   :style="dodgeStyle"
-                  @mouseenter="handleDodge"
-                  @pointerdown.prevent="handlePointerAction"
-                  @click="handleClick"
+                  @mouseenter="handleAttempt"
+                  @click="handleAttempt"
                   class="w-full sm:flex-1 px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-sm shadow-md select-none cursor-pointer flex items-center justify-center gap-2 will-change-transform"
                 >
                   <span>{{ currentButtonText }}</span>
@@ -90,16 +89,14 @@ const currentButtonText = computed(() => {
   if (dodgeCount.value === 0) return 'Ya, periksa!'
   if (dodgeCount.value === 1) return 'Eits...!'
   if (dodgeCount.value === 2) return 'Kejar aku!'
-  if (dodgeCount.value === 3) return 'Hampir!'
-  return 'Tangkap!'
+  return 'Hampir!'
 })
 
 const currentButtonEmoji = computed(() => {
   if (dodgeCount.value === 0) return '🔍'
   if (dodgeCount.value === 1) return '💨'
   if (dodgeCount.value === 2) return '😜'
-  if (dodgeCount.value === 3) return '🏃'
-  return '🎯'
+  return '🏃'
 })
 
 const dodgeTaunt = computed(() => {
@@ -134,7 +131,6 @@ const handleCatchAndReset = () => {
 const triggerDodge = () => {
   dodgeCount.value++
   if (dodgeCount.value >= 4) {
-    // Selesai dodge / tertangkap: langsung hapus link & mulai dari awal
     handleCatchAndReset()
     return
   }
@@ -155,22 +151,10 @@ const triggerDodge = () => {
   offsetY.value = nextDir.y + jitterY
 }
 
-const handleDodge = () => {
-  if (dodgeCount.value < 4) {
-    triggerDodge()
-  }
-}
-
-const handlePointerAction = () => {
-  if (dodgeCount.value < 4) {
+const handleAttempt = () => {
+  if (dodgeCount.value < 3) {
     triggerDodge()
   } else {
-    handleCatchAndReset()
-  }
-}
-
-const handleClick = () => {
-  if (dodgeCount.value >= 4) {
     handleCatchAndReset()
   }
 }
