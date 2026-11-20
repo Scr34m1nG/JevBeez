@@ -22,9 +22,11 @@
       <!-- Main Input Form -->
       <UrlForm
         :is-loading="isLoading"
+        :is-cooldown-waiting="isCooldownWaiting"
         :cooldown-seconds="cooldownSeconds"
         :error-message="error"
         @submit="analyze"
+        @cancel-queue="cancelCooldownWait"
       />
 
       <!-- Analysis Results -->
@@ -63,5 +65,14 @@
 <script setup lang="ts">
 import { useAnalyze } from '~/composables/useAnalyze'
 
-const { isLoading, error, result, cooldownSeconds, analyze, reset } = useAnalyze()
+const {
+  isLoading,
+  isCooldownWaiting,
+  error,
+  result,
+  cooldownSeconds,
+  analyze,
+  cancelCooldownWait,
+  reset
+} = useAnalyze()
 </script>
