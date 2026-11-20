@@ -22,6 +22,24 @@ function isSelfUrl(inputUrl: string): boolean {
   }
 }
 
+function calculateDodgeOffset(dodgeCount: number): { x: number; y: number } {
+  const directions = [
+    { x: 90, y: -30 },
+    { x: -90, y: 25 },
+    { x: 75, y: 35 },
+    { x: -80, y: -35 }
+  ]
+  return directions[(dodgeCount - 1) % directions.length]
+}
+
+function getButtonTextForDodge(count: number): string {
+  if (count === 0) return 'Ya, periksa!'
+  if (count === 1) return 'Eits...!'
+  if (count === 2) return 'Kejar aku!'
+  if (count === 3) return 'Hampir!'
+  return 'Tangkap!'
+}
+
 describe('isSelfUrl self-check detector', () => {
   it('detects primary production domain', () => {
     expect(isSelfUrl('https://jevbeez.hityo.cloud')).toBe(true)
@@ -40,5 +58,27 @@ describe('isSelfUrl self-check detector', () => {
     expect(isSelfUrl('https://news.detik.com/berita/123')).toBe(false)
     expect(isSelfUrl('https://kompas.com/nasional')).toBe(false)
     expect(isSelfUrl('https://cnnindonesia.com')).toBe(false)
+  })
+})
+
+describe('Dodge button mechanics', () => {
+  it('calculates expected offset jumps to avoid cursor', () => {
+    const jump1 = calculateDodgeOffset(1)
+    const jump2 = calculateDodgeOffset(2)
+    const jump3 = calculateDodgeOffset(3)
+
+    expect(jump1).toEqual({ x: 90, y: -30 })
+    expect(jump2).toEqual({ x: -90, y: 25 })
+    expect(jump3).toEqual({ x: 75, y: 35 })
+    // Ensure positions move in opposite quadrants
+    expect(Math.sign(jump1.x)).not.toBe(Math.sign(jump2.x))
+  })
+
+  it('updates teasing button text progressively', () => {
+    expect(getButtonTextForDodge(0)).toBe('Ya, periksa!')
+    expect(getButtonTextForDodge(1)).toBe('Eits...!')
+    expect(getButtonTextForDodge(2)).toBe('Kejar aku!')
+    expect(getButtonTextForDodge(3)).toBe('Hampir!')
+    expect(getButtonTextForDodge(4)).toBe('Tangkap!')
   })
 })

@@ -36,24 +36,43 @@
                 Yakin masih mau coba?
               </h3>
               <p class="text-sm text-slate-600 leading-relaxed">
-                Anda sudah <strong>{{ 3 }} kali</strong> mencoba mengecek website JevBeez di JevBeez sendiri. Apakah Anda yakin ingin melanjutkan?
+                Anda sudah mencoba mengecek website JevBeez di JevBeez sendiri. Apakah Anda yakin ingin melanjutkan?
               </p>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3">
-              <button
-                @click="handleConfirm"
-                class="flex-1 px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2"
+            <!-- Actions area with dodge arena -->
+            <div class="relative pt-2 pb-1">
+              <div class="flex flex-col sm:flex-row items-center gap-3">
+                <!-- Dodging "Ya, periksa!" button -->
+                <button
+                  type="button"
+                  :style="dodgeStyle"
+                  @mouseenter="handleDodge"
+                  @pointerdown.prevent="handlePointerAction"
+                  @click="handleClick"
+                  class="w-full sm:flex-1 px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-sm shadow-md select-none cursor-pointer flex items-center justify-center gap-2 will-change-transform"
+                >
+                  <span>{{ currentButtonText }}</span>
+                  <span class="text-base">{{ currentButtonEmoji }}</span>
+                </button>
+
+                <!-- Stable Cancel Button -->
+                <button
+                  type="button"
+                  @click="handleClose"
+                  class="w-full sm:flex-1 px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm transition-colors border border-slate-200 shrink-0"
+                >
+                  Hmm, nggak jadi deh
+                </button>
+              </div>
+
+              <!-- Taunt bubble when button dodges -->
+              <p
+                v-if="dodgeCount > 0"
+                class="text-center text-xs font-semibold text-amber-600 mt-3 animate-pulse"
               >
-                <span>Ya, periksa!</span>
-                <span class="text-base">🔍</span>
-              </button>
-              <button
-                @click="handleClose"
-                class="flex-1 px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm transition-colors border border-slate-200"
-              >
-                Hmm, nggak jadi deh
-              </button>
+                {{ dodgeTaunt }}
+              </p>
             </div>
           </div>
         </div>
@@ -63,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = defineProps<{
   visible: boolean
@@ -74,19 +93,106 @@ const emit = defineEmits<{
 }>()
 
 const trollRevealed = ref(false)
+const dodgeCount = ref(0)
+const offsetX = ref(0)
+const offsetY = ref(0)
+
+const dodgeTaunts = [
+  'Eits! Kecepetan tombolnya kabur 💨',
+  'Wlee 😜 Kurang cepet ngeklik!',
+  'Hampir aja kena! Coba kejar lagi 🏃‍♂️',
+  'Lincah kan tombolnya? 🎯'
+]
+
+const currentButtonText = computed(() => {
+  if (dodgeCount.value === 0) return 'Ya, periksa!'
+  if (dodgeCount.value === 1) return 'Eits...!'
+  if (dodgeCount.value === 2) return 'Kejar aku!'
+  if (dodgeCount.value === 3) return 'Hampir!'
+  return 'Tangkap!'
+})
+
+const currentButtonEmoji = computed(() => {
+  if (dodgeCount.value === 0) return '🔍'
+  if (dodgeCount.value === 1) return '💨'
+  if (dodgeCount.value === 2) return '😜'
+  if (dodgeCount.value === 3) return '🏃'
+  return '🎯'
+})
+
+const dodgeTaunt = computed(() => {
+  const index = Math.min(dodgeCount.value - 1, dodgeTaunts.length - 1)
+  return index >= 0 ? dodgeTaunts[index] : ''
+})
+
+const dodgeStyle = computed(() => {
+  return {
+    transform: `translate(${offsetX.value}px, ${offsetY.value}px)`,
+    transition: 'transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1)'
+  }
+})
 
 watch(() => props.visible, (val) => {
   if (val) {
     trollRevealed.value = false
+    resetDodge()
   }
 })
 
-const handleConfirm = () => {
-  trollRevealed.value = true
+const resetDodge = () => {
+  dodgeCount.value = 0
+  offsetX.value = 0
+  offsetY.value = 0
+}
+
+const triggerDodge = () => {
+  dodgeCount.value++
+  if (dodgeCount.value >= 4) {
+    // After 4 agile dodges, user finally catches it or clicks -> show troll screen
+    trollRevealed.value = true
+    return
+  }
+
+  // Pre-calculated agile jump directions so it darts away unpredictably
+  const directions = [
+    { x: 90, y: -30 },
+    { x: -90, y: 25 },
+    { x: 75, y: 35 },
+    { x: -80, y: -35 }
+  ]
+
+  const nextDir = directions[(dodgeCount.value - 1) % directions.length]
+  // Add slight random jitter
+  const jitterX = Math.floor((Math.random() - 0.5) * 20)
+  const jitterY = Math.floor((Math.random() - 0.5) * 15)
+
+  offsetX.value = nextDir.x + jitterX
+  offsetY.value = nextDir.y + jitterY
+}
+
+const handleDodge = () => {
+  if (dodgeCount.value < 4) {
+    triggerDodge()
+  }
+}
+
+const handlePointerAction = () => {
+  if (dodgeCount.value < 4) {
+    triggerDodge()
+  } else {
+    trollRevealed.value = true
+  }
+}
+
+const handleClick = () => {
+  if (dodgeCount.value >= 4) {
+    trollRevealed.value = true
+  }
 }
 
 const handleClose = () => {
   trollRevealed.value = false
+  resetDodge()
   emit('dismiss')
 }
 
