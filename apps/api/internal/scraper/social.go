@@ -17,7 +17,9 @@ import (
 
 var (
 	ErrUnsupportedSocialPlatform = errors.New("platform media sosial tidak didukung")
-	ErrSocialCaptionNotFound     = errors.New("caption atau teks postingan tidak ditemukan")
+	ErrSocialCaptionNotFound     = errors.New("tidak ada teks atau caption yang dapat dibaca pada postingan ini")
+	ErrSocialLoginRequired       = errors.New("konten media sosial tidak dapat diakses karena dilindungi login atau privasi akun")
+	ErrSocialContentUnavailable  = errors.New("postingan media sosial tidak ditemukan atau sudah dihapus")
 )
 
 type SocialScraper struct {
@@ -58,7 +60,7 @@ func DetectSocialPlatform(rawURL string) (string, bool) {
 		return config.PlatformInstagram, true
 	case host == "threads.net" || strings.HasSuffix(host, ".threads.net"):
 		return config.PlatformThreads, true
-	case host == "facebook.com" || host == "fb.watch" || strings.HasSuffix(host, ".facebook.com"):
+	case host == "facebook.com" || host == "fb.watch" || host == "fb.com" || strings.HasSuffix(host, ".facebook.com") || strings.HasSuffix(host, ".fb.com"):
 		return config.PlatformFacebook, true
 	default:
 		return "", false
@@ -97,7 +99,7 @@ func (s *SocialScraper) scrapeTwitterOEmbed(ctx context.Context, targetURL strin
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("twitter oembed error with status: %d", resp.StatusCode)
+		return nil, ErrSocialContentUnavailable
 	}
 
 	var res twitterOEmbedResp
@@ -148,7 +150,7 @@ func (s *SocialScraper) scrapeYouTubeOEmbed(ctx context.Context, targetURL strin
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("youtube oembed error with status: %d", resp.StatusCode)
+		return nil, ErrSocialContentUnavailable
 	}
 
 	var res youTubeOEmbedResp
@@ -194,8 +196,11 @@ func (s *SocialScraper) scrapeOpenGraph(ctx context.Context, targetURL string, p
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusForbidden {
+		return nil, ErrSocialLoginRequired
+	}
 	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("upstream social page returned status %d", resp.StatusCode)
+		return nil, ErrSocialContentUnavailable
 	}
 
 	limitedReader := io.LimitReader(resp.Body, config.MaxScrapeBodyBytes)
@@ -215,6 +220,10 @@ func (s *SocialScraper) scrapeOpenGraph(ctx context.Context, targetURL string, p
 	rawTitle := tags["og:title"]
 	if rawTitle == "" {
 		rawTitle = tags["twitter:title"]
+	}
+
+	if IsSocialLoginWall(rawTitle, description) {
+		return nil, ErrSocialLoginRequired
 	}
 
 	platformName := platform
@@ -248,6 +257,10 @@ func (s *SocialScraper) scrapeOpenGraph(ctx context.Context, targetURL string, p
 		return nil, ErrSocialCaptionNotFound
 	}
 
+	if IsSocialLoginWall(title, cleanContent) {
+		return nil, ErrSocialLoginRequired
+	}
+
 	parsedURL, _ := url.Parse(targetURL)
 	words := len(strings.Fields(cleanContent))
 
@@ -278,4 +291,31 @@ func extractCleanCaption(desc string) string {
 		}
 	}
 	return desc
+}
+
+func IsSocialLoginWall(title, desc string) bool {
+	lowerTitle := strings.ToLower(title)
+	lowerDesc := strings.ToLower(desc)
+
+	signals := []string{
+		"masuk atau daftar",
+		"log in or sign up",
+		"log in to facebook",
+		"masuk ke facebook",
+		"masuk facebook",
+		"login • instagram",
+		"masuk • instagram",
+		"welcome back to instagram",
+		"lihat postingan, foto, dan lainnya di facebook",
+		"see posts, photos and more on facebook",
+		"log in to see photos and videos",
+		"masuk untuk melihat foto dan video",
+	}
+
+	for _, signal := range signals {
+		if strings.Contains(lowerTitle, signal) || strings.Contains(lowerDesc, signal) {
+			return true
+		}
+	}
+	return false
 }

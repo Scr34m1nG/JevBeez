@@ -31,6 +31,7 @@ var trackingParams = map[string]struct{}{
 	"nr_email_referer":       {},
 	"igshid":                 {},
 	"si":                     {},
+	"mibextid":               {},
 }
 
 func ValidateAndNormalizeURL(rawURL string) (string, error) {

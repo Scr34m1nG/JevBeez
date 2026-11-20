@@ -18,8 +18,8 @@ func TestValidateAndNormalizeURL(t *testing.T) {
 			expectErr: false,
 		},
 		{
-			name:      "strips tracking utm and fbclid params",
-			rawURL:    "https://news.com/article/1?utm_source=twitter&utm_medium=social&fbclid=xyz123&page=2",
+			name:      "strips tracking utm, fbclid, and mibextid params",
+			rawURL:    "https://news.com/article/1?utm_source=twitter&utm_medium=social&fbclid=xyz123&mibextid=wwXIfr&page=2",
 			wantURL:   "https://news.com/article/1?page=2",
 			expectErr: false,
 		},

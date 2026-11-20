@@ -55,7 +55,7 @@ export const useAnalyze = () => {
       }
 
       if (!response.ok) {
-        const errorMsg = data?.data?.error || data?.error || data?.statusMessage || (response.status >= 500 ? 'Layanan verifikasi sedang tidak dapat diakses (server error).' : 'Terjadi kesalahan saat memverifikasi artikel.')
+        const errorMsg = data?.data?.error || data?.error || data?.message || data?.statusMessage || (response.status >= 500 ? 'Layanan verifikasi sedang tidak dapat diakses (server error).' : 'Terjadi kesalahan saat memverifikasi artikel.')
         if (response.status === 429) {
           const cd = data?.data?.cooldown_seconds || data?.cooldown_seconds || 15
           startCooldown(cd)
