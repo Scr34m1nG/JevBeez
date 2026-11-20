@@ -21,3 +21,4 @@ redis_data/
 .DS_Store
 Thumbs.db
 screenshot-*.png
+test-playwright.mjs
