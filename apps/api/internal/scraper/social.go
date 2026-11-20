@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"io"
 	"net/http"
 	"net/url"
@@ -23,18 +24,21 @@ var (
 )
 
 type SocialScraper struct {
-	client *http.Client
+	client            *http.Client
+	fxTwitterEndpoint string
 }
 
 func NewSocialScraper() *SocialScraper {
 	return &SocialScraper{
-		client: security.NewSafeHTTPClient(),
+		client:            security.NewSafeHTTPClient(),
+		fxTwitterEndpoint: config.FxTwitterEndpoint,
 	}
 }
 
 func NewSocialScraperWithClient(client *http.Client) *SocialScraper {
 	return &SocialScraper{
-		client: client,
+		client:            client,
+		fxTwitterEndpoint: config.FxTwitterEndpoint,
 	}
 }
 
@@ -58,7 +62,7 @@ func DetectSocialPlatform(rawURL string) (string, bool) {
 		return config.PlatformYouTube, true
 	case host == "instagram.com" || strings.HasSuffix(host, ".instagram.com"):
 		return config.PlatformInstagram, true
-	case host == "threads.net" || strings.HasSuffix(host, ".threads.net"):
+	case host == "threads.net" || host == "threads.com" || strings.HasSuffix(host, ".threads.net") || strings.HasSuffix(host, ".threads.com"):
 		return config.PlatformThreads, true
 	case host == "facebook.com" || host == "fb.watch" || host == "fb.com" || strings.HasSuffix(host, ".facebook.com") || strings.HasSuffix(host, ".fb.com"):
 		return config.PlatformFacebook, true
@@ -70,7 +74,7 @@ func DetectSocialPlatform(rawURL string) (string, bool) {
 func (s *SocialScraper) Scrape(ctx context.Context, targetURL string, platform string) (*model.Article, error) {
 	switch platform {
 	case config.PlatformTwitter:
-		return s.scrapeTwitterOEmbed(ctx, targetURL)
+		return s.scrapeTwitter(ctx, targetURL)
 	case config.PlatformYouTube:
 		return s.scrapeYouTubeOEmbed(ctx, targetURL)
 	case config.PlatformTikTok, config.PlatformInstagram, config.PlatformThreads, config.PlatformFacebook:
@@ -126,6 +130,126 @@ func (s *SocialScraper) scrapeTwitterOEmbed(ctx context.Context, targetURL strin
 		URL:          targetURL,
 		WordCount:    words,
 		SourceDomain: parsedURL.Hostname(),
+		IsSocial:     true,
+		Platform:     config.PlatformTwitter,
+	}, nil
+}
+
+func (s *SocialScraper) scrapeTwitter(ctx context.Context, targetURL string) (*model.Article, error) {
+	article, err := s.scrapeTwitterOEmbed(ctx, targetURL)
+	if err == nil && article != nil && article.WordCount >= config.MinSocialWordCount {
+		return article, nil
+	}
+
+	fxArticle, fxErr := s.scrapeTwitterFx(ctx, targetURL)
+	if fxErr == nil && fxArticle != nil {
+		return fxArticle, nil
+	}
+
+	if article != nil && article.Content != "" {
+		return article, nil
+	}
+
+	if fxErr != nil {
+		return nil, fxErr
+	}
+	return nil, err
+}
+
+type fxTweetResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Tweet   *struct {
+		Text   string `json:"text"`
+		Author struct {
+			Name       string `json:"name"`
+			ScreenName string `json:"screen_name"`
+		} `json:"author"`
+		Quote *struct {
+			Text   string `json:"text"`
+			Author struct {
+				Name       string `json:"name"`
+				ScreenName string `json:"screen_name"`
+			} `json:"author"`
+		} `json:"quote"`
+	} `json:"tweet"`
+}
+
+func (s *SocialScraper) scrapeTwitterFx(ctx context.Context, targetURL string) (*model.Article, error) {
+	parsed, err := url.Parse(targetURL)
+	if err != nil || parsed.Path == "" {
+		return nil, ErrSocialContentUnavailable
+	}
+
+	endpoint := s.fxTwitterEndpoint
+	if endpoint == "" {
+		endpoint = config.FxTwitterEndpoint
+	}
+	apiURL := fmt.Sprintf("%s%s", endpoint, parsed.Path)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, apiURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("User-Agent", "JevBeezBot/1.0 (+https://jevbeez.hityo.cloud)")
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusForbidden {
+		return nil, ErrSocialLoginRequired
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, ErrSocialContentUnavailable
+	}
+
+	var res fxTweetResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, err
+	}
+
+	if res.Code == 401 {
+		return nil, ErrSocialLoginRequired
+	}
+	if res.Code != 200 || res.Tweet == nil {
+		return nil, ErrSocialContentUnavailable
+	}
+
+	content := strings.TrimSpace(res.Tweet.Text)
+	if res.Tweet.Quote != nil && strings.TrimSpace(res.Tweet.Quote.Text) != "" {
+		quoteAuthor := res.Tweet.Quote.Author.ScreenName
+		if quoteAuthor != "" {
+			quoteAuthor = "@" + quoteAuthor
+		}
+		if content != "" {
+			content += fmt.Sprintf("\n\n[Kutipan %s]: %s", quoteAuthor, strings.TrimSpace(res.Tweet.Quote.Text))
+		} else {
+			content = strings.TrimSpace(res.Tweet.Quote.Text)
+		}
+	}
+
+	if content == "" {
+		return nil, ErrSocialCaptionNotFound
+	}
+
+	title := "Postingan X / Twitter"
+	if res.Tweet.Author.ScreenName != "" {
+		title = fmt.Sprintf("Postingan X (@%s)", res.Tweet.Author.ScreenName)
+	} else if res.Tweet.Author.Name != "" {
+		title = fmt.Sprintf("Postingan X (%s)", res.Tweet.Author.Name)
+	}
+
+	words := len(strings.Fields(content))
+	return &model.Article{
+		Title:        title,
+		Content:      content,
+		URL:          targetURL,
+		WordCount:    words,
+		SourceDomain: parsed.Hostname(),
 		IsSocial:     true,
 		Platform:     config.PlatformTwitter,
 	}, nil
@@ -232,9 +356,9 @@ func (s *SocialScraper) scrapeOpenGraph(ctx context.Context, targetURL string, p
 	}
 	title := fmt.Sprintf("Postingan %s", platformName)
 	if rawTitle != "" {
-		if idx := strings.Index(rawTitle, " on Instagram:"); idx != -1 {
+		if idx := strings.Index(rawTitle, " on Instagram"); idx != -1 {
 			title = fmt.Sprintf("Postingan Instagram (%s)", strings.TrimSpace(rawTitle[:idx]))
-		} else if idx := strings.Index(rawTitle, " on Threads:"); idx != -1 {
+		} else if idx := strings.Index(rawTitle, " on Threads"); idx != -1 {
 			title = fmt.Sprintf("Postingan Threads (%s)", strings.TrimSpace(rawTitle[:idx]))
 		} else {
 			title = rawTitle
@@ -252,6 +376,8 @@ func (s *SocialScraper) scrapeOpenGraph(ctx context.Context, targetURL string, p
 		cleanContent = rawTitle
 	}
 
+	title = html.UnescapeString(title)
+	cleanContent = html.UnescapeString(cleanContent)
 	cleanContent = strings.TrimSpace(cleanContent)
 	if cleanContent == "" {
 		return nil, ErrSocialCaptionNotFound
