@@ -10,16 +10,12 @@ function isSelfUrl(inputUrl: string): boolean {
       host === 'jevbeez.hityo.cloud' ||
       host.endsWith('.jevbeez.hityo.cloud') ||
       host === 'jevbeez.com' ||
-      host.endsWith('.jevbeez.com') ||
-      host === 'localhost' ||
-      host === '127.0.0.1' ||
-      host === '0.0.0.0'
+      host.endsWith('.jevbeez.com')
     )
   } catch {
     return false
   }
 }
-
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const apiBase = process.env.API_INTERNAL_URL || process.env.NUXT_API_INTERNAL_URL || config.apiInternalUrl || 'http://api:8080'
@@ -73,7 +69,13 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: status,
       statusMessage: msg,
-      data: { error: msg, cooldown_seconds: errData.cooldown_seconds }
+      data: {
+        error: msg,
+        cooldown_seconds: errData.cooldown_seconds,
+        blocked: errData.blocked,
+        reason: errData.reason,
+        expires_at: errData.expires_at
+      }
     })
   }
 })

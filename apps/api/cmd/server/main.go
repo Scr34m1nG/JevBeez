@@ -86,6 +86,51 @@ func main() {
 		})
 	})
 
+	// Global IP ban check middleware
+	app.Use(func(c *fiber.Ctx) error {
+		clientIP := c.IP()
+		if blocked, info, err := redisCache.IsIPBlocked(c.Context(), clientIP); err == nil && blocked {
+			reason := "BLOCKED"
+			expiresAt := ""
+			if info != nil {
+				reason = info.Reason
+				expiresAt = info.ExpiresAt
+			}
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"error":      "Akses ditolak: Alamat IP Anda diblokir selama 24 jam karena terdeteksi melakukan aktivitas berbahaya",
+				"blocked":    true,
+				"reason":     reason,
+				"expires_at": expiresAt,
+			})
+		}
+		return c.Next()
+	})
+
+	// Honeypot trap routes for automated scanners
+	honeypotPaths := []string{
+		"/.env",
+		"/.git",
+		"/.git/*",
+		"/.aws/*",
+		"/wp-admin*",
+		"/wp-login*",
+		"/phpmyadmin*",
+		"/actuator*",
+		"/shell*",
+		"/c99*",
+		"/r57*",
+	}
+	for _, p := range honeypotPaths {
+		app.All(p, func(c *fiber.Ctx) error {
+			_ = redisCache.BlockIP(c.Context(), c.IP(), "SCANNER_PROBE", c.Path(), config.DefaultBlockDuration)
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"error":   "Akses ditolak: Alamat IP Anda diblokir selama 24 jam karena memindai endpoint sensitif",
+				"blocked": true,
+				"reason":  "SCANNER_PROBE",
+			})
+		})
+	}
+
 	app.Post("/api/v1/analyze", analyzeHandler.Handle)
 
 	quit := make(chan os.Signal, 1)

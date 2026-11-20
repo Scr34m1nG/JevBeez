@@ -23,6 +23,9 @@
       <UrlForm
         :is-loading="isLoading"
         :is-cooldown-waiting="isCooldownWaiting"
+        :is-blocked="isBlocked"
+        :blocked-reason="blockedReason"
+        :blocked-expires-at="blockedExpiresAt"
         :cooldown-seconds="cooldownSeconds"
         :error-message="error"
         :is-easter-egg="isEasterEgg"
@@ -49,6 +52,12 @@
       </div>
     </main>
 
+    <!-- Self-Check Confirmation Modal -->
+    <SelfCheckModal
+      :visible="showSelfCheckModal"
+      @dismiss="dismissSelfCheckModal"
+    />
+
     <!-- Footer -->
     <footer class="border-t border-slate-200 bg-white py-6 text-xs text-slate-500 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))]">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
@@ -69,12 +78,17 @@ import { useAnalyze } from '~/composables/useAnalyze'
 const {
   isLoading,
   isCooldownWaiting,
+  isBlocked,
+  blockedReason,
+  blockedExpiresAt,
   error,
   result,
   cooldownSeconds,
   isEasterEgg,
+  showSelfCheckModal,
   analyze,
   cancelCooldownWait,
+  dismissSelfCheckModal,
   reset
 } = useAnalyze()
 </script>

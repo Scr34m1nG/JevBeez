@@ -23,7 +23,7 @@
             type="url"
             required
             placeholder="https://..."
-            :disabled="isLoading"
+            :disabled="isLoading || isBlocked"
             class="w-full bg-transparent text-slate-900 placeholder-slate-400 font-medium text-sm sm:text-base focus:outline-none disabled:opacity-50 py-1"
           />
 
@@ -58,11 +58,12 @@
         <!-- Submit Button -->
         <button
           type="submit"
-          :disabled="isLoading || !inputUrl.trim()"
+          :disabled="isLoading || isBlocked || !inputUrl.trim()"
           class="px-5 py-3 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-semibold text-sm sm:text-base flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0 min-h-[46px]"
         >
           <span v-if="isLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
           <span v-if="isLoading">Memeriksa Fakta...</span>
+          <span v-else-if="isBlocked" class="text-rose-400 font-bold">Akses Diblokir</span>
           <span v-else-if="isCooldownWaiting" class="flex items-center gap-2 text-amber-300">
             <span class="w-3.5 h-3.5 border-2 border-amber-300/30 border-t-amber-300 rounded-full animate-spin"></span>
             <span>Antrean ({{ cooldownSeconds }}s)...</span>
@@ -103,9 +104,34 @@
       Mohon tunggu jeda <strong>{{ cooldownSeconds }} detik</strong> sebelum pemeriksaan berikutnya (atau klik 'Antrekan' untuk otomatis diproses setelah jeda).
     </div>
 
+    <!-- Security IP Ban Alert -->
+    <div
+      v-if="isBlocked"
+      class="mt-3 p-4 rounded-xl bg-rose-950 text-rose-100 border-2 border-rose-600 text-xs sm:text-sm shadow-md"
+    >
+      <div class="flex items-start gap-3">
+        <div class="p-2 rounded-lg bg-rose-900/80 text-rose-400 shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div class="flex-1 space-y-1">
+          <div class="font-bold text-white text-sm flex items-center gap-2">
+            <span>Akses Ditolak: Alamat IP Anda Diblokir (24 Jam)</span>
+          </div>
+          <p class="text-rose-200 leading-relaxed">
+            {{ errorMessage || 'Sistem pertahanan JevBeez mendeteksi aktivitas eksploitasi berbahaya dari alamat IP Anda. Akses telah diblokir secara otomatis selama 24 jam demi keamanan sistem.' }}
+          </p>
+          <div v-if="blockedReason" class="text-xs text-rose-400 font-mono pt-1">
+            Alasan: {{ blockedReason }}
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Easter Egg Troll Alert -->
     <div
-      v-if="errorMessage && isEasterEgg"
+      v-else-if="errorMessage && isEasterEgg"
       class="mt-3 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 text-amber-950 text-xs sm:text-sm shadow-sm"
     >
       <div class="flex items-start gap-3">
@@ -150,6 +176,9 @@ import { ref, onMounted } from 'vue'
 const props = defineProps<{
   isLoading: boolean
   isCooldownWaiting?: boolean
+  isBlocked?: boolean
+  blockedReason?: string
+  blockedExpiresAt?: string
   cooldownSeconds: number
   errorMessage?: string | null
   isEasterEgg?: boolean
