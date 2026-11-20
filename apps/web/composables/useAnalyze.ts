@@ -8,6 +8,12 @@ export const useAnalyze = () => {
   const result = ref<VerificationResult | null>(null)
   const cooldownSeconds = ref(0)
   const pendingUrl = ref('')
+  const isEasterEgg = ref(false)
+  const showSelfCheckModal = ref(false)
+  const isBlocked = ref(false)
+  const blockedReason = ref('')
+  const blockedExpiresAt = ref('')
+  const selfCheckCount = ref(0)
   let timer: ReturnType<typeof setInterval> | null = null
 
   const startCooldown = (seconds: number) => {
@@ -43,7 +49,6 @@ export const useAnalyze = () => {
 
     const trimmedUrl = rawUrl.trim()
 
-    // Jika sedang dalam jeda cooldown, antrekan URL dan jalankan otomatis saat jeda selesai
     if (cooldownSeconds.value > 0) {
       pendingUrl.value = trimmedUrl
       isCooldownWaiting.value = true
@@ -86,10 +91,36 @@ export const useAnalyze = () => {
           return
         }
 
+        if (response.status === 403 && (data?.data?.blocked || data?.blocked)) {
+          isBlocked.value = true
+          blockedReason.value = data?.data?.reason || data?.reason || 'Aktivitas Berbahaya'
+          blockedExpiresAt.value = data?.data?.expires_at || data?.expires_at || ''
+          const errorMsg = data?.data?.error || data?.error || 'Akses ditolak: Alamat IP Anda diblokir selama 24 jam karena terdeteksi aktivitas berbahaya.'
+          throw new Error(errorMsg)
+        }
+
+        const isSelf = data?.data?.code === 'SELF_CHECK_EASTER_EGG' || (data?.data?.error && data.data.error.includes('INCEPTION'))
+        if (isSelf) {
+          selfCheckCount.value++
+          isEasterEgg.value = true
+
+          if (selfCheckCount.value >= 3) {
+            showSelfCheckModal.value = true
+            error.value = '🛑 WKWK Ngotot banget ya! Tombol "Periksa Fakta" angkat tangan menyerah menghadapi Anda 🏳️🤣. Serius nih, yuk masukkan tautan berita dari web lain sekarang!'
+          } else if (selfCheckCount.value === 2) {
+            error.value = '👀 Masih ngeyel dicoba lagi? Udah dibilang jangan ngetes web ini sendiri, nanti server kami kena krisis identitas! 🤖💥 Hayuk buruan cari tautan berita lain!'
+          } else {
+            error.value = '🚨 INCEPTION DETECTED! Anda sedang mengecek website JevBeez di JevBeez sendiri 🪞. AI kami sempat krisis eksistensial menatap cermin... Tenang, kami 100% fakta & bebas hoax! Silakan coba periksa tautan berita dari situs atau media sosial lain ya.'
+          }
+          return
+        }
+
+        isEasterEgg.value = false
         const errorMsg = data?.data?.error || data?.error || data?.message || data?.statusMessage || (response.status >= 500 ? 'Layanan verifikasi sedang tidak dapat diakses (server error).' : 'Terjadi kesalahan saat memverifikasi artikel.')
         throw new Error(errorMsg)
       }
 
+      isEasterEgg.value = false
       if (!data) {
         throw new Error('Format respons dari server tidak valid.')
       }
@@ -105,21 +136,32 @@ export const useAnalyze = () => {
     }
   }
 
+  const dismissSelfCheckModal = () => {
+    showSelfCheckModal.value = false
+  }
+
   const reset = () => {
     result.value = null
     error.value = null
     pendingUrl.value = ''
     isCooldownWaiting.value = false
+    isEasterEgg.value = false
   }
 
   return {
     isLoading,
     isCooldownWaiting,
+    isBlocked,
+    blockedReason,
+    blockedExpiresAt,
     error,
     result,
     cooldownSeconds,
+    isEasterEgg,
+    showSelfCheckModal,
     analyze,
     cancelCooldownWait,
+    dismissSelfCheckModal,
     reset
   }
 }

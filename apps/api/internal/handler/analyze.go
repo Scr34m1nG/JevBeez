@@ -41,10 +41,35 @@ func NewAnalyzeHandler(
 }
 
 func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
+	clientIP := c.IP()
+	if blocked, info, err := h.cache.IsIPBlocked(c.Context(), clientIP); err == nil && blocked {
+		reason := "BLOCKED"
+		expiresAt := ""
+		if info != nil {
+			reason = info.Reason
+			expiresAt = info.ExpiresAt
+		}
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error":      "Akses ditolak: Alamat IP Anda diblokir selama 24 jam karena terdeteksi melakukan aktivitas berbahaya",
+			"blocked":    true,
+			"reason":     reason,
+			"expires_at": expiresAt,
+		})
+	}
+
 	var req model.AnalyzeRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Format request tidak valid, pastikan JSON memiliki field 'url'",
+		})
+	}
+
+	if isExploit, reason, detail := security.DetectExploit(req.URL); isExploit {
+		_ = h.cache.BlockIP(c.Context(), clientIP, reason, req.URL, config.DefaultBlockDuration)
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error":   fmt.Sprintf("Akses ditolak: Alamat IP Anda diblokir selama 24 jam karena terdeteksi aktivitas eksploitasi (%s)", detail),
+			"blocked": true,
+			"reason":  reason,
 		})
 	}
 
@@ -59,7 +84,6 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 		return c.JSON(cached)
 	}
 
-	clientIP := c.IP()
 	if allowed, remaining, err := h.cache.CheckAndSetCooldown(c.Context(), clientIP, config.DefaultCooldownDuration); err == nil && !allowed {
 		c.Set("Retry-After", fmt.Sprintf("%.0f", remaining.Seconds()))
 		return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
@@ -71,8 +95,11 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 	article, err := h.scraper.Extract(c.Context(), normalizedURL)
 	if err != nil {
 		if errors.Is(err, security.ErrPrivateIPBlocked) || errors.Is(err, security.ErrInvalidIPAddress) {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Akses ke URL ini diblokir demi alasan keamanan",
+			_ = h.cache.BlockIP(c.Context(), clientIP, security.ReasonSSRFAttempt, normalizedURL, config.DefaultBlockDuration)
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"error":   "Akses ditolak: Alamat IP Anda diblokir selama 24 jam karena mencoba mengakses alamat IP privat/internal (SSRF)",
+				"blocked": true,
+				"reason":  security.ReasonSSRFAttempt,
 			})
 		}
 

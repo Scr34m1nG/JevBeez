@@ -1,3 +1,21 @@
+function isSelfUrl(inputUrl: string): boolean {
+  try {
+    let normalized = inputUrl.trim()
+    if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
+      normalized = 'https://' + normalized
+    }
+    const parsed = new URL(normalized)
+    const host = parsed.hostname.toLowerCase()
+    return (
+      host === 'jevbeez.hityo.cloud' ||
+      host.endsWith('.jevbeez.hityo.cloud') ||
+      host === 'jevbeez.com' ||
+      host.endsWith('.jevbeez.com')
+    )
+  } catch {
+    return false
+  }
+}
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const apiBase = process.env.API_INTERNAL_URL || process.env.NUXT_API_INTERNAL_URL || config.apiInternalUrl || 'http://api:8080'
@@ -16,6 +34,17 @@ export default defineEventHandler(async (event) => {
       statusCode: 400,
       statusMessage: 'URL melebihi batas panjang maksimum (2048 karakter)',
       data: { error: 'URL melebihi batas panjang maksimum (2048 karakter)' }
+    })
+  }
+
+  if (isSelfUrl(body.url)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'INCEPTION_SELF_CHECK',
+      data: {
+        code: 'SELF_CHECK_EASTER_EGG',
+        error: '🚨 INCEPTION DETECTED! Anda sedang mengecek website JevBeez di JevBeez sendiri 🪞. AI kami sudah menatap cermin dan yakin kami 100% fakta bukan hoax 😎. Silakan coba periksa tautan berita dari situs atau media sosial lain!'
+      }
     })
   }
 
@@ -40,7 +69,13 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: status,
       statusMessage: msg,
-      data: { error: msg, cooldown_seconds: errData.cooldown_seconds }
+      data: {
+        error: msg,
+        cooldown_seconds: errData.cooldown_seconds,
+        blocked: errData.blocked,
+        reason: errData.reason,
+        expires_at: errData.expires_at
+      }
     })
   }
 })

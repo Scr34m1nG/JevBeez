@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -15,7 +16,8 @@ import (
 )
 
 type CacheService struct {
-	client *redis.Client
+	client       *redis.Client
+	blockedCache sync.Map
 }
 
 func NewRedisService(addr, password string, db int) (*CacheService, error) {
@@ -78,6 +80,77 @@ func (s *CacheService) CheckAndSetCooldown(ctx context.Context, ip string, durat
 	}
 
 	return true, 0, nil
+}
+
+func (s *CacheService) BlockIP(ctx context.Context, ip, reason, payload string, duration time.Duration) error {
+	if ip == "" {
+		return nil
+	}
+
+	if len(payload) > 100 {
+		payload = payload[:100] + "..."
+	}
+
+	now := time.Now()
+	expiresAt := now.Add(duration)
+
+	info := model.BlockedIPInfo{
+		IP:        ip,
+		Reason:    reason,
+		Payload:   payload,
+		BlockedAt: now.Format(time.RFC3339),
+		ExpiresAt: expiresAt.Format(time.RFC3339),
+	}
+
+	data, err := json.Marshal(info)
+	if err != nil {
+		return err
+	}
+
+	key := fmt.Sprintf("jevbeez:blocked:%s", ip)
+	if err := s.client.Set(ctx, key, data, duration).Err(); err != nil {
+		return err
+	}
+
+	s.blockedCache.Store(ip, expiresAt)
+	return nil
+}
+
+func (s *CacheService) IsIPBlocked(ctx context.Context, ip string) (bool, *model.BlockedIPInfo, error) {
+	if ip == "" {
+		return false, nil, nil
+	}
+
+	if val, ok := s.blockedCache.Load(ip); ok {
+		if exp, ok := val.(time.Time); ok && time.Now().Before(exp) {
+			return true, &model.BlockedIPInfo{
+				IP:        ip,
+				Reason:    "BLOCKED",
+				ExpiresAt: exp.Format(time.RFC3339),
+			}, nil
+		}
+		s.blockedCache.Delete(ip)
+	}
+
+	key := fmt.Sprintf("jevbeez:blocked:%s", ip)
+	val, err := s.client.Get(ctx, key).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return false, nil, nil
+		}
+		return false, nil, err
+	}
+
+	var info model.BlockedIPInfo
+	if err := json.Unmarshal([]byte(val), &info); err != nil {
+		return true, &model.BlockedIPInfo{IP: ip, Reason: "BLOCKED"}, nil
+	}
+
+	if exp, err := time.Parse(time.RFC3339, info.ExpiresAt); err == nil {
+		s.blockedCache.Store(ip, exp)
+	}
+
+	return true, &info, nil
 }
 
 func (s *CacheService) Close() error {
