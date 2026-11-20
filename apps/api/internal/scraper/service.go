@@ -35,9 +35,13 @@ func (s *ScraperService) Extract(ctx context.Context, targetURL string) (*model.
 	platform, isSocial := DetectSocialPlatform(targetURL)
 	if isSocial {
 		article, err = s.social.Scrape(ctx, targetURL, platform)
-		if article != nil && err == nil && s.validateArticle(article) == nil {
-			return article, nil
+		if err != nil {
+			return nil, err
 		}
+		if err := s.validateArticle(article); err != nil {
+			return nil, err
+		}
+		return article, nil
 	}
 
 	if s.firecrawl.apiKey != "" {
@@ -51,11 +55,6 @@ func (s *ScraperService) Extract(ctx context.Context, targetURL string) (*model.
 		}
 	}
 
-	if isSocial && article != nil {
-		article.IsSocial = true
-		article.Platform = platform
-	}
-
 	if err := s.validateArticle(article); err != nil {
 		return nil, err
 	}
@@ -64,8 +63,12 @@ func (s *ScraperService) Extract(ctx context.Context, targetURL string) (*model.
 }
 
 func (s *ScraperService) validateArticle(article *model.Article) error {
-	if article == nil || article.Content == "" {
+	if article == nil || strings.TrimSpace(article.Content) == "" {
 		return ErrEmptyArticle
+	}
+
+	if article.IsSocial && IsSocialLoginWall(article.Title, article.Content) {
+		return ErrSocialLoginRequired
 	}
 
 	lowerTitle := strings.ToLower(article.Title)

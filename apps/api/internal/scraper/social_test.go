@@ -25,6 +25,9 @@ func TestDetectSocialPlatform(t *testing.T) {
 		{"https://www.threads.net/@user/post/Dxyz456", config.PlatformThreads, true},
 		{"https://facebook.com/story.php?story_fbid=123", config.PlatformFacebook, true},
 		{"https://fb.watch/abc123xyz/", config.PlatformFacebook, true},
+		{"https://www.facebook.com/share/v/19z", config.PlatformFacebook, true},
+		{"https://fb.com/share/v/123", config.PlatformFacebook, true},
+		{"https://m.facebook.com/watch/?v=123", config.PlatformFacebook, true},
 		{"https://news.detik.com/berita/123-berita-nasional", "", false},
 		{"https://kompas.com/tren/read/123", "", false},
 		{"not-a-valid-url", "", false},
@@ -80,5 +83,64 @@ func TestSocialScraper_ParseInstagramCaption(t *testing.T) {
 	}
 	if !article.IsSocial {
 		t.Errorf("expected article.IsSocial to be true")
+	}
+}
+
+func TestSocialScraper_FacebookLoginWall(t *testing.T) {
+	mockHTML := `<!DOCTYPE html>
+<html>
+<head>
+	<meta property="og:title" content="Masuk atau Daftar untuk Melihat" />
+	<meta property="og:description" content="Lihat postingan, foto, dan lainnya di Facebook." />
+</head>
+<body></body>
+</html>`
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html")
+		w.Write([]byte(mockHTML))
+	}))
+	defer server.Close()
+
+	scraper := NewSocialScraperWithClient(server.Client())
+	_, err := scraper.scrapeOpenGraph(context.Background(), server.URL, config.PlatformFacebook)
+	if err == nil {
+		t.Fatalf("expected error for facebook login wall, got nil")
+	}
+	if err != ErrSocialLoginRequired {
+		t.Errorf("expected ErrSocialLoginRequired, got: %v", err)
+	}
+}
+
+func TestSocialScraper_UnavailablePost(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer server.Close()
+
+	scraper := NewSocialScraperWithClient(server.Client())
+	_, err := scraper.scrapeOpenGraph(context.Background(), server.URL, config.PlatformFacebook)
+	if err != ErrSocialContentUnavailable {
+		t.Errorf("expected ErrSocialContentUnavailable, got: %v", err)
+	}
+}
+
+func TestIsSocialLoginWall(t *testing.T) {
+	cases := []struct {
+		title string
+		desc  string
+		want  bool
+	}{
+		{"Masuk atau Daftar untuk Melihat", "Lihat postingan, foto, dan lainnya di Facebook.", true},
+		{"Log in or sign up to view", "See posts, photos and more on Facebook.", true},
+		{"Login • Instagram", "Welcome back to Instagram.", true},
+		{"Berita Hoax Vaksin", "Ini adalah caption lengkap mengenai klaim vaksin tertentu.", false},
+	}
+
+	for _, tc := range cases {
+		got := IsSocialLoginWall(tc.title, tc.desc)
+		if got != tc.want {
+			t.Errorf("IsSocialLoginWall(%q, %q) = %v, want %v", tc.title, tc.desc, got, tc.want)
+		}
 	}
 }

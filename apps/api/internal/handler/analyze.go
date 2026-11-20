@@ -70,18 +70,19 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 
 	article, err := h.scraper.Extract(c.Context(), normalizedURL)
 	if err != nil {
-		if errors.Is(err, scraper.ErrInsufficientContent) || errors.Is(err, scraper.ErrEmptyArticle) {
-			return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
-				"error": err.Error(),
-			})
-		}
 		if errors.Is(err, security.ErrPrivateIPBlocked) || errors.Is(err, security.ErrInvalidIPAddress) {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Akses ke URL ini diblokir demi alasan keamanan",
 			})
 		}
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
-			"error": "Gagal membaca artikel dari URL tersebut, situs mungkin tidak dapat diakses",
+
+		errMsg := err.Error()
+		if errMsg == "" || errors.Is(err, scraper.ErrEmptyArticle) {
+			errMsg = "Gagal membaca konten dari URL tersebut, situs mungkin tidak dapat diakses atau dibatasi"
+		}
+
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
+			"error": errMsg,
 		})
 	}
 
