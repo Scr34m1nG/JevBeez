@@ -24,6 +24,12 @@ func TestValidateAndNormalizeURL(t *testing.T) {
 			expectErr: false,
 		},
 		{
+			name:      "strips threads and x share tracking params",
+			rawURL:    "https://www.threads.com/@iamrupnath/post/Df9GvpvIIPk?xmt=AQG0FB2745&igsh=XYZ&s=20&t=abc",
+			wantURL:   "https://www.threads.com/@iamrupnath/post/Df9GvpvIIPk",
+			expectErr: false,
+		},
+		{
 			name:      "rejects invalid scheme",
 			rawURL:    "ftp://news.com/file.txt",
 			expectErr: true,

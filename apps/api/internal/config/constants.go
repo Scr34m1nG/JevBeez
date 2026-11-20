@@ -26,6 +26,7 @@ const (
 	PlatformFacebook  = "facebook"
 
 	TwitterOEmbedEndpoint = "https://publish.twitter.com/oembed"
+	FxTwitterEndpoint     = "https://api.fxtwitter.com"
 	YouTubeOEmbedEndpoint = "https://www.youtube.com/oembed"
 
 	JevEndpoint               = "https://api.typesafe.ai/v1/systemone"

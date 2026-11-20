@@ -32,6 +32,11 @@ var trackingParams = map[string]struct{}{
 	"igshid":                 {},
 	"si":                     {},
 	"mibextid":               {},
+	"xmt":                    {},
+	"igsh":                   {},
+	"s":                      {},
+	"t":                      {},
+	"context":                {},
 }
 
 func ValidateAndNormalizeURL(rawURL string) (string, error) {
