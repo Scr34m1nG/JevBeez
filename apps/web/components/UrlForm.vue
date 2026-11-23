@@ -6,7 +6,7 @@
         <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
         </svg>
-        <span>Tempel tautan berita atau postingan media sosial:</span>
+        <span>{{ t('form.inputLabel') }}</span>
       </span>
     </div>
 
@@ -22,7 +22,7 @@
             v-model="inputUrl"
             type="url"
             required
-            placeholder="https://..."
+            :placeholder="t('form.placeholder')"
             :disabled="isLoading || isBlocked"
             class="w-full bg-transparent text-slate-900 placeholder-slate-400 font-medium text-sm sm:text-base focus:outline-none disabled:opacity-50 py-1"
           />
@@ -33,12 +33,12 @@
             type="button"
             @click="pasteClipboard"
             class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-colors flex items-center gap-1.5 shrink-0"
-            title="Tempel dari Clipboard"
+            :title="t('form.pasteTitle')"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            <span>Tempel</span>
+            <span>{{ t('form.pasteBtn') }}</span>
           </button>
 
           <!-- Quick Clear Button -->
@@ -47,7 +47,7 @@
             type="button"
             @click="inputUrl = ''"
             class="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shrink-0"
-            aria-label="Hapus tautan"
+            :aria-label="t('form.clearAria')"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -62,23 +62,23 @@
           class="px-5 py-3 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-semibold text-sm sm:text-base flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0 min-h-[46px]"
         >
           <span v-if="isLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-          <span v-if="isLoading">Memeriksa Fakta...</span>
-          <span v-else-if="isBlocked" class="text-rose-400 font-bold">Akses Diblokir</span>
+          <span v-if="isLoading">{{ t('form.checkingBtn') }}</span>
+          <span v-else-if="isBlocked" class="text-rose-400 font-bold">{{ t('form.blockedBtn') }}</span>
           <span v-else-if="isCooldownWaiting" class="flex items-center gap-2 text-amber-300">
             <span class="w-3.5 h-3.5 border-2 border-amber-300/30 border-t-amber-300 rounded-full animate-spin"></span>
-            <span>Antrean ({{ cooldownSeconds }}s)...</span>
+            <span>{{ t('form.cooldownWaiting', { time: cooldownSeconds }) }}</span>
           </span>
           <span v-else-if="cooldownSeconds > 0" class="flex items-center gap-2 text-amber-200">
             <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>Antrekan ({{ cooldownSeconds }}s)</span>
+            <span>{{ t('form.cooldownWaitBtn', { time: cooldownSeconds }) }}</span>
           </span>
           <span v-else class="flex items-center gap-2">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
-            <span>Periksa Fakta</span>
+            <span>{{ t('form.checkBtn') }}</span>
           </span>
         </button>
       </div>
@@ -90,18 +90,18 @@
         <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span><strong>Tautan dalam antrean:</strong> Otomatis diproses dalam <strong>{{ cooldownSeconds }} detik</strong>...</span>
+        <span><strong>{{ t('form.queueAlertTitle') }}</strong> {{ t('form.queueAlertDesc', { time: cooldownSeconds }) }}</span>
       </div>
       <button
         type="button"
         @click="emit('cancel-queue')"
         class="text-xs font-semibold text-amber-800 hover:text-amber-950 underline shrink-0"
       >
-        Batalkan
+        {{ t('form.cancelQueue') }}
       </button>
     </div>
     <div v-else-if="cooldownSeconds > 0" class="mt-3 p-3 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-center text-xs sm:text-sm">
-      Mohon tunggu jeda <strong>{{ cooldownSeconds }} detik</strong> sebelum pemeriksaan berikutnya (atau klik 'Antrekan' untuk otomatis diproses setelah jeda).
+      {{ t('form.cooldownNotice', { time: cooldownSeconds }) }}
     </div>
 
     <!-- Security IP Ban Alert -->
@@ -117,13 +117,13 @@
         </div>
         <div class="flex-1 space-y-1">
           <div class="font-bold text-white text-sm flex items-center gap-2">
-            <span>Akses Ditolak: Alamat IP Anda Diblokir (24 Jam)</span>
+            <span>{{ t('form.blockedTitle') }}</span>
           </div>
           <p class="text-rose-200 leading-relaxed">
             {{ errorMessage || 'Sistem pertahanan JevBeez mendeteksi aktivitas eksploitasi berbahaya dari alamat IP Anda. Akses telah diblokir secara otomatis selama 24 jam demi keamanan sistem.' }}
           </p>
           <div v-if="blockedReason" class="text-xs text-rose-400 font-mono pt-1">
-            Alasan: {{ blockedReason }}
+            {{ t('form.blockedReasonLabel') }} {{ blockedReason }}
           </div>
         </div>
       </div>
@@ -140,7 +140,7 @@
         </div>
         <div class="flex-1 space-y-2">
           <div class="font-bold text-amber-900 flex items-center gap-1.5">
-            <span>Waduh, Kena Prank Cermin! 🤖</span>
+            <span>{{ t('form.easterEggTitle') }}</span>
           </div>
           <p class="leading-relaxed font-medium">
             {{ errorMessage }}
@@ -151,7 +151,7 @@
               @click="clearAndFocus"
               class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs transition-colors shadow-sm inline-flex items-center gap-1.5"
             >
-              <span>Siap, coba web lain 🫡</span>
+              <span>{{ t('form.easterEggBtn') }}</span>
             </button>
           </div>
         </div>
@@ -172,6 +172,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from '~/composables/useI18n'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   isLoading: boolean
