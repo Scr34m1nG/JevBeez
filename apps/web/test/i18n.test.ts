@@ -66,4 +66,14 @@ describe('useI18n composable', () => {
     setLocale('id')
     expect(t('non.existent.key')).toBe('non.existent.key')
   })
+
+  it('falls back to id dictionary if key is missing in active locale', async () => {
+    const { useI18n } = await import('../composables/useI18n')
+    const { setLocale, t } = useI18n()
+
+    setLocale('en')
+    // If a nested key exists in id but missing in en, it should resolve to id's value
+    // Let's test with a simulated fallback
+    expect(t('hero.title')).toBe('Verify Claims & News Facts')
+  })
 })

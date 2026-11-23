@@ -32,6 +32,7 @@
             type="button"
             @click="setLocale('id')"
             :class="isId ? 'bg-white text-slate-950 shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+            :aria-pressed="isId"
             class="px-2 py-1 rounded-md transition-all cursor-pointer"
             aria-label="Bahasa Indonesia"
           >
@@ -41,6 +42,7 @@
             type="button"
             @click="setLocale('en')"
             :class="isEn ? 'bg-white text-slate-950 shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+            :aria-pressed="isEn"
             class="px-2 py-1 rounded-md transition-all cursor-pointer"
             aria-label="English"
           >

@@ -9,11 +9,38 @@ const dictionaries: Record<Locale, TranslationSchema> = { id, en }
 
 const currentLocale = ref<Locale>('id')
 
-if (typeof window !== 'undefined') {
-  const saved = localStorage.getItem(LOCALE_STORAGE_KEY) as Locale | null
-  if (saved && (saved === 'id' || saved === 'en')) {
-    currentLocale.value = saved
+function initLocale() {
+  if (typeof useCookie === 'function') {
+    try {
+      const cookie = useCookie<Locale>(LOCALE_STORAGE_KEY, { default: () => 'id' })
+      if (cookie.value === 'id' || cookie.value === 'en') {
+        currentLocale.value = cookie.value
+        return
+      }
+    } catch {}
   }
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem(LOCALE_STORAGE_KEY) as Locale | null
+      if (saved === 'id' || saved === 'en') {
+        currentLocale.value = saved
+      }
+    } catch {}
+  }
+}
+
+initLocale()
+
+function resolveKey(dict: any, keys: string[]): string | null {
+  let current: any = dict
+  for (const k of keys) {
+    if (current && typeof current === 'object' && k in current) {
+      current = current[k]
+    } else {
+      return null
+    }
+  }
+  return typeof current === 'string' ? current : null
 }
 
 export function useI18n() {
@@ -23,6 +50,12 @@ export function useI18n() {
 
   const setLocale = (newLocale: Locale) => {
     currentLocale.value = newLocale
+    if (typeof useCookie === 'function') {
+      try {
+        const cookie = useCookie<Locale>(LOCALE_STORAGE_KEY)
+        cookie.value = newLocale
+      } catch {}
+    }
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem(LOCALE_STORAGE_KEY, newLocale)
@@ -31,29 +64,21 @@ export function useI18n() {
   }
 
   const t = (key: string, params?: Record<string, string | number>): string => {
-    const dict = dictionaries[currentLocale.value] || id
     const keys = key.split('.')
-    let current: any = dict
+    const primary = resolveKey(dictionaries[currentLocale.value], keys)
+    const fallback = primary !== null ? primary : resolveKey(id, keys)
 
-    for (const k of keys) {
-      if (current && typeof current === 'object' && k in current) {
-        current = current[k]
-      } else {
-        return key
-      }
-    }
-
-    if (typeof current !== 'string') {
+    if (fallback === null) {
       return key
     }
 
     if (params) {
       return Object.entries(params).reduce((str, [paramKey, val]) => {
-        return str.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(val))
-      }, current)
+        return str.replaceAll(`{${paramKey}}`, String(val))
+      }, fallback)
     }
 
-    return current
+    return fallback
   }
 
   return {

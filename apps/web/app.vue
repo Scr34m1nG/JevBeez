@@ -79,7 +79,12 @@ import { ref } from 'vue'
 import { useAnalyze } from '~/composables/useAnalyze'
 import { useI18n } from '~/composables/useI18n'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+useHead(() => ({
+  htmlAttrs: {
+    lang: locale.value
+  }
+}))
 const urlFormRef = ref<{ clearAndFocus: () => void } | null>(null)
 
 const {
