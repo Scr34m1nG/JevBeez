@@ -42,3 +42,28 @@ describe('i18n locales dictionary schema & parity', () => {
     expect(en.verdict.hoax).toBe('Confirmed Hoax / Fake')
   })
 })
+
+describe('useI18n composable', () => {
+  it('switches locales and translates nested keys with parameter replacement', async () => {
+    const { useI18n } = await import('../composables/useI18n')
+    const { locale, setLocale, t, isId, isEn } = useI18n()
+
+    setLocale('id')
+    expect(locale.value).toBe('id')
+    expect(isId.value).toBe(true)
+    expect(isEn.value).toBe(false)
+    expect(t('hero.title')).toBe('Cek Kebenaran Fakta & Berita')
+    expect(t('form.cooldownWaiting', { time: 12 })).toBe('Lagi antre (12s)...')
+
+    setLocale('en')
+    expect(locale.value).toBe('en')
+    expect(isId.value).toBe(false)
+    expect(isEn.value).toBe(true)
+    expect(t('hero.title')).toBe('Verify Claims & News Facts')
+    expect(t('form.cooldownWaiting', { time: 12 })).toBe('Queued (12s)...')
+
+    // Reset back to id
+    setLocale('id')
+    expect(t('non.existent.key')).toBe('non.existent.key')
+  })
+})
