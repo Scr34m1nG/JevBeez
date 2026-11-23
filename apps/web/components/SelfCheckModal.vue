@@ -15,18 +15,19 @@
             <div class="text-center space-y-3">
               <div class="text-5xl select-none">🤔</div>
               <h3 class="text-lg sm:text-xl font-bold text-slate-900">
-                Yakin masih mau coba?
+                {{ t('selfCheck.modalTitle') }}
               </h3>
               <p class="text-sm text-slate-600 leading-relaxed">
-                Anda sudah mencoba mengecek website JevBeez di JevBeez sendiri. Apakah Anda yakin ingin melanjutkan?
+                {{ t('selfCheck.modalDesc') }}
               </p>
             </div>
 
             <!-- Actions area with dodge arena -->
             <div class="relative pt-2 pb-1">
               <div class="flex flex-col sm:flex-row items-center gap-3">
-                <!-- Dodging "Ya, periksa!" button -->
+                <!-- Dodging button -->
                 <button
+                  data-testid="dodge-button"
                   type="button"
                   :style="dodgeStyle"
                   @mouseenter="handleAttempt"
@@ -43,7 +44,7 @@
                   @click="handleClose"
                   class="w-full sm:flex-1 px-4 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm transition-colors border border-slate-200 shrink-0"
                 >
-                  Hmm, nggak jadi deh
+                  {{ t('selfCheck.cancelBtn') }}
                 </button>
               </div>
 
@@ -64,6 +65,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from '~/composables/useI18n'
 
 const props = defineProps<{
   visible: boolean
@@ -74,22 +76,16 @@ const emit = defineEmits<{
   (e: 'caught-and-reset'): void
 }>()
 
+const { t } = useI18n()
 const dodgeCount = ref(0)
 const offsetX = ref(0)
 const offsetY = ref(0)
 
-const dodgeTaunts = [
-  'Eits! Kecepetan tombolnya kabur 💨',
-  'Wlee 😜 Kurang cepet ngeklik!',
-  'Hampir aja kena! Coba kejar lagi 🏃‍♂️',
-  'Lincah kan tombolnya? 🎯'
-]
-
 const currentButtonText = computed(() => {
-  if (dodgeCount.value === 0) return 'Ya, periksa!'
-  if (dodgeCount.value === 1) return 'Eits...!'
-  if (dodgeCount.value === 2) return 'Kejar aku!'
-  return 'Hampir!'
+  if (dodgeCount.value === 0) return t('selfCheck.dodge0')
+  if (dodgeCount.value === 1) return t('selfCheck.dodge1')
+  if (dodgeCount.value === 2) return t('selfCheck.dodge2')
+  return t('selfCheck.dodge3')
 })
 
 const currentButtonEmoji = computed(() => {
@@ -100,8 +96,9 @@ const currentButtonEmoji = computed(() => {
 })
 
 const dodgeTaunt = computed(() => {
-  const index = Math.min(dodgeCount.value - 1, dodgeTaunts.length - 1)
-  return index >= 0 ? dodgeTaunts[index] : ''
+  if (dodgeCount.value <= 0) return ''
+  const tauntIndex = Math.min(dodgeCount.value, 4)
+  return t(`selfCheck.taunt${tauntIndex}`)
 })
 
 const dodgeStyle = computed(() => {
