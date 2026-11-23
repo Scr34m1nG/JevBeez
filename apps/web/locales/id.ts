@@ -20,6 +20,11 @@ export const id = {
     blockedBtn: 'Akses Diblokir',
     cooldownWaiting: 'Lagi antre ({time}s)...',
     cooldownWaitBtn: 'Tunggu sebentar ({time}s)',
+    cooldownNotice: 'Mohon tunggu jeda {time} detik sebelum pemeriksaan berikutnya (atau klik tombol untuk proses otomatis setelah jeda).',
+    blockedTitle: 'Akses Ditolak: Alamat IP Anda Diblokir (24 Jam)',
+    blockedReasonLabel: 'Alasan:',
+    easterEggTitle: 'Waduh, Kena Prank Cermin! 🤖',
+    easterEggBtn: 'Siap, coba web lain 🫡',
     queueAlertTitle: 'Link kamu udah masuk antrean:',
     queueAlertDesc: 'Bakal otomatis dicek dalam {time} detik...',
     cancelQueue: 'Batalkan'
@@ -38,7 +43,19 @@ export const id = {
     detailedHeading: 'Detail Pengujian Fakta AI',
     contradictedByEvidence: 'Indikasi Bohong / Bantahan',
     supportedByEvidence: 'Didukung Bukti Valid',
-    sensationalFraming: 'Gaya Bahasa Klikbait / Sensasi'
+    sensationalFraming: 'Gaya Bahasa Klikbait / Sensasi',
+    shareMsgTitle: '📢 *Hasil Cek Fakta JevBeez AI*',
+    shareMsgStatus: '*Status:*',
+    shareMsgConfidence: '*Tingkat Keyakinan:*',
+    shareMsgArticleTitle: '*Judul Berita:*',
+    shareMsgSummary: '*Penjelasan:*',
+    shareMsgCheckAt: '*Cek kebenaran berita di:*',
+    copyHeader: '[Pemeriksaan Fakta JevBeez]',
+    copyStatus: 'Status:',
+    copyConfidence: 'Keyakinan AI:',
+    copyTitle: 'Judul:',
+    copySummaryLabel: 'Ringkasan:',
+    copyUrlLabel: 'Tautan Berita:'
   },
   verdict: {
     hoax: 'Terbukti Hoax / Palsu',

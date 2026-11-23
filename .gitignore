@@ -22,3 +22,4 @@ redis_data/
 Thumbs.db
 screenshot-*.png
 test-playwright.mjs
+.superpowers/

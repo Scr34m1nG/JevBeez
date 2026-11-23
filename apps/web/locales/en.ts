@@ -22,6 +22,11 @@ export const en: TranslationSchema = {
     blockedBtn: 'Access Blocked',
     cooldownWaiting: 'Queued ({time}s)...',
     cooldownWaitBtn: 'Wait a moment ({time}s)',
+    cooldownNotice: 'Please wait {time} seconds before the next check (or click the button to automatically check after the cooldown).',
+    blockedTitle: 'Access Denied: Your IP is Blocked (24 Hours)',
+    blockedReasonLabel: 'Reason:',
+    easterEggTitle: 'Whoops, Mirror Inception! 🤖',
+    easterEggBtn: 'Got it, check another site 🫡',
     queueAlertTitle: 'Link is in queue:',
     queueAlertDesc: 'Will automatically check in {time} seconds...',
     cancelQueue: 'Cancel'
@@ -40,7 +45,19 @@ export const en: TranslationSchema = {
     detailedHeading: 'AI Decision Details',
     contradictedByEvidence: 'Contradicted by Evidence',
     supportedByEvidence: 'Supported by Evidence',
-    sensationalFraming: 'Sensational / Clickbait Framing'
+    sensationalFraming: 'Sensational / Clickbait Framing',
+    shareMsgTitle: '📢 *JevBeez AI Fact-Check Result*',
+    shareMsgStatus: '*Status:*',
+    shareMsgConfidence: '*Confidence Level:*',
+    shareMsgArticleTitle: '*Headline:*',
+    shareMsgSummary: '*Explanation:*',
+    shareMsgCheckAt: '*Check truth of news at:*',
+    copyHeader: '[JevBeez Fact-Check]',
+    copyStatus: 'Status:',
+    copyConfidence: 'AI Confidence:',
+    copyTitle: 'Title:',
+    copySummaryLabel: 'Summary:',
+    copyUrlLabel: 'Article URL:'
   },
   verdict: {
     hoax: 'Confirmed Hoax / Fake',
