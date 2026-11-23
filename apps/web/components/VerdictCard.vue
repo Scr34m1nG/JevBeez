@@ -19,13 +19,13 @@
         </span>
 
         <span v-if="result.is_cached" class="px-2.5 py-1 rounded-md bg-white/80 border border-slate-300 text-slate-700 text-xs font-mono">
-          Hasil Tersimpan (Cache)
+          {{ t('results.cachedResult') }}
         </span>
       </div>
 
       <!-- Confidence Score -->
       <div class="flex items-center sm:flex-col sm:items-end justify-between text-xs">
-        <span class="text-slate-600 font-medium">Tingkat Keyakinan:</span>
+        <span class="text-slate-600 font-medium">{{ t('results.confidenceLabel') }}</span>
         <span class="text-xl sm:text-2xl font-bold tabular-nums text-slate-900">
           {{ result.confidence }}%
         </span>
@@ -37,10 +37,10 @@
       <div>
         <div class="flex flex-wrap items-center gap-2 mb-2 text-xs">
           <span class="font-mono text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
-            Sumber: {{ result.source_domain }}
+            {{ t('results.sourcePrefix') }} {{ result.source_domain }}
           </span>
           <span v-if="result.is_social" class="font-mono text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
-            {{ result.platform || 'Media Sosial' }}
+            {{ result.platform || t('results.socialMedia') }}
           </span>
         </div>
         <h2 class="text-lg sm:text-xl font-bold text-slate-950 leading-snug break-words">
@@ -51,7 +51,7 @@
       <!-- Analysis Summary -->
       <div class="p-4 sm:p-5 rounded-lg bg-slate-50 border border-slate-200">
         <div class="flex items-center justify-between gap-2 mb-2 text-xs font-semibold text-slate-700">
-          <span>Ringkasan Analisis Fakta:</span>
+          <span>{{ t('results.summaryTitle') }}</span>
         </div>
         <p class="text-sm sm:text-base text-slate-800 leading-relaxed break-words">
           {{ result.summary }}
@@ -67,7 +67,7 @@
             <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.044c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.112.551 4.095 1.517 5.819l-1.617 5.909 6.046-1.587c1.664.908 3.568 1.423 5.597 1.423 6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
             </svg>
-            <span>Bagikan ke WhatsApp</span>
+            <span>{{ t('results.shareWhatsApp') }}</span>
           </button>
 
           <button
@@ -81,7 +81,7 @@
             <svg v-else class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
-            <span>{{ copied ? 'Teks Tersalin!' : 'Salin Ringkasan' }}</span>
+            <span>{{ copied ? t('results.copiedBtn') : t('results.copyBtn') }}</span>
           </button>
         </div>
       </div>
@@ -92,7 +92,7 @@
           <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <span>Peringatan Unsur Mencurigakan (Red Flags)</span>
+          <span>{{ t('results.redFlagsTitle') }}</span>
         </h3>
         <ul class="space-y-1.5 text-xs sm:text-sm text-rose-900">
           <li v-for="(flag, idx) in result.red_flags" :key="idx" class="flex items-start gap-2">
@@ -105,15 +105,15 @@
       <!-- Decision Probability Vectors -->
       <div class="pt-4 border-t border-slate-200">
         <div class="flex items-center justify-between gap-2 mb-3 text-xs">
-          <span class="font-semibold text-slate-700">Detail Pengujian Fakta AI</span>
-          <span class="font-mono text-slate-500">TypeSafe Jev Engine</span>
+          <span class="font-semibold text-slate-700">{{ t('results.detailedHeading') }}</span>
+          <span class="font-mono text-slate-500">{{ t('nav.engineName') }}</span>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <!-- Contradicted by Evidence -->
           <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between">
             <div class="flex sm:flex-col items-center sm:items-start justify-between gap-1 mb-2">
-              <span class="text-xs font-medium text-slate-600">Unsur Bantahan / Bohong</span>
+              <span class="text-xs font-medium text-slate-600">{{ t('results.contradictedByEvidence') }}</span>
               <span class="text-sm font-bold text-rose-700 tabular-nums">
                 {{ formatPercent(result.judgments.contradicted_by_evidence) }}
               </span>
@@ -126,7 +126,7 @@
           <!-- Supported by Evidence -->
           <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between">
             <div class="flex sm:flex-col items-center sm:items-start justify-between gap-1 mb-2">
-              <span class="text-xs font-medium text-slate-600">Dukungan Bukti Valid</span>
+              <span class="text-xs font-medium text-slate-600">{{ t('results.supportedByEvidence') }}</span>
               <span class="text-sm font-bold text-emerald-700 tabular-nums">
                 {{ formatPercent(result.judgments.supported_by_evidence) }}
               </span>
@@ -139,7 +139,7 @@
           <!-- Sensational Framing -->
           <div class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 flex flex-col justify-between">
             <div class="flex sm:flex-col items-center sm:items-start justify-between gap-1 mb-2">
-              <span class="text-xs font-medium text-slate-600">Bahasa Klikbait / Sensasi</span>
+              <span class="text-xs font-medium text-slate-600">{{ t('results.sensationalFraming') }}</span>
               <span class="text-sm font-bold text-amber-700 tabular-nums">
                 {{ formatPercent(result.judgments.sensational_framing) }}
               </span>
@@ -157,19 +157,21 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { VerificationResult } from '~/types'
+import { useI18n } from '~/composables/useI18n'
 
 const props = defineProps<{
   result: VerificationResult
 }>()
 
+const { t } = useI18n()
 const copied = ref(false)
 
 const verdictLabel = computed(() => {
   switch (props.result.verdict) {
-    case 'HOAX': return 'Terbukti Hoax / Palsu'
-    case 'VALID': return 'Terbukti Fakta Faktual'
-    case 'MISLEADING': return 'Informasi Menyesatkan'
-    default: return 'Informasi Belum Terverifikasi'
+    case 'HOAX': return t('verdict.hoax')
+    case 'VALID': return t('verdict.valid')
+    case 'MISLEADING': return t('verdict.misleading')
+    default: return t('verdict.unverified')
   }
 })
 
@@ -200,7 +202,7 @@ const percentStyle = (val: number) => {
 }
 
 const copySummary = async () => {
-  const text = `[Pemeriksaan Fakta JevBeez]\nStatus: ${verdictLabel.value}\nKeyakinan AI: ${props.result.confidence}%\nJudul: ${props.result.article_title}\n\nRingkasan:\n${props.result.summary}\n\nTautan Berita: ${props.result.article_url}`
+  const text = `${t('results.copyHeader')}\n${t('results.copyStatus')} ${verdictLabel.value}\n${t('results.copyConfidence')} ${props.result.confidence}%\n${t('results.copyTitle')} ${props.result.article_title}\n\n${t('results.copySummaryLabel')}\n${props.result.summary}\n\n${t('results.copyUrlLabel')} ${props.result.article_url}`
   try {
     await navigator.clipboard.writeText(text)
     copied.value = true
@@ -212,7 +214,7 @@ const shareToWhatsApp = () => {
   const safeArticleUrl = props.result.article_url && (props.result.article_url.startsWith('https://') || props.result.article_url.startsWith('http://'))
     ? props.result.article_url
     : 'https://jevbeez.hityo.cloud'
-  const message = `📢 *Hasil Cek Fakta JevBeez AI*\n\n*Status:* ${verdictLabel.value}\n*Tingkat Keyakinan:* ${props.result.confidence}%\n*Judul Berita:* "${props.result.article_title}"\n\n*Penjelasan:* \n${props.result.summary}\n\n*Cek kebenaran berita di:* ${safeArticleUrl}`
+  const message = `${t('results.shareMsgTitle')}\n\n${t('results.shareMsgStatus')} ${verdictLabel.value}\n${t('results.shareMsgConfidence')} ${props.result.confidence}%\n${t('results.shareMsgArticleTitle')} "${props.result.article_title}"\n\n${t('results.shareMsgSummary')} \n${props.result.summary}\n\n${t('results.shareMsgCheckAt')} ${safeArticleUrl}`
   const encoded = encodeURIComponent(message)
   window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank')
 }
