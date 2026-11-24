@@ -2,9 +2,9 @@
 
 # 🛡️ JevBeez
 
-**Automated Evidence-Grounded Fact-Checking & Misinformation Detection Engine**
+**Automated Evidence-Grounded Fact-Checking & Cyber Threat Detection Engine**
 
-*Melawan disinformasi dan hoax digital menggunakan penalaran probabilistik terkalibrasi System One (TypeSafe Jev) dan penelusuran bukti empiris berbasis web.*
+*Combatting digital disinformation, hoax narratives, phishing, and malware threats using calibrated System One probabilistic decision models (TypeSafe Jev) and real-time empirical web evidence grounding.*
 
 [![Go Version](https://img.shields.io/badge/Go-1.23-00ADD8?style=flat-square&logo=go)](https://golang.org)
 [![Nuxt](https://img.shields.io/badge/Nuxt-4.x-00DC82?style=flat-square&logo=nuxtdotjs)](https://nuxt.com)
@@ -18,59 +18,76 @@
 
 ---
 
-## 📸 Antarmuka Aplikasi (User Interface)
+## 📸 User Interface
 
-### 1. Halaman Utama (Fact-Check Workbench)
-Desain editorial modern dengan tipografi berwibawa, bebas dari distraksi visual generik (*anti-slop*), dan berfokus pada kecepatan input:
+### 1. Fact-Check & Threat Intelligence Workbench
+Modern editorial aesthetic featuring distraction-free, high-legibility typography (*anti-slop*) optimized for swift URL input and real-time feedback:
 
 ![JevBeez Workbench](docs/screenshots/hero.png)
 
-### 2. Dossier Hasil Analisis & Verifikasi Bukti
-Menampilkan putusan keabsahan fakta (*Verdict*), skor keyakinan (*Confidence Score*), rincian metrik probabilitas terkalibrasi (*Calibrated Probabilities*), serta rujukan dokumen primer yang ditemukan di internet:
+### 2. Analysis Dossier & Multi-Source Evidence Grounding
+Displays transparent verification verdicts, calibrated confidence scores, probabilistic decision vectors, and primary cited web sources:
 
 ![JevBeez Verdict Dossier](docs/screenshots/verdict-analysis.png)
 
 ---
 
-## 🌟 Sekilas Tentang JevBeez
+## 🌟 Overview
 
-Penyebaran disinformasi dan hoax di grup percakapan keluarga maupun media sosial sering kali sulit dibendung karena lambatnya proses verifikasi manual. Di sisi lain, model bahasa besar (LLM) konvensional kerap mengalami **halusinasi** (*hallucination*) dan menyajikan data yang terdengar meyakinkan meski tanpa dasar fakta empiris.
+The proliferation of online disinformation, fake news, deceptive scams, and credential-harvesting phishing campaigns often spreads faster than manual debunking can keep up. Furthermore, standard Large Language Models (LLMs) frequently suffer from **hallucinations**, presenting fabricated statements with false confidence.
 
-**JevBeez** hadir sebagai solusi pemeriksa fakta otomatis yang dibangun dengan arsitektur hibrida:
-1. **Web Scraper & Social Media Content Extractor**: Mengambil konten klaim dari artikel berita maupun postingan media sosial (Twitter/X, TikTok, YouTube, Instagram, Threads, Facebook).
-2. **Multi-Source Evidence Grounding**: Melakukan pencarian bukti tervalidasi dari situs berita arus utama dan portal klarifikasi fakta terpercaya secara langsung (*live search* via Tavily & Firecrawl).
-3. **System One Decision Engine (TypeSafe Jev)**: Menganalisis korelasi klaim dengan bukti melalui pemodelan probabilitas terkalibrasi matematis, bukan sekadar respons teks generatif bebas.
-
----
-
-## ✨ Fitur Utama
-
-- 🔍 **Ekstraksi Konten Multi-Platform**: Mendukung ekstraksi teks dari berbagai portal berita web dan tautan media sosial melalui integrasi scraping aman dan protokol OEMBED.
-- ⚖️ **Probabilistic Decision Modeling (TypeSafe Jev)**: Menghasilkan 3 metrik kuantitatif independen:
-  - `supported_by_evidence`: Derajat probabilitas bahwa klaim didukung oleh fakta web.
-  - `contradicted_by_evidence`: Derajat probabilitas bahwa klaim dibantah oleh bukti kredibel.
-  - `sensational_framing`: Derajat indikasi bahasa klikbait, provokatif, atau judul bombastis.
-- 🎯 **Tiga Klasifikasi Putusan Faktual**:
-  - `VALID` *(Terbukti Fakta Faktual)*: Didukung secara konsisten oleh sumber terpercaya.
-  - `HOAX` *(Terindikasi Hoax / Bantahan)*: Klaim terbantahkan oleh laporan valid atau terkonfirmasi palsu.
-  - `MISLEADING` *(Menyesatkan / Belum Terverifikasi)*: Klaim ambigu, keluar konteks, atau bukti belum memadai.
-- 📱 **Anti-Slop Editorial Design**: Antarmuka bersih, tenang, bertipografi tegas, dan ramah pengguna lintas generasi tanpa elemen visual berlebih.
-- 🚀 **1-Click WhatsApp Debunk Sharing**: Tombol bagikan langsung ke WhatsApp untuk memudahkan pengguna mengklarifikasi hoax di grup pesan instan hanya dalam satu ketukan.
-- ⚡ **Ultra-Fast Redis Caching**: Hasil evaluasi disimpan dalam cache dengan TTL optimal untuk memberikan respon instan bagi URL yang sering diperiksa.
-- 🛡️ **Enterprise Security & SSRF Protection**: Dilengkapi dengan pencegahan SSRF (blokir private/loopback IP), sanitasi URL berlapis, rate limiting, dan Content Security Policy (CSP) ketat.
-- 🎣 **Phishing, Scam & Malware Dropper Detection Engine**:
-  - **Zero-Contact Heuristics (<20ms)**: Instantly detects brand spoofing, subdomain traps, punycode/homoglyphs, raw IP hosts, high-risk TLDs, and malicious application extensions (`.apk`, `.exe`) without contacting the malicious target server.
-  - **Safe URL Shortener Unroller**: Resolves obfuscated short links (`s.id`, `bit.ly`, `tinyurl.com`, `link.id`, etc.) via lightweight HTTP header hops strictly governed by SSRF loop and IP guards.
-  - **Sandboxed Deep Dive Inspector**: On-demand isolated inspection streaming max 100KB with strict timeouts to detect credential-harvesting form inputs (PIN, OTP, CVV, passwords) and external data exfiltration.
-  - **Actionable Safety Recommendations & Emergency Debunk Broadcast**: Provides immediate next-step instructions and 1-click WhatsApp emergency broadcast warning templates to alert family and community groups.
+**JevBeez** provides a robust, enterprise-grade fact-checking and cyber threat mitigation platform built on a defense-in-depth hybrid architecture:
+1. **Multi-Platform Scraper & Content Extractor**: Securely parses article claims and social media URLs (Twitter/X, TikTok, YouTube, Instagram, Threads, Facebook) using SSRF-safe scrapers and OEMBED protocols.
+2. **Safe Shortener Resolver**: Unrolls obfuscated redirect chains (`s.id`, `bit.ly`, `tinyurl.com`, `link.id`, etc.) via lightweight HTTP header hops without downloading untrusted payloads.
+3. **Zero-Contact Threat Heuristics (<20ms)**: Instantly detects brand impersonation, subdomain traps, homoglyphs, `@` credential tricks, raw IP hosts, high-risk TLDs, and executable dropper files (`.apk`, `.exe`) without contacting the malicious target server.
+4. **Sandboxed Deep Dive Inspector**: On-demand isolated inspection streaming a maximum of 100KB with strict 3-second timeouts to identify credential-theft forms (PIN, OTP, CVV, passwords) and external data exfiltration.
+5. **Multi-Source Evidence Grounding**: Performs live internet fact-finding across authoritative news outlets and independent fact-checking databases via Tavily & Firecrawl.
+6. **System One Decision Engine (TypeSafe Jev)**: Evaluates claim validity through mathematically calibrated probabilities rather than unconstrained generative text.
 
 ---
 
-## 🏛️ Arsitektur Sistem
+## ✨ Core Features
+
+- 🔍 **Multi-Platform Content Extraction**: Universal single-input analyzer supporting news portals and major social media platforms.
+- ⚖️ **Calibrated Probabilistic Decision Modeling (TypeSafe Jev)**: Generates 3 independent quantitative metrics:
+  - `supported_by_evidence`: Probability that the claim is substantiated by credible web evidence.
+  - `contradicted_by_evidence`: Probability that the claim is refuted by verified reporting.
+  - `sensational_framing`: Degree of clickbait, emotive exaggeration, or sensationalist framing.
+- 🎯 **Comprehensive Verdict Classifications**:
+  - **Factual Verifications**:
+    - `VALID`: Factually accurate and corroborated by authoritative sources.
+    - `HOAX`: Debunked claim or proven falsehood.
+    - `MISLEADING`: Out-of-context, unverified, or manipulated narrative.
+    - `UNVERIFIED`: Insufficient empirical evidence to draw a definitive conclusion.
+  - **Cyber Threat Verifications**:
+    - `PHISHING`: Fake login portals or credential-harvesting websites.
+    - `MALWARE`: Malicious executables or deceptive APK dropper links.
+    - `SCAM`: Fraudulent schemes, fake lotteries, or impersonation campaigns.
+- 🎣 **Zero-Contact Threat Detection Engine**:
+  - Protects users immediately by terminating before contacting rogue servers when fatal anomalies are discovered.
+  - Detects brand spoofing for major Indonesian and global financial institutions and tech platforms (BCA, Mandiri, BRI, BNI, DANA, OVO, Shopee, Tokopedia, Gojek, Grab, etc.).
+- 🔗 **Safe Shortener Unroller**:
+  - Traces up to 5 redirection hops with strict SSRF and loopback protection.
+- 🧪 **Sandboxed Deep Dive Content Audit**:
+  - Users can optionally trigger deep content inspection to verify `<form>` input targets and Telegram bot exfiltration webhooks in a constrained sandbox.
+- 📱 **Anti-Slop Editorial Design**:
+  - Restful, professional user experience with clean typography, clear visual hierarchy, and full bilingual support (Indonesian & English).
+- 🚀 **1-Click WhatsApp Debunk Broadcast**:
+  - Pre-formatted warning templates ready to share directly to family and community chat groups in one click.
+- ⚡ **Ultra-Fast Redis Caching**:
+  - Key-value caching with configurable TTLs for sub-millisecond responses on repeated queries.
+- 🛡️ **Enterprise Security & Rate Limiting**:
+  - 15-second per-IP cooldown with RFC-compliant `429 Too Many Requests` and `Retry-After` headers.
+  - Automated 24-hour malicious IP blocking for suspicious injection or abuse attempts.
+  - Strict SSRF prevention blocking RFC 1918 private subnets, loopback (`127.0.0.0/8`), link-local (`169.254.0.0/16`), and internal DNS rebinding.
+
+---
+
+## 🏛️ System Architecture
 
 ```
                                   +-----------------------+
-                                  |   Pengguna / Klien    |
+                                  |     Client / User     |
                                   |   (Browser / Mobile)  |
                                   +-----------+-----------+
                                               |
@@ -81,7 +98,7 @@ Penyebaran disinformasi dan hoax di grup percakapan keluarga maupun media sosial
                               |   (Vue 3, Tailwind, Vite)     |
                               +---------------+---------------+
                                               |
-                                              | Internal Network / Proxy
+                                              | Internal Proxy / Network
                                               v
                               +-------------------------------+
                               |      Go Fiber API Service     |
@@ -96,6 +113,8 @@ Penyebaran disinformasi dan hoax di grup percakapan keluarga maupun media sosial
    |   (Port 6379)   |            |  - Tavily Search API   |            | System One Evaluator  |
    +-----------------+            |  - Firecrawl Engine    |            +-----------------------+
                                   |  - SSRF Safe Scraper   |
+                                  |  - Heuristic Engine    |
+                                  |  - Shortener Resolver  |
                                   +------------------------+
 ```
 
@@ -103,47 +122,48 @@ Penyebaran disinformasi dan hoax di grup percakapan keluarga maupun media sosial
 
 ## 🛠️ Tech Stack
 
-| Layer | Komponen / Library | Kegunaan |
+| Layer | Component / Library | Purpose |
 |---|---|---|
-| **Frontend** | Nuxt 4 (Vue 3, TypeScript) | Server-Side Rendering (SSR), performa tinggi & SEO-ready |
-| **Styling** | Tailwind CSS v3 | Desain sistem bertipe editorial, modular, dan responsif |
-| **Backend Core** | Go 1.23, Fiber v2 | RESTful API mikrografis, routing berkecepatan tinggi & hemat memori |
-| **Decision Model** | TypeSafe Jev AI | Evaluasi keputusan probabilistik non-halusinasi (*System One*) |
-| **Search & Evidence** | Tavily Search & Firecrawl | Mesin pencarian bukti rujukan web dan ekstraksi dokumen primer |
-| **Caching Layer** | Redis 7 Alpine | Penyimpanan hasil fact-check berbasis key-value dengan proteksi sandi |
-| **Containerization** | Docker & Docker Compose | Standardisasi deployment multi-container untuk kemudahan operasional |
+| **Frontend** | Nuxt 4 (Vue 3, TypeScript) | Server-Side Rendering (SSR), high performance & responsive UI |
+| **Styling** | Tailwind CSS v3 | Editorial typography and adaptive threat banner system |
+| **Backend Core** | Go 1.23, Fiber v2 | High-throughput, memory-efficient micro-service architecture |
+| **Decision Model** | TypeSafe Jev AI | Non-hallucinatory System One calibrated probabilistic evaluation |
+| **Search & Evidence** | Tavily Search & Firecrawl | Primary source discovery and live multi-source web extraction |
+| **Heuristics & Sandbox**| Go standard net/http & x/net/html | Zero-contact heuristic analysis & 100KB sandboxed form audit |
+| **Caching Layer** | Redis 7 Alpine | Key-value cache storage with password protection & rate limiters |
+| **Containerization** | Docker & Docker Compose | Multi-container reproducible deployment |
 
 ---
 
-## 🚀 Panduan Memulai (Getting Started)
+## 🚀 Getting Started
 
-### Prasyarat
-- [Docker](https://www.docker.com/) & Docker Compose (v2.x atau lebih baru)
-- Atau jika ingin menjalankan tanpa Docker:
+### Prerequisites
+- [Docker](https://www.docker.com/) & Docker Compose (v2.x or newer)
+- Or for local development without Docker:
   - [Node.js](https://nodejs.org/) (>= 22.x) & [Bun](https://bun.sh/)
   - [Go](https://golang.org/) (>= 1.23)
   - [Redis Server](https://redis.io/) (>= 7.x)
 
-### 1. Kloning Repositori
+### 1. Clone Repository
 ```bash
 git clone https://github.com/Scr34m1nG/JevBeez.git
 cd JevBeez
 ```
 
-### 2. Konfigurasi Environment Variable
-Salin berkas template konfigurasi dan masukkan API Key yang sesuai:
+### 2. Configure Environment Variables
+Copy the configuration template and fill in the required API keys:
 ```bash
 cp .env.example .env
 ```
 
-Isi variabel pada berkas `.env`:
+Set the values in your `.env` file:
 ```env
 PORT=8080
 CORS_ORIGIN=*
 REDIS_ADDR=redis:6379
 REDIS_PASSWORD=
 
-# Kunci API Layanan Eksternal
+# External Service API Keys
 TYPESAFE_API_KEY=your_typesafe_api_key_here
 TAVILY_API_KEY=your_tavily_api_key_here
 FIRECRAWL_API_KEY=your_firecrawl_api_key_here
@@ -151,58 +171,58 @@ FIRECRAWL_API_KEY=your_firecrawl_api_key_here
 API_INTERNAL_URL=http://api:8080
 ```
 
-> **Catatan Keamanan:** Jangan pernah melakukan commit berkas `.env` asli atau mempublikasikan kunci API pribadi ke git repository publik.
+> **Security Note:** Never commit your production `.env` file or expose private API credentials to a public repository.
 
 ---
 
-### 3. Menjalankan Menggunakan Docker Compose (Direkomendasikan)
+### 3. Run with Docker Compose (Recommended)
 
-Cukup jalankan satu perintah berikut:
+Start the entire system with one command:
 ```bash
 docker compose up --build -d
 ```
 
-Layanan akan aktif pada port:
+Services will be accessible at:
 - **Web Interface:** `http://localhost:3000`
 - **Backend API:** `http://localhost:8080`
 - **Redis Cache:** `127.0.0.1:6379`
 
-Untuk menghentikan layanan:
+To stop the services:
 ```bash
 docker compose down
 ```
 
 ---
 
-### 4. Menjalankan Manual untuk Pengembangan Lokal (Local Dev)
+### 4. Local Development (Without Docker)
 
-**Langkah A: Menjalankan Redis**
+**Step A: Start Redis**
 ```bash
 docker run -d --name jevbeez-redis -p 6379:6379 redis:7-alpine
 ```
 
-**Langkah B: Menjalankan Backend API (Go)**
+**Step B: Start Backend API (Go)**
 ```bash
 cd apps/api
 go run cmd/server/main.go
 ```
 
-**Langkah C: Menjalankan Frontend (Nuxt)**
+**Step C: Start Frontend (Nuxt)**
 ```bash
 cd apps/web
 bun install
 bun run dev
 ```
-Buka browser pada tautan `http://localhost:3000`.
+Open your browser at `http://localhost:3000`.
 
 ---
 
-## 📡 Dokumentasi Endpoint API
+## 📡 API Documentation
 
 ### 1. `GET /health`
-Memeriksa status ketersediaan layanan API.
+Verifies backend service operational health.
 
-**Response:**
+**Response (`200 OK`):**
 ```json
 {
   "service": "jevbeez-api",
@@ -213,7 +233,7 @@ Memeriksa status ketersediaan layanan API.
 ---
 
 ### 2. `POST /api/v1/analyze`
-Menganalisis dan memverifikasi keabsahan fakta dari sebuah tautan artikel atau media sosial.
+Analyzes a URL for factual verification or cyber threats (phishing, scam, malware).
 
 **Request Headers:**
 - `Content-Type: application/json`
@@ -221,11 +241,17 @@ Menganalisis dan memverifikasi keabsahan fakta dari sebuah tautan artikel atau m
 **Request Body:**
 ```json
 {
-  "url": "https://example.com/berita-tertentu"
+  "url": "https://example.com/article-or-link",
+  "deep_dive": false
 }
 ```
 
-**Contoh Response Sukses (`200 OK`):**
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `url` | `string` | Yes | Target web or social media URL to analyze |
+| `deep_dive` | `boolean` | No | When `true`, executes sandboxed form & DOM inspection (Default: `false`) |
+
+#### Example Response: Standard Fact-Checking (`200 OK`)
 ```json
 {
   "verdict": "VALID",
@@ -235,59 +261,101 @@ Menganalisis dan memverifikasi keabsahan fakta dari sebuah tautan artikel atau m
     "contradicted_by_evidence": 0.05,
     "sensational_framing": 0.08
   },
-  "article_title": "Judul Artikel Terverifikasi",
-  "article_url": "https://example.com/berita-tertentu",
+  "article_title": "Verified News Headline",
+  "article_url": "https://example.com/article-or-link",
   "source_domain": "example.com",
-  "summary": "Informasi dalam artikel ini terverifikasi dan didukung oleh bukti laporan kredibel.",
+  "summary": "The claim is substantiated by multiple credible news reports and factual corroboration.",
   "red_flags": [],
   "evidences": [
     {
-      "source": "antaranews.com",
-      "title": "Klarifikasi dan Laporan Terkait Fakta",
-      "snippet": "Kutipan laporan verifikasi pendukung...",
-      "url": "https://www.antaranews.com/berita/..."
+      "source": "reuters.com",
+      "title": "Official Report on the Event",
+      "snippet": "Corroborating statement from official representatives...",
+      "url": "https://www.reuters.com/article/..."
     }
   ],
   "is_cached": false,
   "is_social": false,
-  "platform": ""
+  "platform": "",
+  "is_threat": false
 }
 ```
 
-**Status Kode HTTP:**
-- `200 OK`: Evaluasi berhasil dilakukan.
-- `400 Bad Request`: Format JSON tidak valid atau URL tidak memenuhi kriteria keamanan.
-- `422 Unprocessable Entity`: Konten pada URL tidak dapat diakses atau teks artikel terlalu singkat.
-- `429 Too Many Requests`: Melebihi batas kuota permintaan (rate limit).
-- `500 Internal Server Error`: Kendala internal pada server.
+#### Example Response: Threat / Phishing Detection (`200 OK`)
+```json
+{
+  "verdict": "PHISHING",
+  "confidence": 92,
+  "judgments": {
+    "supported_by_evidence": 0,
+    "contradicted_by_evidence": 0,
+    "sensational_framing": 0
+  },
+  "article_title": "Security Threat Warning: Phishing / Fake Site",
+  "article_url": "https://bca.co.id.login-promo.xyz/auth",
+  "source_domain": "login-promo.xyz",
+  "summary": "This link exhibits high-risk cyber threat characteristics matching phishing campaigns. Do not enter credentials or OTP codes.",
+  "red_flags": [
+    "High-risk top level domain (.xyz) frequently associated with malicious campaigns",
+    "Subdomain spoofing impersonating official brand 'bca'"
+  ],
+  "evidences": [],
+  "is_cached": false,
+  "is_threat": true,
+  "threat_type": "PHISHING",
+  "threat_reasons": [
+    "Subdomain spoofing targeting brand 'bca'",
+    "High-risk top level domain (.xyz)"
+  ],
+  "target_brand": "bca",
+  "resolved_url": "https://bca.co.id.login-promo.xyz/auth",
+  "form_threats": [],
+  "is_deep_dive": false
+}
+```
+
+**HTTP Status Codes:**
+- `200 OK`: Successful analysis completed.
+- `400 Bad Request`: Malformed JSON or invalid URL scheme.
+- `422 Unprocessable Entity`: Unable to extract valid textual content.
+- `429 Too Many Requests`: Rate limit or cooldown active (`Retry-After` header included).
+- `500 Internal Server Error`: Server-side processing failure.
 
 ---
 
-## 🔒 Keamanan & Kebijakan Privasi (Security & Privacy)
+## 🔒 Security & Privacy Policy
 
-Sistem JevBeez dirancang dengan mengedepankan prinsip **Zero-Risk** dan **Privacy-by-Design**:
-1. **Mitigasi SSRF (Server-Side Request Forgery)**:
-   - Validasi ketat terhadap skema protokol (hanya `http` dan `https` yang diizinkan).
-   - Resolusi DNS sebelum *fetch* untuk mencegah pemanggilan alamat IP privat (RFC 1918), loopback (`127.0.0.0/8`), link-local (`169.254.0.0/16`), atau IP khusus internal.
-2. **Perlindungan Data Pribadi**:
-   - Sistem **tidak menyimpan rekaman identitas pribadi** pengguna.
-   - Analisis berfokus murni pada teks berita dan bukti publik di internet.
-3. **Hardened HTTP Headers**:
-   - Header keamanan lengkap: `Content-Security-Policy`, `Strict-Transport-Security` (HSTS), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, dan `Referrer-Policy: strict-origin-when-cross-origin`.
-4. **Zero Secret Exposure**:
-   - Seluruh kredensial dan kunci API terisolasi secara eksklusif melalui *environment variable* aman dan tidak pernah masuk ke dalam bundle frontend klien.
+JevBeez is engineered with strict **Zero-Risk** and **Privacy-by-Design** principles:
+1. **SSRF (Server-Side Request Forgery) Mitigation**:
+   - Strict protocol enforcement (only `http` and `https` permitted).
+   - Pre-flight DNS resolution before fetching to block all RFC 1918 private IP subnets, loopback (`127.0.0.0/8`), link-local (`169.254.0.0/16`), and internal Docker virtual networks.
+2. **Zero-Contact Threat Pipeline**:
+   - Fatal structural anomalies terminate execution before contacting malicious servers, protecting internal infrastructure from client-side exploit payloads.
+3. **Data Privacy**:
+   - **No Personally Identifiable Information (PII) is recorded or stored**.
+   - Analysis evaluates public web metadata, claims, and verified news sources only.
+4. **Hardened HTTP Headers**:
+   - Strict Content Security Policy (CSP), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and HSTS headers.
+5. **Zero Secret Exposure**:
+   - API tokens and Redis credentials remain isolated on server environments and are never exposed to client bundles.
 
 ---
 
-## 🧪 Menjalankan Pengujian Otomatis
+## 🧪 Automated Testing
 
-**Menjalankan Test Suite Backend (Go):**
+**Run Backend Unit & Integration Tests (Go):**
 ```bash
 cd apps/api
 go test -v ./...
 ```
 
-**Memverifikasi Kompilasi Frontend (Nuxt):**
+**Run Frontend Unit Tests (Bun / Vitest):**
+```bash
+cd apps/web
+bun test
+```
+
+**Verify Production Frontend Build:**
 ```bash
 cd apps/web
 bun run build
@@ -295,24 +363,25 @@ bun run build
 
 ---
 
-## 🤝 Kontribusi & GitFlow
+## 🤝 Contribution & GitFlow Standards
 
-Proyek ini menerapkan standar **GitFlow** dan **Conventional Commits**:
-- `main`: Branch stabil khusus rilis produksi.
-- `develop`: Branch integrasi untuk siklus pengembangan harian.
-- `feature/<nama>`: Fitur baru dibuat dari `develop` dan di-merge kembali setelah pengujian selesai.
-- `fix/<nama>`: Perbaikan bug berbasis branch `develop`.
+The project strictly follows **GitFlow** and **Conventional Commits**:
+- `main`: Production-ready release branch only.
+- `develop`: Primary integration branch for day-to-day development.
+- `feature/<name>`: New features branched from `develop` and merged back after full test verification.
+- `bug-fix/<name>`: Bug fixes branched from and merged back to `develop`.
+- `hotfix/<name>`: Emergency production fixes branched from `main`.
 
-Setiap kontribusi pull request sangat terbuka! Pastikan seluruh pengujian unit (`go test` dan `bun run build`) berhasil lolos sebelum mengajukan merge.
+Please ensure all tests (`go test ./...` and `bun test`) pass before opening a Pull Request.
 
 ---
 
-## 📄 Lisensi
+## 📄 License
 
-Didistribusikan di bawah lisensi **MIT License**. Lihat berkas [LICENSE](LICENSE) untuk informasi lebih lanjut.
+Distributed under the **MIT License**. See [LICENSE](LICENSE) for details.
 
 ---
 
 <div align="center">
-  <sub>Dibangun untuk ekosistem internet yang lebih sehat, bersih dari disinformasi, dan berbasis bukti empiris.</sub>
+  <sub>Built for a safer, cleaner, and empirically verified digital ecosystem.</sub>
 </div>
