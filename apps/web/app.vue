@@ -48,8 +48,12 @@
           </button>
         </div>
 
-        <VerdictCard :result="result" />
-        <EvidenceList :evidences="result.evidences" />
+        <VerdictCard
+          :result="result"
+          :is-deep-diving="isDeepDiving"
+          @deep-dive="handleDeepDive"
+        />
+        <EvidenceList v-if="!result.is_threat && result.evidences && result.evidences.length > 0" :evidences="result.evidences" />
       </div>
     </main>
 
@@ -89,6 +93,7 @@ const urlFormRef = ref<{ clearAndFocus: () => void } | null>(null)
 
 const {
   isLoading,
+  isDeepDiving,
   isCooldownWaiting,
   isBlocked,
   blockedReason,
@@ -103,6 +108,10 @@ const {
   dismissSelfCheckModal,
   reset
 } = useAnalyze()
+
+const handleDeepDive = (url: string) => {
+  analyze(url, true)
+}
 
 const handleCaughtAndReset = () => {
   reset()

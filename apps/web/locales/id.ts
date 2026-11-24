@@ -61,7 +61,24 @@ export const id = {
     hoax: 'Terbukti Hoax / Palsu',
     valid: 'Beneran Fakta (Akurat)',
     misleading: 'Menyesatkan / Misleading',
-    unverified: 'Belum Bisa Dipastikan'
+    unverified: 'Belum Bisa Dipastikan',
+    phishing: 'BAHAYA: INDIKASI PHISHING',
+    malware: 'BAHAYA: UNDUHAN MALWARE / APK',
+    scam: 'WASPADA: SITUS PENIPUAN (SCAM)'
+  },
+  threat: {
+    threatBadge: 'Ancaman Siber Terdeteksi',
+    anomalyTitle: 'Keanehan Struktur Tautan & Domain',
+    actionAdviceTitle: 'Rekomendasi Tindakan Keamanan',
+    action1: 'Jangan masukkan password, nomor kartu, PIN, atau kode OTP di tautan ini.',
+    action2: 'Jika telah terlanjur mengunduh file APK/eksekusi, jangan buka dan segera hapus dari folder Download.',
+    action3: 'Jika mengatasnamakan bank atau instansi, hubungi saluran pengaduan resmi institusi terkait.',
+    deepDiveBtn: 'Buka Analisis Konten Mendalam (Sandboxed Deep Dive)',
+    deepDiveRunning: 'Sedang menganalisis konten dalam sandbox...',
+    deepDiveCompleted: 'Hasil Audit Deep Dive Sandboxed',
+    formAlertTitle: 'Indikator Formulir Pencurian Data',
+    unshortenedNotice: 'Tautan asli telah dibongkar dari pemendek URL',
+    targetBrandPrefix: 'Mencatut Brand:'
   },
   evidence: {
     title: 'Sumber & Bukti Terkait',

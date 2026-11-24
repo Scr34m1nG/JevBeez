@@ -59,7 +59,10 @@ export default defineEventHandler(async (event) => {
         'Accept': 'application/json',
         'X-Forwarded-For': clientIP
       },
-      body: { url: body.url.trim() }
+      body: {
+        url: body.url.trim(),
+        deep_dive: Boolean(body.deep_dive)
+      }
     })
     return response
   } catch (err: any) {

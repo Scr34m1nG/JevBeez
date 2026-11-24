@@ -63,7 +63,24 @@ export const en: TranslationSchema = {
     hoax: 'Confirmed Hoax / Fake',
     valid: 'Verified Fact',
     misleading: 'Misleading Content',
-    unverified: 'Unverified Info'
+    unverified: 'Unverified Info',
+    phishing: 'DANGER: PHISHING DETECTED',
+    malware: 'DANGER: MALWARE / APK DETECTED',
+    scam: 'WARNING: SCAM DETECTED'
+  },
+  threat: {
+    threatBadge: 'Cyber Threat Detected',
+    anomalyTitle: 'Link & Domain Structural Anomalies',
+    actionAdviceTitle: 'Recommended Security Actions',
+    action1: 'Never enter your password, card number, PIN, or OTP codes on this link.',
+    action2: 'If you already downloaded an APK or executable file, do not open it and delete it immediately.',
+    action3: 'If impersonating a bank or authority, verify directly via their official customer service channels.',
+    deepDiveBtn: 'Run In-Depth Content Audit (Sandboxed Deep Dive)',
+    deepDiveRunning: 'Inspecting forms and content in sandbox...',
+    deepDiveCompleted: 'Audited via Sandboxed Deep Dive',
+    formAlertTitle: 'Credential Harvesting Form Indicators',
+    unshortenedNotice: 'Original URL unrolled from shortener',
+    targetBrandPrefix: 'Impersonating Brand:'
   },
   evidence: {
     title: 'Sources & Evidence',

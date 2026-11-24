@@ -3,6 +3,7 @@ import type { VerificationResult } from '~/types'
 
 export const useAnalyze = () => {
   const isLoading = ref(false)
+  const isDeepDiving = ref(false)
   const isCooldownWaiting = ref(false)
   const error = ref<string | null>(null)
   const result = ref<VerificationResult | null>(null)
@@ -41,7 +42,7 @@ export const useAnalyze = () => {
     isCooldownWaiting.value = false
   }
 
-  const analyze = async (rawUrl: string) => {
+  const analyze = async (rawUrl: string, deepDive = false) => {
     if (!rawUrl || !rawUrl.trim()) {
       error.value = 'Silakan masukkan tautan artikel berita.'
       return
@@ -49,15 +50,19 @@ export const useAnalyze = () => {
 
     const trimmedUrl = rawUrl.trim()
 
-    if (cooldownSeconds.value > 0) {
+    if (cooldownSeconds.value > 0 && !deepDive) {
       pendingUrl.value = trimmedUrl
       isCooldownWaiting.value = true
       error.value = null
       return
     }
 
-    result.value = null
-    isLoading.value = true
+    if (deepDive) {
+      isDeepDiving.value = true
+    } else {
+      result.value = null
+      isLoading.value = true
+    }
     isCooldownWaiting.value = false
     error.value = null
 
@@ -68,7 +73,7 @@ export const useAnalyze = () => {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ url: trimmedUrl })
+        body: JSON.stringify({ url: trimmedUrl, deep_dive: deepDive })
       })
 
       let data: any = null
@@ -133,6 +138,7 @@ export const useAnalyze = () => {
       error.value = err.message || 'Gagal terhubung ke server backend.'
     } finally {
       isLoading.value = false
+      isDeepDiving.value = false
     }
   }
 
@@ -146,12 +152,14 @@ export const useAnalyze = () => {
     pendingUrl.value = ''
     isCooldownWaiting.value = false
     isEasterEgg.value = false
+    isDeepDiving.value = false
     selfCheckCount.value = 0
     showSelfCheckModal.value = false
   }
 
   return {
     isLoading,
+    isDeepDiving,
     isCooldownWaiting,
     isBlocked,
     blockedReason,
