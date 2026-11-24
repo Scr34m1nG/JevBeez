@@ -58,6 +58,11 @@ Penyebaran disinformasi dan hoax di grup percakapan keluarga maupun media sosial
 - 🚀 **1-Click WhatsApp Debunk Sharing**: Tombol bagikan langsung ke WhatsApp untuk memudahkan pengguna mengklarifikasi hoax di grup pesan instan hanya dalam satu ketukan.
 - ⚡ **Ultra-Fast Redis Caching**: Hasil evaluasi disimpan dalam cache dengan TTL optimal untuk memberikan respon instan bagi URL yang sering diperiksa.
 - 🛡️ **Enterprise Security & SSRF Protection**: Dilengkapi dengan pencegahan SSRF (blokir private/loopback IP), sanitasi URL berlapis, rate limiting, dan Content Security Policy (CSP) ketat.
+- 🎣 **Phishing, Scam & Malware Dropper Detection Engine**:
+  - **Zero-Contact Heuristics (<20ms)**: Instantly detects brand spoofing, subdomain traps, punycode/homoglyphs, raw IP hosts, high-risk TLDs, and malicious application extensions (`.apk`, `.exe`) without contacting the malicious target server.
+  - **Safe URL Shortener Unroller**: Resolves obfuscated short links (`s.id`, `bit.ly`, `tinyurl.com`, `link.id`, etc.) via lightweight HTTP header hops strictly governed by SSRF loop and IP guards.
+  - **Sandboxed Deep Dive Inspector**: On-demand isolated inspection streaming max 100KB with strict timeouts to detect credential-harvesting form inputs (PIN, OTP, CVV, passwords) and external data exfiltration.
+  - **Actionable Safety Recommendations & Emergency Debunk Broadcast**: Provides immediate next-step instructions and 1-click WhatsApp emergency broadcast warning templates to alert family and community groups.
 
 ---
 
