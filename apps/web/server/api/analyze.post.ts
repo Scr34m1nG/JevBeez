@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const rawIP = getHeader(event, 'cf-connecting-ip') || getRequestIP(event, { xForwardedFor: false }) || '127.0.0.1'
+  const rawIP = getHeader(event, 'cf-connecting-ip') || getHeader(event, 'x-real-ip') || getRequestIP(event, { xForwardedFor: false }) || '127.0.0.1'
   const clientIP = rawIP.split(',')[0].trim()
 
   try {

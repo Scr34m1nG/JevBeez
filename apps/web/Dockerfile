@@ -18,6 +18,8 @@ ENV HOST=0.0.0.0
 
 COPY --from=builder /app/.output ./
 
+USER node
+
 EXPOSE 3000
 
 CMD ["node", "server/index.mjs"]

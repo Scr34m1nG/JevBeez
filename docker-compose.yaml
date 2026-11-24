@@ -5,8 +5,8 @@ services:
     command: /bin/sh -c "if [ -n \"$$REDIS_PASSWORD\" ]; then exec redis-server --requirepass \"$$REDIS_PASSWORD\"; else exec redis-server; fi"
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-    ports:
-      - "127.0.0.1:6379:6379"
+    expose:
+      - "6379"
     volumes:
       - redis_data:/data
     restart: unless-stopped

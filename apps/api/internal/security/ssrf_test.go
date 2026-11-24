@@ -18,6 +18,10 @@ func TestIsPrivateIP(t *testing.T) {
 		{"192.168.1.1", true},
 		{"169.254.169.254", true},
 		{"::1", true},
+		{"::ffff:127.0.0.1", true},
+		{"::ffff:10.0.0.1", true},
+		{"::ffff:169.254.169.254", true},
+		{"::ffff:8.8.8.8", false},
 		{"8.8.8.8", false},
 		{"1.1.1.1", false},
 	}

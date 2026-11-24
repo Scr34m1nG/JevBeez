@@ -40,6 +40,9 @@ func IsPrivateIP(ip net.IP) bool {
 	if ip == nil {
 		return true
 	}
+	if v4 := ip.To4(); v4 != nil {
+		ip = v4
+	}
 	if ip.IsUnspecified() || ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() || ip.IsPrivate() {
 		return true
 	}
