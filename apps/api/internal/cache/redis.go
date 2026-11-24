@@ -38,6 +38,9 @@ func NewRedisService(addr, password string, db int) (*CacheService, error) {
 }
 
 func (s *CacheService) Get(ctx context.Context, normalizedURL string) (*model.VerificationResult, error) {
+	if s == nil || s.client == nil {
+		return nil, nil
+	}
 	key := s.formatURLKey(normalizedURL)
 	val, err := s.client.Get(ctx, key).Result()
 	if err != nil {
@@ -56,6 +59,9 @@ func (s *CacheService) Get(ctx context.Context, normalizedURL string) (*model.Ve
 }
 
 func (s *CacheService) Set(ctx context.Context, normalizedURL string, result *model.VerificationResult, ttl time.Duration) error {
+	if s == nil || s.client == nil {
+		return nil
+	}
 	key := s.formatURLKey(normalizedURL)
 	data, err := json.Marshal(result)
 	if err != nil {
@@ -65,6 +71,9 @@ func (s *CacheService) Set(ctx context.Context, normalizedURL string, result *mo
 }
 
 func (s *CacheService) CheckAndSetCooldown(ctx context.Context, ip string, duration time.Duration) (bool, time.Duration, error) {
+	if s == nil || s.client == nil {
+		return true, 0, nil
+	}
 	key := fmt.Sprintf("jevbeez:cooldown:%s", ip)
 	ok, err := s.client.SetNX(ctx, key, "1", duration).Result()
 	if err != nil {
@@ -83,7 +92,7 @@ func (s *CacheService) CheckAndSetCooldown(ctx context.Context, ip string, durat
 }
 
 func (s *CacheService) BlockIP(ctx context.Context, ip, reason, payload string, duration time.Duration) error {
-	if ip == "" {
+	if s == nil || s.client == nil || ip == "" {
 		return nil
 	}
 
@@ -117,7 +126,7 @@ func (s *CacheService) BlockIP(ctx context.Context, ip, reason, payload string, 
 }
 
 func (s *CacheService) IsIPBlocked(ctx context.Context, ip string) (bool, *model.BlockedIPInfo, error) {
-	if ip == "" {
+	if s == nil || ip == "" {
 		return false, nil, nil
 	}
 
@@ -130,6 +139,10 @@ func (s *CacheService) IsIPBlocked(ctx context.Context, ip string) (bool, *model
 			}, nil
 		}
 		s.blockedCache.Delete(ip)
+	}
+
+	if s.client == nil {
+		return false, nil, nil
 	}
 
 	key := fmt.Sprintf("jevbeez:blocked:%s", ip)

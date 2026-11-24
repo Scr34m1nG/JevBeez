@@ -85,7 +85,12 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 		})
 	}
 
-	if cached, err := h.cache.Get(c.Context(), normalizedURL); err == nil && cached != nil {
+	cacheKey := normalizedURL
+	if req.DeepDive {
+		cacheKey = normalizedURL + ":deep"
+	}
+
+	if cached, err := h.cache.Get(c.Context(), cacheKey); err == nil && cached != nil {
 		return c.JSON(cached)
 	}
 
@@ -95,6 +100,63 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 			"error":             fmt.Sprintf("Mohon tunggu %.0f detik sebelum melakukan pengecekan berikutnya", remaining.Seconds()),
 			"cooldown_seconds":  int(remaining.Seconds()),
 		})
+	}
+
+	// Step 1: Safe shortener resolution
+	targetURL := normalizedURL
+	var redirectHops []string
+	if security.IsShortener(normalizedURL) {
+		unrolled, hops, sErr := security.ResolveShortener(c.Context(), normalizedURL, config.MaxShortenerHops)
+		if sErr == nil && unrolled != "" {
+			targetURL = unrolled
+			redirectHops = hops
+		}
+	}
+
+	// Step 2: Zero-contact URL heuristic threat detection
+	threatCheck := security.CheckURLHeuristics(targetURL)
+	if !threatCheck.IsThreat && targetURL != normalizedURL {
+		threatCheck = security.CheckURLHeuristics(normalizedURL)
+	}
+
+	if threatCheck.IsThreat {
+		if !req.DeepDive {
+			threatInput := &model.ThreatEvaluationInput{
+				RawURL:       req.URL,
+				ResolvedURL:  targetURL,
+				RedirectHops: redirectHops,
+				ThreatType:   threatCheck.ThreatType,
+				Confidence:   threatCheck.Confidence,
+				Reasons:      threatCheck.Reasons,
+				TargetBrand:  threatCheck.TargetBrand,
+				IsDeepDive:   false,
+			}
+			result := h.evaluator.EvaluateThreat(threatInput)
+			_ = h.cache.Set(c.Context(), cacheKey, result, config.DefaultCacheTTL)
+			return c.JSON(result)
+		}
+
+		// On-demand sandboxed deep dive inspection
+		formThreats, pageTitle, _ := scraper.InspectFormThreats(c.Context(), targetURL)
+		confidence := threatCheck.Confidence
+		if len(formThreats) > 0 && confidence < 95.0 {
+			confidence = 96.0
+		}
+		threatInput := &model.ThreatEvaluationInput{
+			RawURL:       req.URL,
+			ResolvedURL:  targetURL,
+			RedirectHops: redirectHops,
+			ThreatType:   threatCheck.ThreatType,
+			Confidence:   confidence,
+			Reasons:      threatCheck.Reasons,
+			TargetBrand:  threatCheck.TargetBrand,
+			FormThreats:  formThreats,
+			PageTitle:    pageTitle,
+			IsDeepDive:   true,
+		}
+		result := h.evaluator.EvaluateThreat(threatInput)
+		_ = h.cache.Set(c.Context(), cacheKey, result, config.DefaultCacheTTL)
+		return c.JSON(result)
 	}
 
 	article, err := h.scraper.Extract(c.Context(), normalizedURL)
