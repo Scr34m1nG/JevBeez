@@ -46,4 +46,51 @@ const (
 	VerdictValid       = "VALID"
 	VerdictMisleading  = "MISLEADING"
 	VerdictUnverified  = "UNVERIFIED"
+	VerdictPhishing    = "PHISHING"
+	VerdictMalware     = "MALWARE"
+	VerdictScam        = "SCAM"
+
+	MaxShortenerHops       = 5
+	MaxSandboxPayloadBytes = 100 * 1024
+	SandboxTimeout         = 3 * time.Second
 )
+
+var DangerousExtensions = []string{
+	".apk", ".exe", ".scr", ".bat", ".cmd", ".msi", ".vbs", ".iso", ".dmg", ".bin",
+}
+
+var HighRiskTLDs = []string{
+	".xyz", ".top", ".tk", ".icu", ".buzz", ".cfd", ".fit", ".rest", ".cam", ".work",
+	".gq", ".ml", ".ga", ".cf", ".click", ".link", ".sbs", ".quest",
+}
+
+var ShortenerDomains = []string{
+	"s.id", "link.id", "tribun.link", "heylink.me", "lynk.id", "desty.page",
+	"bit.ly", "tinyurl.com", "t.co", "is.gd", "cutt.ly", "rebrand.ly", "rb.gy",
+	"shorturl.at", "ow.ly", "buff.ly", "qr.ae", "v.gd", "soo.gd", "rotf.lol",
+}
+
+var BrandProfiles = map[string]string{
+	"bca":         "bca.co.id",
+	"mandiri":     "bankmandiri.co.id",
+	"bri":         "bri.co.id",
+	"bni":         "bni.co.id",
+	"cimb":        "cimbniaga.co.id",
+	"dana":        "dana.id",
+	"ovo":         "ovo.id",
+	"gopay":       "gojek.com",
+	"shopee":      "shopee.co.id",
+	"tokopedia":   "tokopedia.com",
+	"blibli":      "blibli.com",
+	"pajak":       "pajak.go.id",
+	"bpjs":        "bpjs-kesehatan.go.id",
+	"pln":         "pln.co.id",
+	"telkomsel":   "telkomsel.com",
+	"indihome":    "indihome.co.id",
+	"kemenkes":    "kemkes.go.id",
+	"polri":       "polri.go.id",
+	"posindonesia": "posindonesia.co.id",
+	"jne":         "jne.co.id",
+	"jnt":         "jet.co.id",
+}
+
