@@ -71,3 +71,48 @@ func (e *Evaluator) Evaluate(article *model.Article, evidences []model.Evidence,
 func round(val float64) float64 {
 	return math.Round(val*10) / 10
 }
+
+func (e *Evaluator) EvaluateThreat(in *model.ThreatEvaluationInput) *model.VerificationResult {
+	title := in.PageTitle
+	if title == "" {
+		switch in.ThreatType {
+		case config.VerdictMalware:
+			title = "Peringatan Bahaya: Unduhan Berbahaya (Malware/APK)"
+		case config.VerdictPhishing:
+			title = "Peringatan Bahaya: Indikasi Tautan Phishing"
+		default:
+			title = "Peringatan Waspada: Indikasi Situs Penipuan (Scam)"
+		}
+	}
+
+	summary := "Tautan ini terdeteksi memiliki karakteristik kejahatan siber yang dapat membahayakan keamanan data Anda."
+	switch in.ThreatType {
+	case config.VerdictMalware:
+		summary = "Tautan ini mengarah langsung ke pengunduhan file eksekusi berbahaya (seperti aplikasi .APK atau .EXE). Modus ini umum digunakan untuk membobol rekening atau membaca SMS/OTP korban."
+	case config.VerdictPhishing:
+		summary = "Tautan ini terdeteksi meniru entitas atau instansi resmi untuk mengelabui korban agar menyerahkan akun, kata sandi, atau data perbankan."
+	case config.VerdictScam:
+		summary = "Tautan ini terindikasi kuat sebagai situs penipuan dengan rekayasa sosial, iming-iming hadiah palsu, atau pemerasan digital."
+	}
+
+	redFlags := append([]string{}, in.Reasons...)
+	redFlags = append(redFlags, in.FormThreats...)
+
+	return &model.VerificationResult{
+		Verdict:       in.ThreatType,
+		Confidence:    in.Confidence,
+		ArticleTitle:  title,
+		ArticleURL:    in.RawURL,
+		ResolvedURL:   in.ResolvedURL,
+		RedirectHops:  in.RedirectHops,
+		Summary:       summary,
+		RedFlags:      redFlags,
+		ThreatType:    in.ThreatType,
+		ThreatReasons: in.Reasons,
+		TargetBrand:   in.TargetBrand,
+		FormThreats:   in.FormThreats,
+		IsThreat:      true,
+		IsDeepDive:    in.IsDeepDive,
+		Evidences:     []model.Evidence{},
+	}
+}

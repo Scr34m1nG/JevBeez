@@ -74,4 +74,55 @@ func TestEvaluator(t *testing.T) {
 			t.Errorf("expected %s, got %s", config.VerdictUnverified, result.Verdict)
 		}
 	})
+
+	t.Run("evaluate threat zero-contact fast verdict", func(t *testing.T) {
+		threatInput := &model.ThreatEvaluationInput{
+			RawURL:      "https://bca.co.id.login.xyz/auth",
+			ResolvedURL: "https://bca.co.id.login.xyz/auth",
+			ThreatType:  config.VerdictPhishing,
+			Confidence:  92.0,
+			Reasons:     []string{"Domain tidak resmi"},
+			TargetBrand: "bca",
+			FormThreats: nil,
+			IsDeepDive:  false,
+		}
+
+		result := evaluator.EvaluateThreat(threatInput)
+		if !result.IsThreat {
+			t.Errorf("expected IsThreat to be true")
+		}
+		if result.Verdict != config.VerdictPhishing {
+			t.Errorf("expected %s, got %s", config.VerdictPhishing, result.Verdict)
+		}
+		if result.TargetBrand != "bca" {
+			t.Errorf("expected target brand bca, got %s", result.TargetBrand)
+		}
+		if result.IsDeepDive {
+			t.Errorf("expected IsDeepDive to be false")
+		}
+	})
+
+	t.Run("evaluate threat deep-dive with form threats", func(t *testing.T) {
+		threatInput := &model.ThreatEvaluationInput{
+			RawURL:      "https://bca.co.id.login.xyz/auth",
+			ResolvedURL: "https://bca.co.id.login.xyz/auth",
+			ThreatType:  config.VerdictPhishing,
+			Confidence:  95.0,
+			Reasons:     []string{"Domain tidak resmi"},
+			TargetBrand: "bca",
+			FormThreats: []string{"Meminta PIN", "Exfiltrasi ke Telegram"},
+			IsDeepDive:  true,
+		}
+
+		result := evaluator.EvaluateThreat(threatInput)
+		if !result.IsThreat {
+			t.Errorf("expected IsThreat to be true")
+		}
+		if len(result.FormThreats) != 2 {
+			t.Errorf("expected 2 form threats, got %d", len(result.FormThreats))
+		}
+		if !result.IsDeepDive {
+			t.Errorf("expected IsDeepDive to be true")
+		}
+	})
 }
