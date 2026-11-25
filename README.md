@@ -21,12 +21,17 @@
 ## 📸 User Interface
 
 ### 1. Smart Fact-Check & Threat Intelligence Workbench
-Modern editorial interface featuring zero-friction smart input detection (auto-switches between URL link and raw WhatsApp broadcast message), live character counters, and real-time reasoning progress stepper:
+Modern editorial interface featuring zero-friction smart input detection (auto-switches between URL link and raw WhatsApp broadcast message) with live system status indicator:
 
 ![JevBeez Workbench](docs/screenshots/hero.png)
 
-### 2. Analysis Dossier & Multi-Source Evidence Grounding
-Displays transparent verification verdicts, calibrated confidence scores, probabilistic decision vectors, cited web sources, instant 1-click WhatsApp debunk generator, and downloadable client-side evidence card:
+### 2. Auto-Detect WhatsApp Broadcast Text Mode
+Pasting raw hoax messages automatically toggles text mode, enforces character limits (up to 1,000 runes), and prepares the broadcast claim for RE2 linear-time sanitization:
+
+![JevBeez WhatsApp Text Mode](docs/screenshots/smart-input-text.png)
+
+### 3. Analysis Dossier & Multi-Source Evidence Grounding
+Displays transparent verification verdicts, calibrated confidence scores, probabilistic decision vectors (TypeSafe Jev), cited web sources, instant 1-click WhatsApp debunk generator, and downloadable client-side evidence card:
 
 ![JevBeez Verdict Dossier](docs/screenshots/verdict-analysis.png)
 
