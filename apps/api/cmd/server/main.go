@@ -132,6 +132,8 @@ func main() {
 	}
 
 	app.Post("/api/v1/analyze", analyzeHandler.Handle)
+	app.Get("/api/check/:hash", analyzeHandler.GetCheckByHash)
+	app.Get("/api/v1/check/:hash", analyzeHandler.GetCheckByHash)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)

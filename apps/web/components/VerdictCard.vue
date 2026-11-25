@@ -75,13 +75,13 @@
           {{ result.summary }}
         </p>
 
-        <!-- Threat Action Buttons -->
-        <div class="mt-5 pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+        <!-- Action Buttons -->
+        <div class="mt-5 pt-4 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
           <!-- WhatsApp Sharing Button -->
           <button
             @click="shareToWhatsApp"
             type="button"
-            class="flex-1 py-2.5 px-4 rounded-lg bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors min-h-[42px]"
+            class="py-2.5 px-3 rounded-lg bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors min-h-[42px]"
           >
             <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.044c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.112.551 4.095 1.517 5.819l-1.617 5.909 6.046-1.587c1.664.908 3.568 1.423 5.597 1.423 6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
@@ -89,11 +89,40 @@
             <span>{{ t('results.shareWhatsApp') }}</span>
           </button>
 
-          <!-- Copy Button -->
+          <!-- Salin Format WA Button -->
+          <button
+            @click="copyWaFormat"
+            type="button"
+            class="py-2.5 px-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 border border-emerald-200 shadow-sm transition-colors min-h-[42px]"
+          >
+            <svg v-if="!copiedWa" class="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>
+            <svg v-else class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>{{ copiedWa ? t('results.copiedWaBtn') : t('results.copyWaBtn') }}</span>
+          </button>
+
+          <!-- Download Evidence Card Button -->
+          <button
+            @click="downloadEvidenceCardAction"
+            :disabled="isDownloadingCard"
+            type="button"
+            class="py-2.5 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors min-h-[42px]"
+          >
+            <svg v-if="!isDownloadingCard" class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span v-else class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            <span>{{ isDownloadingCard ? t('results.downloadingCardBtn') : t('results.downloadCardBtn') }}</span>
+          </button>
+
+          <!-- Copy Plain Summary Button -->
           <button
             @click="copySummary"
             type="button"
-            class="py-2.5 px-4 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-300 shadow-sm transition-colors min-h-[42px]"
+            class="py-2.5 px-3 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-300 shadow-sm transition-colors min-h-[42px]"
           >
             <svg v-if="!copied" class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -104,6 +133,9 @@
             <span>{{ copied ? t('results.copiedBtn') : t('results.copyBtn') }}</span>
           </button>
         </div>
+
+        <!-- Hidden canvas for rendering image card -->
+        <canvas ref="cardCanvasRef" class="hidden"></canvas>
       </div>
 
       <!-- Threat Specific: Threat Reasons / Anomalies -->
@@ -253,6 +285,8 @@
 import { computed, ref } from 'vue'
 import type { VerificationResult } from '~/types'
 import { useI18n } from '~/composables/useI18n'
+import { generateWhatsAppShareText, buildWhatsAppShareUrl } from '~/utils/share'
+import { drawEvidenceCard, downloadCanvasAsImage } from '~/utils/canvas'
 
 const props = defineProps<{
   result: VerificationResult
@@ -265,6 +299,9 @@ defineEmits<{
 
 const { t } = useI18n()
 const copied = ref(false)
+const copiedWa = ref(false)
+const isDownloadingCard = ref(false)
+const cardCanvasRef = ref<HTMLCanvasElement | null>(null)
 
 const verdictLabel = computed(() => {
   switch (props.result.verdict) {
@@ -320,20 +357,31 @@ const copySummary = async () => {
   } catch {}
 }
 
+const copyWaFormat = async () => {
+  const text = generateWhatsAppShareText(props.result)
+  try {
+    await navigator.clipboard.writeText(text)
+    copiedWa.value = true
+    setTimeout(() => { copiedWa.value = false }, 2500)
+  } catch {}
+}
+
 const shareToWhatsApp = () => {
-  const safeArticleUrl = props.result.article_url && (props.result.article_url.startsWith('https://') || props.result.article_url.startsWith('http://'))
-    ? props.result.article_url
-    : 'https://jevbeez.hityo.cloud'
+  const message = generateWhatsAppShareText(props.result)
+  const shareUrl = buildWhatsAppShareUrl(message)
+  window.open(shareUrl, '_blank')
+}
 
-  let message = ''
-  if (props.result.is_threat) {
-    const brandInfo = props.result.target_brand ? `\n*Mencatut Brand:* ${props.result.target_brand.toUpperCase()}` : ''
-    message = `🚨 *PERINGATAN TAUTAN BERBAHAYA (JevBeez Security)*\n\n*Status:* ${verdictLabel.value}\n*Tingkat Keyakinan:* ${props.result.confidence}%${brandInfo}\n*Tautan:* ${safeArticleUrl}\n\n*Penjelasan:* \n${props.result.summary}\n\n⚠️ *PENTING:* Jangan klik atau isi data pribadi/perbankan apapun di link tersebut!\n\n_Verifikasi keamanan tautan via JevBeez AI_`
-  } else {
-    message = `${t('results.shareMsgTitle')}\n\n${t('results.shareMsgStatus')} ${verdictLabel.value}\n${t('results.shareMsgConfidence')} ${props.result.confidence}%\n${t('results.shareMsgArticleTitle')} "${props.result.article_title}"\n\n${t('results.shareMsgSummary')} \n${props.result.summary}\n\n${t('results.shareMsgCheckAt')} ${safeArticleUrl}`
+const downloadEvidenceCardAction = () => {
+  if (!cardCanvasRef.value) return
+  isDownloadingCard.value = true
+  try {
+    drawEvidenceCard(cardCanvasRef.value, props.result)
+    const hash = props.result.share_hash || 'bukti'
+    const filename = `jevbeez-${props.result.verdict?.toLowerCase() || 'hasil'}-${hash.slice(0, 8)}.png`
+    downloadCanvasAsImage(cardCanvasRef.value, filename)
+  } finally {
+    isDownloadingCard.value = false
   }
-
-  const encoded = encodeURIComponent(message)
-  window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank')
 }
 </script>

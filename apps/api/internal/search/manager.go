@@ -41,6 +41,13 @@ func (m *SearchManager) SearchGrounding(ctx context.Context, article *model.Arti
 	if query == "" {
 		return nil, errors.New("query pencarian tidak dapat dibentuk")
 	}
+	return m.SearchQuery(ctx, query)
+}
+
+func (m *SearchManager) SearchQuery(ctx context.Context, query string) ([]model.Evidence, error) {
+	if strings.TrimSpace(query) == "" {
+		return []model.Evidence{}, nil
+	}
 
 	n := len(m.providers)
 	startIdx := int(atomic.AddUint64(&m.counter, 1) % uint64(n))

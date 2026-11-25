@@ -6,31 +6,37 @@ export default defineEventHandler(async (event) => {
   const apiBase = process.env.API_INTERNAL_URL || process.env.NUXT_API_INTERNAL_URL || config.apiInternalUrl || 'http://api:8080'
   const body = await readBody(event)
 
-  if (!body || typeof body.url !== 'string' || !body.url.trim()) {
+  const hasUrl = typeof body?.url === 'string' && body.url.trim().length > 0
+  const hasText = typeof body?.text === 'string' && body.text.trim().length > 0
+
+  if (!hasUrl && !hasText) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'URL tidak valid atau kosong',
-      data: { error: 'URL tidak valid atau kosong' }
+      statusMessage: 'Tautan atau teks pesan tidak valid atau kosong',
+      data: { error: 'Silakan masukkan tautan atau teks pesan yang ingin diverifikasi' }
     })
   }
 
-  if (body.url.length > 2048) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'URL melebihi batas panjang maksimum (2048 karakter)',
-      data: { error: 'URL melebihi batas panjang maksimum (2048 karakter)' }
-    })
-  }
+  if (hasUrl) {
+    const url = body.url.trim()
+    if (url.length > 2048) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'URL melebihi batas panjang maksimum (2048 karakter)',
+        data: { error: 'URL melebihi batas panjang maksimum (2048 karakter)' }
+      })
+    }
 
-  if (isSelfUrl(body.url)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'INCEPTION_SELF_CHECK',
-      data: {
-        code: 'SELF_CHECK_EASTER_EGG',
-        error: '🚨 INCEPTION DETECTED! Anda sedang mengecek website JevBeez di JevBeez sendiri 🪞. AI kami sudah menatap cermin dan yakin kami 100% fakta bukan hoax 😎. Silakan coba periksa tautan berita dari situs atau media sosial lain!'
-      }
-    })
+    if (isSelfUrl(url)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'INCEPTION_SELF_CHECK',
+        data: {
+          code: 'SELF_CHECK_EASTER_EGG',
+          error: '🚨 INCEPTION DETECTED! Anda sedang mengecek website JevBeez di JevBeez sendiri 🪞. AI kami sudah menatap cermin dan yakin kami 100% fakta bukan hoax 😎. Silakan coba periksa tautan berita dari situs atau media sosial lain!'
+        }
+      })
+    }
   }
 
   const clientIP = resolveClientIP({
@@ -40,6 +46,14 @@ export default defineEventHandler(async (event) => {
   }, getRequestIP(event, { xForwardedFor: false }) || '127.0.0.1')
 
   try {
+    const payload: { url?: string; text?: string; deep_dive?: boolean } = {}
+    if (hasUrl) {
+      payload.url = body.url.trim()
+      payload.deep_dive = Boolean(body.deep_dive)
+    } else {
+      payload.text = body.text.trim()
+    }
+
     const response = await $fetch(`${apiBase}/api/v1/analyze`, {
       method: 'POST',
       headers: {
@@ -47,10 +61,7 @@ export default defineEventHandler(async (event) => {
         'Accept': 'application/json',
         'X-Forwarded-For': clientIP
       },
-      body: {
-        url: body.url.trim(),
-        deep_dive: Boolean(body.deep_dive)
-      }
+      body: payload
     })
     return response
   } catch (err: any) {

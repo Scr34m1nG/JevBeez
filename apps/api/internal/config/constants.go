@@ -7,6 +7,7 @@ const (
 	DefaultRedisAddr         = "localhost:6379"
 	DefaultCacheTTL          = 1 * time.Hour
 	UnverifiedCacheTTL       = 2 * time.Minute
+	ShareCacheTTL            = 30 * 24 * time.Hour
 	DefaultCooldownDuration  = 15 * time.Second
 	DefaultBlockDuration     = 24 * time.Hour
 	DefaultRequestBurstLimit = 10

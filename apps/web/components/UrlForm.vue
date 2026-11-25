@@ -1,38 +1,64 @@
 <template>
   <div class="w-full max-w-3xl mx-auto">
-    <!-- Helper Instruction -->
-    <div class="mb-2 px-1 flex items-center justify-between text-xs text-slate-600">
+    <!-- Helper Instruction & Live Mode Indicator -->
+    <div class="mb-2 px-1 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
       <span class="font-medium flex items-center gap-1.5">
         <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
         </svg>
-        <span>{{ t('form.inputLabel') }}</span>
+        <span>{{ isUrlMode ? t('form.inputLabel') : 'Tempel link berita atau teks pesan hoax WhatsApp:' }}</span>
       </span>
+
+      <!-- Live Mode Badge -->
+      <div class="flex items-center gap-2">
+        <span
+          v-if="!inputUrl.trim()"
+          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200"
+        >
+          <span>⚡</span>
+          <span>{{ t('form.modeAuto') }}</span>
+        </span>
+        <span
+          v-else-if="isUrlMode"
+          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-sky-50 text-sky-700 border border-sky-200 animate-fadeIn"
+        >
+          <span>🔗</span>
+          <span>{{ t('form.modeUrl') }}</span>
+        </span>
+        <span
+          v-else
+          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 animate-fadeIn"
+        >
+          <span>📝</span>
+          <span>{{ t('form.modeText') }}</span>
+          <span class="text-[10px] opacity-75 font-mono">({{ textRuneCount }}/1000)</span>
+        </span>
+      </div>
     </div>
 
-    <!-- URL Input Container -->
+    <!-- Main Input Form Container -->
     <form @submit.prevent="handleSubmit" class="relative">
       <div class="bg-white border border-slate-300 focus-within:border-slate-800 focus-within:ring-2 focus-within:ring-slate-900/10 rounded-xl p-2 sm:p-2.5 shadow-sm transition-all flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-        <div class="flex-1 flex items-center px-2 gap-2 min-h-[46px]">
-          <svg class="w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex-1 flex items-start sm:items-center px-2 gap-2 min-h-[46px]">
+          <svg class="w-5 h-5 text-slate-400 shrink-0 mt-2 sm:mt-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input
+          <textarea
             ref="inputEl"
             v-model="inputUrl"
-            type="url"
-            required
-            :placeholder="t('form.placeholder')"
+            :rows="isMultiLine ? 3 : 1"
+            :placeholder="placeholderText"
             :disabled="isLoading || isBlocked"
-            class="w-full bg-transparent text-slate-900 placeholder-slate-400 font-medium text-sm sm:text-base focus:outline-none disabled:opacity-50 py-1"
-          />
+            @keydown="handleKeyDown"
+            class="w-full bg-transparent text-slate-900 placeholder-slate-400 font-medium text-sm sm:text-base focus:outline-none disabled:opacity-50 py-1.5 resize-none leading-relaxed"
+          ></textarea>
 
           <!-- Quick Paste Button -->
           <button
             v-if="!inputUrl && canPaste"
             type="button"
             @click="pasteClipboard"
-            class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-colors flex items-center gap-1.5 shrink-0"
+            class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs border border-slate-200 transition-colors flex items-center gap-1.5 shrink-0 self-center"
             :title="t('form.pasteTitle')"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,7 +72,7 @@
             v-if="inputUrl && !isLoading"
             type="button"
             @click="inputUrl = ''"
-            class="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shrink-0"
+            class="p-1.5 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shrink-0 self-center"
             :aria-label="t('form.clearAria')"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,6 +109,13 @@
         </button>
       </div>
     </form>
+
+    <!-- Dynamic Progress Stepper during loading -->
+    <ProgressStepper
+      v-if="isLoading"
+      :phase="loadingPhase || 1"
+      :is-url-mode="isUrlMode"
+    />
 
     <!-- Cooldown & Queue Notification -->
     <div v-if="isCooldownWaiting" class="mt-3 p-3.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm flex items-center justify-between gap-3 animate-pulse">
@@ -129,7 +162,7 @@
       </div>
     </div>
 
-    <!-- Easter Egg Troll Alert -->
+    <!-- Easter Egg Alert -->
     <div
       v-else-if="errorMessage && isEasterEgg"
       class="mt-3 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 text-amber-950 text-xs sm:text-sm shadow-sm"
@@ -171,8 +204,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from '~/composables/useI18n'
+import { isUrlInput } from '~/utils/input'
+import ProgressStepper from '~/components/ProgressStepper.vue'
 
 const { t } = useI18n()
 
@@ -185,16 +220,25 @@ const props = defineProps<{
   cooldownSeconds: number
   errorMessage?: string | null
   isEasterEgg?: boolean
+  loadingPhase?: number
 }>()
 
 const emit = defineEmits<{
-  (e: 'submit', url: string): void
+  (e: 'submit', input: string): void
   (e: 'cancel-queue'): void
 }>()
 
-const inputEl = ref<HTMLInputElement | null>(null)
+const inputEl = ref<HTMLTextAreaElement | null>(null)
 const inputUrl = ref('')
 const canPaste = ref(false)
+
+const isUrlMode = computed(() => isUrlInput(inputUrl.value))
+const isMultiLine = computed(() => inputUrl.value.includes('\n') || inputUrl.value.length > 90)
+const textRuneCount = computed(() => Array.from(inputUrl.value).length)
+
+const placeholderText = computed(() => {
+  return 'Tempel link berita (https://...) atau teks pesan WhatsApp di sini...'
+})
 
 onMounted(() => {
   if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.readText) {
@@ -218,6 +262,16 @@ const pasteClipboard = async () => {
       inputUrl.value = text.trim()
     }
   } catch {}
+}
+
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    // If in URL mode, submit directly on Enter
+    if (isUrlMode.value || !isMultiLine.value) {
+      e.preventDefault()
+      handleSubmit()
+    }
+  }
 }
 
 const handleSubmit = () => {

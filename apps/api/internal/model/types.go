@@ -46,10 +46,14 @@ type VerificationResult struct {
 	RedirectHops      []string     `json:"redirect_hops,omitempty"`
 	FormThreats       []string     `json:"form_threats,omitempty"`
 	IsDeepDive        bool         `json:"is_deep_dive,omitempty"`
+	ShareHash         string       `json:"share_hash,omitempty"`
+	IsTextMode        bool         `json:"is_text_mode,omitempty"`
+	CleanedText       string       `json:"cleaned_text,omitempty"`
 }
 
 type AnalyzeRequest struct {
-	URL      string `json:"url"`
+	URL      string `json:"url,omitempty"`
+	Text     string `json:"text,omitempty"`
 	DeepDive bool   `json:"deep_dive,omitempty"`
 }
 

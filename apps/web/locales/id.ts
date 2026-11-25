@@ -27,7 +27,10 @@ export const id = {
     easterEggBtn: 'Siap, coba web lain 🫡',
     queueAlertTitle: 'Link kamu udah masuk antrean:',
     queueAlertDesc: 'Bakal otomatis dicek dalam {time} detik...',
-    cancelQueue: 'Batalkan'
+    cancelQueue: 'Batalkan',
+    modeUrl: 'Mode Tautan',
+    modeText: 'Mode Teks Pesan',
+    modeAuto: 'Deteksi Otomatis'
   },
   results: {
     checkAnotherBtn: 'Cek Link Lain',
@@ -39,6 +42,10 @@ export const id = {
     shareWhatsApp: 'Bagikan ke WhatsApp',
     copyBtn: 'Salin Ringkasan',
     copiedBtn: 'Udah Disalin!',
+    copyWaBtn: 'Salin Format WA',
+    copiedWaBtn: 'Format WA Disalin!',
+    downloadCardBtn: 'Download Kartu Bukti',
+    downloadingCardBtn: 'Menyiapkan Kartu...',
     redFlagsTitle: 'Hal yang Mencurigakan',
     detailedHeading: 'Detail Pengujian Fakta AI',
     contradictedByEvidence: 'Indikasi Bohong / Bantahan',

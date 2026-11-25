@@ -1,9 +1,12 @@
 package handler
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"jevbeez/api/internal/cache"
@@ -46,12 +49,29 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 	var req model.AnalyzeRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Format request tidak valid, pastikan JSON memiliki field 'url'",
+			"error": "Format request tidak valid, pastikan JSON memiliki field 'url' atau 'text'",
 		})
 	}
 
-	if isExploit, reason, detail := security.DetectExploit(req.URL); isExploit {
-		_ = h.cache.BlockIP(c.Context(), clientIP, reason, req.URL, config.DefaultBlockDuration)
+	trimmedURL := strings.TrimSpace(req.URL)
+	trimmedText := strings.TrimSpace(req.Text)
+
+	if trimmedURL == "" && trimmedText == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Silakan masukkan tautan (URL) atau teks pesan yang ingin diverifikasi",
+		})
+	}
+
+	if trimmedURL != "" {
+		return h.handleURL(c, clientIP, req, trimmedURL)
+	}
+
+	return h.handleText(c, clientIP, trimmedText)
+}
+
+func (h *AnalyzeHandler) handleURL(c *fiber.Ctx, clientIP string, req model.AnalyzeRequest, rawURL string) error {
+	if isExploit, reason, detail := security.DetectExploit(rawURL); isExploit {
+		_ = h.cache.BlockIP(c.Context(), clientIP, reason, rawURL, config.DefaultBlockDuration)
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 			"error":   fmt.Sprintf("Akses ditolak: Alamat IP Anda diblokir selama 24 jam karena terdeteksi aktivitas eksploitasi (%s)", detail),
 			"blocked": true,
@@ -59,7 +79,7 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 		})
 	}
 
-	normalizedURL, err := security.ValidateAndNormalizeURL(req.URL)
+	normalizedURL, err := security.ValidateAndNormalizeURL(rawURL)
 	if err != nil {
 		if errors.Is(err, security.ErrSelfURL) {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -76,19 +96,24 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 		cacheKey = normalizedURL + ":deep"
 	}
 
-	if cached, err := h.cache.Get(c.Context(), cacheKey); err == nil && cached != nil {
+	hSum := sha256.Sum256([]byte(cacheKey))
+	shareHash := hex.EncodeToString(hSum[:])
+
+	if cached, err := h.cache.GetByHash(c.Context(), shareHash); err == nil && cached != nil {
+		if cached.ShareHash == "" {
+			cached.ShareHash = shareHash
+		}
 		return c.JSON(cached)
 	}
 
 	if allowed, remaining, err := h.cache.CheckAndSetCooldown(c.Context(), clientIP, config.DefaultCooldownDuration); err == nil && !allowed {
 		c.Set("Retry-After", fmt.Sprintf("%.0f", remaining.Seconds()))
 		return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
-			"error":             fmt.Sprintf("Mohon tunggu %.0f detik sebelum melakukan pengecekan berikutnya", remaining.Seconds()),
-			"cooldown_seconds":  int(remaining.Seconds()),
+			"error":            fmt.Sprintf("Mohon tunggu %.0f detik sebelum melakukan pengecekan berikutnya", remaining.Seconds()),
+			"cooldown_seconds": int(remaining.Seconds()),
 		})
 	}
 
-	// Step 1: Safe shortener resolution
 	targetURL := normalizedURL
 	var redirectHops []string
 	if security.IsShortener(normalizedURL) {
@@ -99,7 +124,6 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 		}
 	}
 
-	// Step 2: Zero-contact URL heuristic threat detection
 	threatCheck := security.CheckURLHeuristics(targetURL)
 	if !threatCheck.IsThreat && targetURL != normalizedURL {
 		threatCheck = security.CheckURLHeuristics(normalizedURL)
@@ -108,7 +132,7 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 	if threatCheck.IsThreat {
 		if !req.DeepDive {
 			threatInput := &model.ThreatEvaluationInput{
-				RawURL:       req.URL,
+				RawURL:       rawURL,
 				ResolvedURL:  targetURL,
 				RedirectHops: redirectHops,
 				ThreatType:   threatCheck.ThreatType,
@@ -118,18 +142,19 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 				IsDeepDive:   false,
 			}
 			result := h.evaluator.EvaluateThreat(threatInput)
-			_ = h.cache.Set(c.Context(), cacheKey, result, config.DefaultCacheTTL)
+			result.ShareHash = shareHash
+			_ = h.cache.SetByHash(c.Context(), shareHash, result, config.DefaultCacheTTL)
+			_ = h.cache.SetShare(c.Context(), shareHash, result)
 			return c.JSON(result)
 		}
 
-		// On-demand sandboxed deep dive inspection
 		formThreats, pageTitle, _ := scraper.InspectFormThreats(c.Context(), targetURL)
 		confidence := threatCheck.Confidence
 		if len(formThreats) > 0 && confidence < 95.0 {
 			confidence = 96.0
 		}
 		threatInput := &model.ThreatEvaluationInput{
-			RawURL:       req.URL,
+			RawURL:       rawURL,
 			ResolvedURL:  targetURL,
 			RedirectHops: redirectHops,
 			ThreatType:   threatCheck.ThreatType,
@@ -141,7 +166,9 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 			IsDeepDive:   true,
 		}
 		result := h.evaluator.EvaluateThreat(threatInput)
-		_ = h.cache.Set(c.Context(), cacheKey, result, config.DefaultCacheTTL)
+		result.ShareHash = shareHash
+		_ = h.cache.SetByHash(c.Context(), shareHash, result, config.DefaultCacheTTL)
+		_ = h.cache.SetShare(c.Context(), shareHash, result)
 		return c.JSON(result)
 	}
 
@@ -175,7 +202,9 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 
 	if len(evidences) == 0 {
 		result := h.evaluator.Evaluate(article, evidences, &model.JevJudgments{})
-		_ = h.cache.Set(c.Context(), normalizedURL, result, config.UnverifiedCacheTTL)
+		result.ShareHash = shareHash
+		_ = h.cache.SetByHash(c.Context(), shareHash, result, config.UnverifiedCacheTTL)
+		_ = h.cache.SetShare(c.Context(), shareHash, result)
 		return c.JSON(result)
 	}
 
@@ -187,12 +216,147 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 	}
 
 	result := h.evaluator.Evaluate(article, evidences, judgments)
+	result.ShareHash = shareHash
 
 	cacheTTL := config.DefaultCacheTTL
 	if result.Verdict == config.VerdictUnverified {
 		cacheTTL = config.UnverifiedCacheTTL
 	}
-	_ = h.cache.Set(c.Context(), normalizedURL, result, cacheTTL)
+	_ = h.cache.SetByHash(c.Context(), shareHash, result, cacheTTL)
+	_ = h.cache.SetShare(c.Context(), shareHash, result)
+
+	return c.JSON(result)
+}
+
+func (h *AnalyzeHandler) handleText(c *fiber.Ctx, clientIP string, rawText string) error {
+	cleanedText, searchQuery := security.CleanBroadcastText(rawText)
+	if cleanedText == "" || searchQuery == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Teks pesan terlalu pendek atau tidak memuat klaim yang cukup setelah dibersihkan (minimal 25 karakter dan 4 kata)",
+		})
+	}
+
+	hSum := sha256.Sum256([]byte(cleanedText))
+	shareHash := hex.EncodeToString(hSum[:])
+
+	if cached, err := h.cache.GetByHash(c.Context(), shareHash); err == nil && cached != nil {
+		if cached.ShareHash == "" {
+			cached.ShareHash = shareHash
+		}
+		return c.JSON(cached)
+	}
+
+	if allowed, remaining, err := h.cache.CheckAndSetCooldown(c.Context(), clientIP, config.DefaultCooldownDuration); err == nil && !allowed {
+		c.Set("Retry-After", fmt.Sprintf("%.0f", remaining.Seconds()))
+		return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+			"error":            fmt.Sprintf("Mohon tunggu %.0f detik sebelum melakukan pengecekan berikutnya", remaining.Seconds()),
+			"cooldown_seconds": int(remaining.Seconds()),
+		})
+	}
+
+	evidences, err := h.searcher.SearchQuery(c.Context(), searchQuery)
+	if err != nil {
+		return c.Status(http.StatusServiceUnavailable).JSON(fiber.Map{
+			"error": "Layanan pencarian bukti sedang mengalami gangguan",
+		})
+	}
+
+	title := searchQuery
+	if len([]rune(title)) > 80 {
+		title = string([]rune(title)[:80]) + "..."
+	}
+
+	if len(evidences) == 0 {
+		result := &model.VerificationResult{
+			Verdict:      config.VerdictUnverified,
+			Confidence:   50.0,
+			ArticleTitle: title,
+			ArticleURL:   "",
+			SourceDomain: "Pesan Terusan (WhatsApp/Broadcast)",
+			Summary:      "Tidak ditemukan bukti rujukan atau klarifikasi di media kredibel mengenai klaim pesan ini.",
+			RedFlags:     []string{"Klaim tidak memiliki rekam jejak rujukan di media arus utama kredibel."},
+			Evidences:    []model.Evidence{},
+			ShareHash:    shareHash,
+			IsTextMode:   true,
+			CleanedText:  cleanedText,
+			IsSocial:     true,
+			Platform:     "whatsapp",
+		}
+
+		_ = h.cache.SetByHash(c.Context(), shareHash, result, config.UnverifiedCacheTTL)
+		_ = h.cache.SetShare(c.Context(), shareHash, result)
+		return c.JSON(result)
+	}
+
+	if len(evidences) > 3 {
+		evidences = evidences[:3]
+	}
+	for i := range evidences {
+		runes := []rune(evidences[i].Snippet)
+		if len(runes) > 200 {
+			evidences[i].Snippet = string(runes[:200]) + "..."
+		}
+	}
+
+	article := &model.Article{
+		Title:        title,
+		Content:      cleanedText,
+		URL:          "",
+		SourceDomain: "Pesan Terusan (WhatsApp/Broadcast)",
+		WordCount:    len(strings.Fields(cleanedText)),
+		IsSocial:     true,
+		Platform:     "whatsapp",
+	}
+
+	judgments, err := h.jevClient.Evaluate(c.Context(), article, evidences)
+	if err != nil {
+		return c.Status(http.StatusServiceUnavailable).JSON(fiber.Map{
+			"error": "Layanan evaluasi fakta sedang mengalami gangguan",
+		})
+	}
+
+	result := h.evaluator.Evaluate(article, evidences, judgments)
+	result.ShareHash = shareHash
+	result.IsTextMode = true
+	result.CleanedText = cleanedText
+	result.SourceDomain = "Pesan Terusan (WhatsApp/Broadcast)"
+
+	cacheTTL := config.DefaultCacheTTL
+	if result.Verdict == config.VerdictUnverified {
+		cacheTTL = config.UnverifiedCacheTTL
+	}
+	_ = h.cache.SetByHash(c.Context(), shareHash, result, cacheTTL)
+	_ = h.cache.SetShare(c.Context(), shareHash, result)
+
+	return c.JSON(result)
+}
+
+func (h *AnalyzeHandler) GetCheckByHash(c *fiber.Ctx) error {
+	hash := strings.TrimSpace(c.Params("hash"))
+	if hash == "" || len(hash) < 8 || len(hash) > 64 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Hash verifikasi tidak valid",
+		})
+	}
+
+	for _, r := range hash {
+		if !((r >= '0' && r <= '9') || (r >= 'a' && r <= 'f') || (r >= 'A' && r <= 'F')) {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Hash verifikasi memiliki format yang tidak valid",
+			})
+		}
+	}
+
+	result, err := h.cache.GetShare(c.Context(), hash)
+	if err != nil || result == nil {
+		result, err = h.cache.GetByHash(c.Context(), hash)
+	}
+
+	if err != nil || result == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Data hasil verifikasi tidak ditemukan atau sudah kedaluwarsa",
+		})
+	}
 
 	return c.JSON(result)
 }

@@ -29,7 +29,10 @@ export const en: TranslationSchema = {
     easterEggBtn: 'Got it, check another site 🫡',
     queueAlertTitle: 'Link is in queue:',
     queueAlertDesc: 'Will automatically check in {time} seconds...',
-    cancelQueue: 'Cancel'
+    cancelQueue: 'Cancel',
+    modeUrl: 'Link Mode',
+    modeText: 'Message Text Mode',
+    modeAuto: 'Auto Detect'
   },
   results: {
     checkAnotherBtn: 'Check Another Link',
@@ -41,6 +44,10 @@ export const en: TranslationSchema = {
     shareWhatsApp: 'Share to WhatsApp',
     copyBtn: 'Copy Summary',
     copiedBtn: 'Copied!',
+    copyWaBtn: 'Copy WA Format',
+    copiedWaBtn: 'WA Format Copied!',
+    downloadCardBtn: 'Download Evidence Card',
+    downloadingCardBtn: 'Generating Card...',
     redFlagsTitle: 'Suspicious Red Flags',
     detailedHeading: 'AI Decision Details',
     contradictedByEvidence: 'Contradicted by Evidence',

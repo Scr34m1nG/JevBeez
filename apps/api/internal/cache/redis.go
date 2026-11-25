@@ -36,10 +36,20 @@ func NewRedisService(addr, password string, db int) (*CacheService, error) {
 }
 
 func (s *CacheService) Get(ctx context.Context, normalizedURL string) (*model.VerificationResult, error) {
+	h := sha256.Sum256([]byte(normalizedURL))
+	return s.GetByHash(ctx, hex.EncodeToString(h[:]))
+}
+
+func (s *CacheService) Set(ctx context.Context, normalizedURL string, result *model.VerificationResult, ttl time.Duration) error {
+	h := sha256.Sum256([]byte(normalizedURL))
+	return s.SetByHash(ctx, hex.EncodeToString(h[:]), result, ttl)
+}
+
+func (s *CacheService) GetByHash(ctx context.Context, hash string) (*model.VerificationResult, error) {
 	if s == nil || s.client == nil {
 		return nil, nil
 	}
-	key := s.formatURLKey(normalizedURL)
+	key := fmt.Sprintf("jevbeez:cache:%s", hash)
 	val, err := s.client.Get(ctx, key).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
@@ -56,16 +66,49 @@ func (s *CacheService) Get(ctx context.Context, normalizedURL string) (*model.Ve
 	return &res, nil
 }
 
-func (s *CacheService) Set(ctx context.Context, normalizedURL string, result *model.VerificationResult, ttl time.Duration) error {
+func (s *CacheService) SetByHash(ctx context.Context, hash string, result *model.VerificationResult, ttl time.Duration) error {
 	if s == nil || s.client == nil {
 		return nil
 	}
-	key := s.formatURLKey(normalizedURL)
+	key := fmt.Sprintf("jevbeez:cache:%s", hash)
 	data, err := json.Marshal(result)
 	if err != nil {
 		return err
 	}
 	return s.client.Set(ctx, key, data, ttl).Err()
+}
+
+func (s *CacheService) GetShare(ctx context.Context, hash string) (*model.VerificationResult, error) {
+	if s == nil || s.client == nil {
+		return nil, nil
+	}
+	key := fmt.Sprintf("jevbeez:share:%s", hash)
+	val, err := s.client.Get(ctx, key).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	var res model.VerificationResult
+	if err := json.Unmarshal([]byte(val), &res); err != nil {
+		return nil, err
+	}
+	res.IsCached = true
+	return &res, nil
+}
+
+func (s *CacheService) SetShare(ctx context.Context, hash string, result *model.VerificationResult) error {
+	if s == nil || s.client == nil {
+		return nil
+	}
+	key := fmt.Sprintf("jevbeez:share:%s", hash)
+	data, err := json.Marshal(result)
+	if err != nil {
+		return err
+	}
+	return s.client.SetNX(ctx, key, data, config.ShareCacheTTL).Err()
 }
 
 func (s *CacheService) CheckAndSetCooldown(ctx context.Context, ip string, duration time.Duration) (bool, time.Duration, error) {

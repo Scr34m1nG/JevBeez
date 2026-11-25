@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import type { VerificationResult } from '~/types'
+import { isUrlInput } from '~/utils/input'
 
 export const useAnalyze = () => {
   const isLoading = ref(false)
@@ -8,14 +9,17 @@ export const useAnalyze = () => {
   const error = ref<string | null>(null)
   const result = ref<VerificationResult | null>(null)
   const cooldownSeconds = ref(0)
-  const pendingUrl = ref('')
+  const pendingInput = ref('')
   const isEasterEgg = ref(false)
   const showSelfCheckModal = ref(false)
   const isBlocked = ref(false)
   const blockedReason = ref('')
   const blockedExpiresAt = ref('')
   const selfCheckCount = ref(0)
+  const loadingPhase = ref(1)
+
   let timer: ReturnType<typeof setInterval> | null = null
+  let stepperTimer: ReturnType<typeof setInterval> | null = null
 
   const startCooldown = (seconds: number) => {
     cooldownSeconds.value = seconds
@@ -27,31 +31,49 @@ export const useAnalyze = () => {
       if (cooldownSeconds.value <= 0) {
         if (timer) clearInterval(timer)
         timer = null
-        if (pendingUrl.value) {
-          const nextUrl = pendingUrl.value
-          pendingUrl.value = ''
+        if (pendingInput.value) {
+          const nextInput = pendingInput.value
+          pendingInput.value = ''
           isCooldownWaiting.value = false
-          analyze(nextUrl)
+          analyze(nextInput)
         }
       }
     }, 1000)
   }
 
   const cancelCooldownWait = () => {
-    pendingUrl.value = ''
+    pendingInput.value = ''
     isCooldownWaiting.value = false
   }
 
-  const analyze = async (rawUrl: string, deepDive = false) => {
-    if (!rawUrl || !rawUrl.trim()) {
-      error.value = 'Silakan masukkan tautan artikel berita.'
+  const startStepper = () => {
+    loadingPhase.value = 1
+    if (stepperTimer) clearInterval(stepperTimer)
+    stepperTimer = setInterval(() => {
+      if (loadingPhase.value < 4) {
+        loadingPhase.value++
+      }
+    }, 1100)
+  }
+
+  const stopStepper = () => {
+    if (stepperTimer) {
+      clearInterval(stepperTimer)
+      stepperTimer = null
+    }
+    loadingPhase.value = 4
+  }
+
+  const analyze = async (rawInput: string, deepDive = false) => {
+    if (!rawInput || !rawInput.trim()) {
+      error.value = 'Silakan masukkan tautan atau teks pesan yang ingin diverifikasi.'
       return
     }
 
-    const trimmedUrl = rawUrl.trim()
+    const trimmed = rawInput.trim()
 
     if (cooldownSeconds.value > 0 && !deepDive) {
-      pendingUrl.value = trimmedUrl
+      pendingInput.value = trimmed
       isCooldownWaiting.value = true
       error.value = null
       return
@@ -62,18 +84,24 @@ export const useAnalyze = () => {
     } else {
       result.value = null
       isLoading.value = true
+      startStepper()
     }
     isCooldownWaiting.value = false
     error.value = null
 
     try {
+      const isUrl = isUrlInput(trimmed)
+      const payload = isUrl
+        ? { url: trimmed, deep_dive: deepDive }
+        : { text: trimmed }
+
       const response = await fetch('/api/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ url: trimmedUrl, deep_dive: deepDive })
+        body: JSON.stringify(payload)
       })
 
       let data: any = null
@@ -89,7 +117,7 @@ export const useAnalyze = () => {
       if (!response.ok) {
         if (response.status === 429) {
           const cd = data?.data?.cooldown_seconds || data?.cooldown_seconds || 15
-          pendingUrl.value = trimmedUrl
+          pendingInput.value = trimmed
           isCooldownWaiting.value = true
           error.value = null
           startCooldown(cd)
@@ -137,6 +165,7 @@ export const useAnalyze = () => {
     } catch (err: any) {
       error.value = err.message || 'Gagal terhubung ke server backend.'
     } finally {
+      stopStepper()
       isLoading.value = false
       isDeepDiving.value = false
     }
@@ -149,12 +178,17 @@ export const useAnalyze = () => {
   const reset = () => {
     result.value = null
     error.value = null
-    pendingUrl.value = ''
+    pendingInput.value = ''
     isCooldownWaiting.value = false
     isEasterEgg.value = false
     isDeepDiving.value = false
     selfCheckCount.value = 0
     showSelfCheckModal.value = false
+    loadingPhase.value = 1
+    if (stepperTimer) {
+      clearInterval(stepperTimer)
+      stepperTimer = null
+    }
   }
 
   return {
@@ -169,6 +203,7 @@ export const useAnalyze = () => {
     cooldownSeconds,
     isEasterEgg,
     showSelfCheckModal,
+    loadingPhase,
     analyze,
     cancelCooldownWait,
     dismissSelfCheckModal,

@@ -32,4 +32,7 @@ export interface VerificationResult {
   redirect_hops?: string[]
   form_threats?: string[]
   is_deep_dive?: boolean
+  share_hash?: string
+  is_text_mode?: boolean
+  cleaned_text?: string
 }
