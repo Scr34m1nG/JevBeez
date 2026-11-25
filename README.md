@@ -4,7 +4,7 @@
 
 **Automated Evidence-Grounded Fact-Checking & Cyber Threat Detection Engine**
 
-*Combatting digital disinformation, hoax narratives, phishing, and malware threats using calibrated System One probabilistic decision models (TypeSafe Jev) and real-time empirical web evidence grounding.*
+*Combatting digital disinformation, viral WhatsApp hoaxes, phishing, and malware threats using calibrated System One probabilistic decision models (TypeSafe Jev) and real-time empirical web evidence grounding.*
 
 [![Go Version](https://img.shields.io/badge/Go-1.23-00ADD8?style=flat-square&logo=go)](https://golang.org)
 [![Nuxt](https://img.shields.io/badge/Nuxt-4.x-00DC82?style=flat-square&logo=nuxtdotjs)](https://nuxt.com)
@@ -20,13 +20,13 @@
 
 ## 📸 User Interface
 
-### 1. Fact-Check & Threat Intelligence Workbench
-Modern editorial aesthetic featuring distraction-free, high-legibility typography (*anti-slop*) optimized for swift URL input and real-time feedback:
+### 1. Smart Fact-Check & Threat Intelligence Workbench
+Modern editorial interface featuring zero-friction smart input detection (auto-switches between URL link and raw WhatsApp broadcast message), live character counters, and real-time reasoning progress stepper:
 
 ![JevBeez Workbench](docs/screenshots/hero.png)
 
 ### 2. Analysis Dossier & Multi-Source Evidence Grounding
-Displays transparent verification verdicts, calibrated confidence scores, probabilistic decision vectors, and primary cited web sources:
+Displays transparent verification verdicts, calibrated confidence scores, probabilistic decision vectors, cited web sources, instant 1-click WhatsApp debunk generator, and downloadable client-side evidence card:
 
 ![JevBeez Verdict Dossier](docs/screenshots/verdict-analysis.png)
 
@@ -34,21 +34,33 @@ Displays transparent verification verdicts, calibrated confidence scores, probab
 
 ## 🌟 Overview
 
-The proliferation of online disinformation, fake news, deceptive scams, and credential-harvesting phishing campaigns often spreads faster than manual debunking can keep up. Furthermore, standard Large Language Models (LLMs) frequently suffer from **hallucinations**, presenting fabricated statements with false confidence.
+The proliferation of online disinformation, viral WhatsApp broadcasts, fake news, deceptive scams, and credential-harvesting phishing campaigns often spreads faster than manual debunking can keep up. Furthermore, standard Large Language Models (LLMs) frequently suffer from **hallucinations**, presenting fabricated statements with false confidence.
 
 **JevBeez** provides a robust, enterprise-grade fact-checking and cyber threat mitigation platform built on a defense-in-depth hybrid architecture:
-1. **Multi-Platform Scraper & Content Extractor**: Securely parses article claims and social media URLs (Twitter/X, TikTok, YouTube, Instagram, Threads, Facebook) using SSRF-safe scrapers and OEMBED protocols.
-2. **Safe Shortener Resolver**: Unrolls obfuscated redirect chains (`s.id`, `bit.ly`, `tinyurl.com`, `link.id`, etc.) via lightweight HTTP header hops without downloading untrusted payloads.
-3. **Zero-Contact Threat Heuristics (<20ms)**: Instantly detects brand impersonation, subdomain traps, homoglyphs, `@` credential tricks, raw IP hosts, high-risk TLDs, and executable dropper files (`.apk`, `.exe`) without contacting the malicious target server.
-4. **Sandboxed Deep Dive Inspector**: On-demand isolated inspection streaming a maximum of 100KB with strict 3-second timeouts to identify credential-theft forms (PIN, OTP, CVV, passwords) and external data exfiltration.
-5. **Multi-Source Evidence Grounding**: Performs live internet fact-finding across authoritative news outlets and independent fact-checking databases via Tavily & Firecrawl.
-6. **System One Decision Engine (TypeSafe Jev)**: Evaluates claim validity through mathematically calibrated probabilities rather than unconstrained generative text.
+1. **Smart Unified Input & Broadcast Cleaner**: Automatically differentiates between web links and viral text messages. Raw broadcasts are cleaned using pure Go RE2 linear regex to strip WhatsApp noise, fake authority hooks, forwarding tags, and phone numbers without LLM costs.
+2. **Multi-Platform Scraper & Content Extractor**: Securely parses article claims and social media URLs (Twitter/X, TikTok, YouTube, Instagram, Threads, Facebook) using SSRF-safe scrapers and OEMBED protocols.
+3. **Safe Shortener Resolver**: Unrolls obfuscated redirect chains (`s.id`, `bit.ly`, `tinyurl.com`, `link.id`, etc.) via lightweight HTTP header hops with fallback safe GET without downloading untrusted payloads.
+4. **Zero-Contact Threat Heuristics (<20ms)**: Instantly detects brand impersonation, boundary-token spoofing, homoglyphs, raw IP hosts, high-risk TLDs, and executable dropper files (`.apk`, `.exe`) without contacting the malicious target server.
+5. **Sandboxed Deep Dive Inspector**: On-demand isolated inspection streaming a maximum of 100KB with strict 3-second timeouts to identify credential-theft forms (PIN, OTP, CVV, passwords) and external data exfiltration.
+6. **Multi-Source Evidence Grounding**: Performs live internet fact-finding across authoritative news outlets and independent fact-checking databases via Tavily & Firecrawl.
+7. **System One Decision Engine (TypeSafe Jev)**: Evaluates claim validity through mathematically calibrated probabilities rather than unconstrained generative text.
+8. **Permanent Archive Permalinks & Share Tools**: Instant 30-day permalink caching (`/c/:hash`), 1-click WhatsApp debunk messages, and 100% client-side HTML5 Canvas evidence card generation.
 
 ---
 
 ## ✨ Core Features
 
-- 🔍 **Multi-Platform Content Extraction**: Universal single-input analyzer supporting news portals and major social media platforms.
+- 📝 **Smart Unified Input (Auto-Detect Link vs Text)**:
+  - Automatically identifies whether user pasted a web URL (`[🔗 Mode Tautan]`) or a raw viral broadcast message (`[📝 Mode Teks Pesan]`).
+  - Seamless zero-friction workflow without manual tab toggles.
+- 🧹 **Pure Go WhatsApp Broadcast Cleaner (RE2 Linear Time)**:
+  - Strips forwarding tags (*"Forwarded as received"*, *"Diteruskan"*), fake authority hooks (*"Info dari dokter RSPAD/IDI"*), viral exhortations (*"Sebarkan ke 10 grup"*), phone numbers, and formatting noise.
+  - Formulates concise search queries (< 100 runes) snapped to clean word boundaries.
+  - Guaranteed linear-time execution: **0% ReDoS vulnerability** and zero network I/O (**Zero SSRF risk** in Text Mode).
+- 💰 **Zero-Waste Token & Cost Architecture**:
+  - **Redis SHA-256 Deduplication**: Identical claims return cached results instantly (**0 Tavily tokens, 0 Jev tokens**).
+  - **Zero-Evidence Short-Circuit**: If live search returns 0 corroborating news sources, the system returns `UNVERIFIED` immediately without calling TypeSafe Jev (**0 Jev tokens spent**).
+  - **Lean Payload Trimming**: Capped queries (max 100 runes) and snippets (max 200 runes per top 3 sources) keep context size minimal.
 - ⚖️ **Calibrated Probabilistic Decision Modeling (TypeSafe Jev)**: Generates 3 independent quantitative metrics:
   - `supported_by_evidence`: Probability that the claim is substantiated by credible web evidence.
   - `contradicted_by_evidence`: Probability that the claim is refuted by verified reporting.
@@ -65,21 +77,27 @@ The proliferation of online disinformation, fake news, deceptive scams, and cred
     - `SCAM`: Fraudulent schemes, fake lotteries, or impersonation campaigns.
 - 🎣 **Zero-Contact Threat Detection Engine**:
   - Protects users immediately by terminating before contacting rogue servers when fatal anomalies are discovered.
-  - Detects brand spoofing for major Indonesian and global financial institutions and tech platforms (BCA, Mandiri, BRI, BNI, DANA, OVO, Shopee, Tokopedia, Gojek, Grab, etc.).
+  - Boundary-aware brand profile matching preventing false positives on legitimate domains (`lenovo.com`, `cambridge.org`).
+  - Covers Indonesian & global institutions: BCA, Mandiri, BRI, BNI, DANA, OVO, Shopee, Tokopedia, Gojek, Grab, etc.
 - 🔗 **Safe Shortener Unroller**:
-  - Traces up to 5 redirection hops with strict SSRF and loopback protection.
+  - Traces up to 5 redirection hops with strict SSRF loopback protection and HTTP 405/501 fallback.
 - 🧪 **Sandboxed Deep Dive Content Audit**:
   - Users can optionally trigger deep content inspection to verify `<form>` input targets and Telegram bot exfiltration webhooks in a constrained sandbox.
-- 📱 **Anti-Slop Editorial Design**:
-  - Restful, professional user experience with clean typography, clear visual hierarchy, and full bilingual support (Indonesian & English).
-- 🚀 **1-Click WhatsApp Debunk Broadcast**:
-  - Pre-formatted warning templates ready to share directly to family and community chat groups in one click.
-- ⚡ **Ultra-Fast Redis Caching**:
-  - Key-value caching with configurable TTLs for sub-millisecond responses on repeated queries.
-- 🛡️ **Enterprise Security & Rate Limiting**:
-  - 15-second per-IP cooldown with RFC-compliant `429 Too Many Requests` and `Retry-After` headers.
-  - Automated 24-hour malicious IP blocking for suspicious injection or abuse attempts.
-  - Strict SSRF prevention blocking RFC 1918 private subnets, loopback (`127.0.0.0/8`), link-local (`169.254.0.0/16`), and internal DNS rebinding.
+- 💬 **1-Click WhatsApp Debunk Generator**:
+  - Generates ready-to-paste WhatsApp messages with bold headers (`*bold*`), concise factual summaries, cited references, and permanent archive links.
+- 🖼️ **Client-Side HTML5 Canvas Evidence Card**:
+  - One-click `.png` evidence card generator rendered 100% inside the user's browser with **zero server CPU overhead, zero external dependencies, and zero XSS vulnerability**.
+- 🗄️ **30-Day Permanent Archive Permalinks (`/c/:hash`)**:
+  - Generates shareable, persistent audit links backed by Redis `SET NX` caching with automated 30-day TTL.
+- ⏳ **Glass-Box Reasoning Timeline (Progress Stepper)**:
+  - Interactive 4-phase visual progress indicator during verification:
+    1. Analyzing input and dissecting claims...
+    2. Grounding live references across credible press...
+    3. Probabilistic evaluation via TypeSafe Jev...
+    4. Compiling verification summary...
+- 🛡️ **Edge Honeypot & Scanner Trap**:
+  - Edge Nitro middleware intercepts automated vulnerability scanners (`/.env`, `/.git`, `/wp-admin`, etc.) with HTTP 403 before reaching application handlers.
+  - Core Go service applies automated 24-hour IP bans for persistent exploit probes.
 
 ---
 
@@ -95,10 +113,13 @@ The proliferation of online disinformation, fake news, deceptive scams, and cred
                                               v
                               +-------------------------------+
                               |    Nuxt 4 Frontend (SSR)      |
-                              |   (Vue 3, Tailwind, Vite)     |
+                              |   - Smart Input Detection     |
+                              |   - Edge Honeypot Trap        |
+                              |   - Client HTML5 Canvas Card  |
+                              |   - WhatsApp Debunk Builder   |
                               +---------------+---------------+
                                               |
-                                              | Internal Proxy / Network
+                                              | Internal Network (Proxy)
                                               v
                               +-------------------------------+
                               |      Go Fiber API Service     |
@@ -107,14 +128,15 @@ The proliferation of online disinformation, fake news, deceptive scams, and cred
                                   |           |           |
             +---------------------+           |           +---------------------+
             | Redis Cache                     |                                 |
-            v (Key-Value TTL)                 v (Live Grounding)                v (Probabilistic Evaluation)
+            v (TTL Caching & Permalinks)      v (Live Grounding)                v (Probabilistic Evaluation)
    +-----------------+            +------------------------+            +-----------------------+
    |   Redis Store   |            | Search & Scraping Core |            |   TypeSafe Jev AI     |
    |   (Port 6379)   |            |  - Tavily Search API   |            | System One Evaluator  |
-   +-----------------+            |  - Firecrawl Engine    |            +-----------------------+
-                                  |  - SSRF Safe Scraper   |
-                                  |  - Heuristic Engine    |
-                                  |  - Shortener Resolver  |
+   | - Deduplication |            |  - Firecrawl Engine    |            +-----------------------+
+   | - 30d Permalinks|            |  - Go RE2 Text Cleaner |
+   | - 24h IP Bans   |            |  - SSRF Safe Scraper   |
+   | - Rate Limits   |            |  - Heuristic Engine    |
+   +-----------------+            |  - Shortener Resolver  |
                                   +------------------------+
 ```
 
@@ -127,10 +149,12 @@ The proliferation of online disinformation, fake news, deceptive scams, and cred
 | **Frontend** | Nuxt 4 (Vue 3, TypeScript) | Server-Side Rendering (SSR), high performance & responsive UI |
 | **Styling** | Tailwind CSS v3 | Editorial typography and adaptive threat banner system |
 | **Backend Core** | Go 1.23, Fiber v2 | High-throughput, memory-efficient micro-service architecture |
+| **Text Processing**| Go standard `regexp` (RE2) | Anti-ReDoS linear time broadcast cleaning & query extraction |
 | **Decision Model** | TypeSafe Jev AI | Non-hallucinatory System One calibrated probabilistic evaluation |
 | **Search & Evidence** | Tavily Search & Firecrawl | Primary source discovery and live multi-source web extraction |
-| **Heuristics & Sandbox**| Go standard net/http & x/net/html | Zero-contact heuristic analysis & 100KB sandboxed form audit |
-| **Caching Layer** | Redis 7 Alpine | Key-value cache storage with password protection & rate limiters |
+| **Heuristics & Sandbox**| Go standard `net/http` & `x/net/html` | Zero-contact heuristic analysis & 100KB sandboxed form audit |
+| **Card Generation**| HTML5 Canvas API | 100% client-side graphic card rendering without headless browsers |
+| **Caching Layer** | Redis 7 Alpine | Deduplication, permalinks (`SET NX`), IP bans, and rate limiters |
 | **Containerization** | Docker & Docker Compose | Multi-container reproducible deployment |
 
 ---
@@ -233,12 +257,12 @@ Verifies backend service operational health.
 ---
 
 ### 2. `POST /api/v1/analyze`
-Analyzes a URL for factual verification or cyber threats (phishing, scam, malware).
+Analyzes a URL or a WhatsApp broadcast message for factual verification or cyber threats.
 
 **Request Headers:**
 - `Content-Type: application/json`
 
-**Request Body:**
+#### Option A: URL Analysis Request
 ```json
 {
   "url": "https://example.com/article-or-link",
@@ -246,10 +270,20 @@ Analyzes a URL for factual verification or cyber threats (phishing, scam, malwar
 }
 ```
 
+#### Option B: Broadcast Text Analysis Request
+```json
+{
+  "text": "Diteruskan berkali-kali: Info dari dokter RSPAD bagi-bagi obat gratis klik link ini..."
+}
+```
+
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `url` | `string` | Yes | Target web or social media URL to analyze |
+| `url` | `string` | Optional* | Target web or social media URL to analyze |
+| `text` | `string` | Optional* | Raw broadcast text or claim message (min 25 runes, max 1000 runes) |
 | `deep_dive` | `boolean` | No | When `true`, executes sandboxed form & DOM inspection (Default: `false`) |
+
+*\*Either `url` or `text` must be provided.*
 
 #### Example Response: Standard Fact-Checking (`200 OK`)
 ```json
@@ -274,9 +308,9 @@ Analyzes a URL for factual verification or cyber threats (phishing, scam, malwar
       "url": "https://www.reuters.com/article/..."
     }
   ],
+  "share_hash": "a1b2c3d4e5f60718293a4b5c6d7e8f90",
   "is_cached": false,
-  "is_social": false,
-  "platform": "",
+  "is_text_mode": false,
   "is_threat": false
 }
 ```
@@ -300,6 +334,7 @@ Analyzes a URL for factual verification or cyber threats (phishing, scam, malwar
     "Subdomain spoofing impersonating official brand 'bca'"
   ],
   "evidences": [],
+  "share_hash": "8f7e6d5c4b3a2109fedcba9876543210",
   "is_cached": false,
   "is_threat": true,
   "threat_type": "PHISHING",
@@ -314,12 +349,16 @@ Analyzes a URL for factual verification or cyber threats (phishing, scam, malwar
 }
 ```
 
-**HTTP Status Codes:**
-- `200 OK`: Successful analysis completed.
-- `400 Bad Request`: Malformed JSON or invalid URL scheme.
-- `422 Unprocessable Entity`: Unable to extract valid textual content.
-- `429 Too Many Requests`: Rate limit or cooldown active (`Retry-After` header included).
-- `500 Internal Server Error`: Server-side processing failure.
+---
+
+### 3. `GET /api/check/:hash`
+Retrieves a cached 30-day verification result using its SHA-256 permalink hash.
+
+**Parameters:**
+- `hash` (Path, required): Hexadecimal verification hash (8 to 64 characters).
+
+**Response (`200 OK`):** Returns the cached `VerificationResult` object with `"is_cached": true`.  
+**Response (`404 Not Found`):** When hash is expired or non-existent.
 
 ---
 
@@ -329,31 +368,38 @@ JevBeez is engineered with strict **Zero-Risk** and **Privacy-by-Design** princi
 1. **SSRF (Server-Side Request Forgery) Mitigation**:
    - Strict protocol enforcement (only `http` and `https` permitted).
    - Pre-flight DNS resolution before fetching to block all RFC 1918 private IP subnets, loopback (`127.0.0.0/8`), link-local (`169.254.0.0/16`), and internal Docker virtual networks.
-2. **Zero-Contact Threat Pipeline**:
-   - Fatal structural anomalies terminate execution before contacting malicious servers, protecting internal infrastructure from client-side exploit payloads.
-3. **Data Privacy**:
+   - **Zero SSRF in Text Mode**: Text mode runs 100% in-memory; internal IPs or links mentioned in broadcast text are never scraped or connected.
+2. **ReDoS Defense**:
+   - Broadcast text cleaner uses Go's standard `regexp` engine (RE2), guaranteeing linear time execution $O(n)$ with zero backtracking overhead.
+3. **Stored XSS Prevention**:
+   - Frontend Nuxt templates strictly use safe text interpolation `{{ ... }}` and zero `v-html` for dynamic user content and permalink results.
+   - Canvas card generation rasterizes text directly with HTML tags stripped.
+4. **Data Privacy**:
    - **No Personally Identifiable Information (PII) is recorded or stored**.
    - Analysis evaluates public web metadata, claims, and verified news sources only.
-4. **Hardened HTTP Headers**:
+5. **Hardened HTTP Headers & Honeypot**:
+   - Edge Nitro honeypot immediately drops scanner paths (`/.env`, `/.git`, `/wp-admin`).
    - Strict Content Security Policy (CSP), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and HSTS headers.
-5. **Zero Secret Exposure**:
+6. **Zero Secret Exposure**:
    - API tokens and Redis credentials remain isolated on server environments and are never exposed to client bundles.
 
 ---
 
 ## 🧪 Automated Testing
 
-**Run Backend Unit & Integration Tests (Go):**
+**Run Backend Unit & Security Tests (Go):**
 ```bash
 cd apps/api
-go test -v ./...
+go test -v -count=1 ./...
 ```
+*Covers unit tests, detector benchmarks, ReDoS fuzzing, SSRF payload isolation, and Unicode surrogate safety.*
 
 **Run Frontend Unit Tests (Bun / Vitest):**
 ```bash
 cd apps/web
 bun test
 ```
+*Covers 41 test cases across 8 suites: URL detection, share formatting, XSS safety, honeypot traps, and Canvas mocks.*
 
 **Verify Production Frontend Build:**
 ```bash
