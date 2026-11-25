@@ -37,6 +37,15 @@ export default defineEventHandler(async (event) => {
         }
       })
     }
+  } else if (hasText) {
+    const text = body.text.trim()
+    if (text.length > 2048) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Teks pesan melebihi batas panjang maksimum (2048 karakter)',
+        data: { error: 'Teks pesan melebihi batas panjang maksimum (2048 karakter)' }
+      })
+    }
   }
 
   const clientIP = resolveClientIP({

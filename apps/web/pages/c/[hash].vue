@@ -57,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
 import type { VerificationResult } from '~/types'
 import VerdictCard from '~/components/VerdictCard.vue'
 import EvidenceList from '~/components/EvidenceList.vue'

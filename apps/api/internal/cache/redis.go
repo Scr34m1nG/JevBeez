@@ -186,8 +186,3 @@ func (s *CacheService) IsIPBlocked(ctx context.Context, ip string) (bool, *model
 func (s *CacheService) Close() error {
 	return s.client.Close()
 }
-
-func (s *CacheService) formatURLKey(normalizedURL string) string {
-	h := sha256.Sum256([]byte(normalizedURL))
-	return fmt.Sprintf("jevbeez:cache:%s", hex.EncodeToString(h[:]))
-}

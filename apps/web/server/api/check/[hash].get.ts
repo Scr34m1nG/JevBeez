@@ -11,8 +11,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Prevent injection
-  if (!/^[a-zA-Z0-9]+$/.test(hash)) {
+  // Prevent injection and match hexadecimal hash format
+  if (!/^[0-9a-fA-F]+$/.test(hash)) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Format hash tidak valid',
