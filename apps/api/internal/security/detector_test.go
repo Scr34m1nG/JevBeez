@@ -32,6 +32,16 @@ func TestDetectExploit(t *testing.T) {
 			url:       "https://www.kompas.com/read.php?id=99281",
 			wantBlock: false,
 		},
+		{
+			name:      "legitimate news url with ellipsis slug",
+			url:       "https://news.detik.com/read/2026/01/01/isu-gempa.../",
+			wantBlock: false,
+		},
+		{
+			name:      "legitimate tech article with whoami in slug",
+			url:       "https://linux.org/article/what-is-whoami",
+			wantBlock: false,
+		},
 
 		// SSRF & Loopback / Private Network
 		{

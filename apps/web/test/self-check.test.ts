@@ -1,43 +1,6 @@
 import { describe, it, expect } from 'vitest'
-
-function isSelfUrl(inputUrl: string): boolean {
-  try {
-    let normalized = inputUrl.trim()
-    if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
-      normalized = 'https://' + normalized
-    }
-    const parsed = new URL(normalized)
-    const host = parsed.hostname.toLowerCase()
-    return (
-      host === 'jevbeez.hityo.cloud' ||
-      host.endsWith('.jevbeez.hityo.cloud') ||
-      host === 'jevbeez.com' ||
-      host.endsWith('.jevbeez.com') ||
-      host === 'localhost' ||
-      host === '127.0.0.1' ||
-      host === '0.0.0.0'
-    )
-  } catch {
-    return false
-  }
-}
-
-function calculateDodgeOffset(dodgeCount: number): { x: number; y: number } {
-  const directions = [
-    { x: 35, y: -22 },
-    { x: -20, y: 18 },
-    { x: 45, y: 15 },
-    { x: -15, y: -20 }
-  ]
-  return directions[(dodgeCount - 1) % directions.length]
-}
-
-function getButtonTextForDodge(count: number): string {
-  if (count === 0) return 'Ya, periksa!'
-  if (count === 1) return 'Eits...!'
-  if (count === 2) return 'Kejar aku!'
-  return 'Hampir!'
-}
+import { isSelfUrl } from '../utils/url'
+import { calculateDodgeOffset, getButtonTextForDodge } from '../utils/dodge'
 
 function shouldResetAndClearOnFinalDodge(dodgeCount: number): boolean {
   return dodgeCount >= 3

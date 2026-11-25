@@ -90,3 +90,35 @@ func TestResolveShortener_MaxHopsExceeded(t *testing.T) {
 		t.Fatalf("expected error for max hops exceeded, got nil")
 	}
 }
+
+func TestResolveShortener_Head405FallbackToGet(t *testing.T) {
+	finalServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("Final Destination"))
+	}))
+	defer finalServer.Close()
+
+	// Server rejects HEAD with 405 Method Not Allowed, but redirects on GET
+	shortenerServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodHead {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		http.Redirect(w, r, finalServer.URL, http.StatusFound)
+	}))
+	defer shortenerServer.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	resolved, hops, err := resolveShortenerWithClient(ctx, shortenerServer.URL, 5, shortenerServer.Client())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resolved != finalServer.URL {
+		t.Errorf("expected %s, got %s", finalServer.URL, resolved)
+	}
+	if len(hops) != 1 {
+		t.Errorf("expected 1 hop, got %d", len(hops))
+	}
+}

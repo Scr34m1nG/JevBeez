@@ -42,20 +42,6 @@ func NewAnalyzeHandler(
 
 func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 	clientIP := c.IP()
-	if blocked, info, err := h.cache.IsIPBlocked(c.Context(), clientIP); err == nil && blocked {
-		reason := "BLOCKED"
-		expiresAt := ""
-		if info != nil {
-			reason = info.Reason
-			expiresAt = info.ExpiresAt
-		}
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"error":      "Akses ditolak: Alamat IP Anda diblokir selama 24 jam karena terdeteksi melakukan aktivitas berbahaya",
-			"blocked":    true,
-			"reason":     reason,
-			"expires_at": expiresAt,
-		})
-	}
 
 	var req model.AnalyzeRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -185,6 +171,12 @@ func (h *AnalyzeHandler) Handle(c *fiber.Ctx) error {
 		return c.Status(http.StatusServiceUnavailable).JSON(fiber.Map{
 			"error": "Layanan pencarian bukti sedang mengalami gangguan",
 		})
+	}
+
+	if len(evidences) == 0 {
+		result := h.evaluator.Evaluate(article, evidences, &model.JevJudgments{})
+		_ = h.cache.Set(c.Context(), normalizedURL, result, config.UnverifiedCacheTTL)
+		return c.JSON(result)
 	}
 
 	judgments, err := h.jevClient.Evaluate(c.Context(), article, evidences)

@@ -69,16 +69,3 @@ func BuildQuestions() map[string]QuestionPayload {
 		},
 	}
 }
-
-func BuildThreatQuestions() map[string]QuestionPayload {
-	return map[string]QuestionPayload{
-		"credential_harvesting": {
-			Type:         "noul",
-			Instructions: "Does this webpage attempt to harvest credentials, PIN, passwords, OTP, or sensitive financial information from the user?",
-		},
-		"social_engineering": {
-			Type:         "noul",
-			Instructions: "Does this webpage use deceptive urgency, fake prizes, account suspension threats, or impersonate an institution to trick the visitor?",
-		},
-	}
-}

@@ -76,7 +76,10 @@ func resolveShortenerWithClient(ctx context.Context, rawURL string, maxHops int,
 		req.Header.Set("User-Agent", "JevBeez-SafetyBot/1.0")
 
 		resp, err := safeClient.Do(req)
-		if err != nil {
+		if err != nil || (resp != nil && (resp.StatusCode == http.StatusMethodNotAllowed || resp.StatusCode == http.StatusNotImplemented)) {
+			if resp != nil && resp.Body != nil {
+				_ = resp.Body.Close()
+			}
 			// Some servers reject HEAD requests; fallback to safe GET with immediate body close
 			reqGet, getErr := http.NewRequestWithContext(ctx, http.MethodGet, currentURL, nil)
 			if getErr != nil {

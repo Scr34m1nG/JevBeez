@@ -30,6 +30,12 @@ func TestValidateAndNormalizeURL(t *testing.T) {
 			expectErr: false,
 		},
 		{
+			name:      "preserves functional query params s and t on standard sites",
+			rawURL:    "https://news.com/search?s=gempa&t=all",
+			wantURL:   "https://news.com/search?s=gempa&t=all",
+			expectErr: false,
+		},
+		{
 			name:      "rejects invalid scheme",
 			rawURL:    "ftp://news.com/file.txt",
 			expectErr: true,

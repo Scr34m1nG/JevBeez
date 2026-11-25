@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -16,8 +15,7 @@ import (
 )
 
 type CacheService struct {
-	client       *redis.Client
-	blockedCache sync.Map
+	client *redis.Client
 }
 
 func NewRedisService(addr, password string, db int) (*CacheService, error) {
@@ -117,31 +115,11 @@ func (s *CacheService) BlockIP(ctx context.Context, ip, reason, payload string, 
 	}
 
 	key := fmt.Sprintf("jevbeez:blocked:%s", ip)
-	if err := s.client.Set(ctx, key, data, duration).Err(); err != nil {
-		return err
-	}
-
-	s.blockedCache.Store(ip, expiresAt)
-	return nil
+	return s.client.Set(ctx, key, data, duration).Err()
 }
 
 func (s *CacheService) IsIPBlocked(ctx context.Context, ip string) (bool, *model.BlockedIPInfo, error) {
-	if s == nil || ip == "" {
-		return false, nil, nil
-	}
-
-	if val, ok := s.blockedCache.Load(ip); ok {
-		if exp, ok := val.(time.Time); ok && time.Now().Before(exp) {
-			return true, &model.BlockedIPInfo{
-				IP:        ip,
-				Reason:    "BLOCKED",
-				ExpiresAt: exp.Format(time.RFC3339),
-			}, nil
-		}
-		s.blockedCache.Delete(ip)
-	}
-
-	if s.client == nil {
+	if s == nil || s.client == nil || ip == "" {
 		return false, nil, nil
 	}
 
@@ -157,10 +135,6 @@ func (s *CacheService) IsIPBlocked(ctx context.Context, ip string) (bool, *model
 	var info model.BlockedIPInfo
 	if err := json.Unmarshal([]byte(val), &info); err != nil {
 		return true, &model.BlockedIPInfo{IP: ip, Reason: "BLOCKED"}, nil
-	}
-
-	if exp, err := time.Parse(time.RFC3339, info.ExpiresAt); err == nil {
-		s.blockedCache.Store(ip, exp)
 	}
 
 	return true, &info, nil

@@ -35,9 +35,14 @@ var trackingParams = map[string]struct{}{
 	"mibextid":               {},
 	"xmt":                    {},
 	"igsh":                   {},
-	"s":                      {},
-	"t":                      {},
 	"context":                {},
+}
+
+func isSocialHost(host string) bool {
+	return host == "twitter.com" || host == "x.com" ||
+		strings.HasSuffix(host, ".twitter.com") || strings.HasSuffix(host, ".x.com") ||
+		host == "threads.net" || host == "threads.com" ||
+		strings.HasSuffix(host, ".threads.net") || strings.HasSuffix(host, ".threads.com")
 }
 
 func ValidateAndNormalizeURL(rawURL string) (string, error) {
@@ -70,6 +75,12 @@ func ValidateAndNormalizeURL(rawURL string) (string, error) {
 		lower := strings.ToLower(param)
 		if strings.HasPrefix(lower, "utm_") {
 			query.Del(param)
+			continue
+		}
+		if lower == "s" || lower == "t" {
+			if isSocialHost(host) {
+				query.Del(param)
+			}
 			continue
 		}
 		if _, exists := trackingParams[lower]; exists {

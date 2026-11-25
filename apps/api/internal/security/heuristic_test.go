@@ -89,6 +89,8 @@ func TestCheckURLHeuristics_LegitimateURL(t *testing.T) {
 		"https://bankmandiri.co.id/promo",
 		"https://news.detik.com/berita/123/presiden-resmikan-jalan",
 		"https://kompas.com/read/2026/01/01/berita",
+		"https://www.lenovo.com/id/in/laptops/thinkpad",
+		"https://www.cambridge.org/core/books/quantum-mechanics",
 	}
 
 	for _, u := range legitURLs {

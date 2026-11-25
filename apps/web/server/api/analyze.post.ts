@@ -1,21 +1,6 @@
-function isSelfUrl(inputUrl: string): boolean {
-  try {
-    let normalized = inputUrl.trim()
-    if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
-      normalized = 'https://' + normalized
-    }
-    const parsed = new URL(normalized)
-    const host = parsed.hostname.toLowerCase()
-    return (
-      host === 'jevbeez.hityo.cloud' ||
-      host.endsWith('.jevbeez.hityo.cloud') ||
-      host === 'jevbeez.com' ||
-      host.endsWith('.jevbeez.com')
-    )
-  } catch {
-    return false
-  }
-}
+import { isSelfUrl } from '../../utils/url'
+import { resolveClientIP } from '../utils/ip'
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const apiBase = process.env.API_INTERNAL_URL || process.env.NUXT_API_INTERNAL_URL || config.apiInternalUrl || 'http://api:8080'
@@ -48,8 +33,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const rawIP = getHeader(event, 'cf-connecting-ip') || getHeader(event, 'x-real-ip') || getRequestIP(event, { xForwardedFor: false }) || '127.0.0.1'
-  const clientIP = rawIP.split(',')[0].trim()
+  const clientIP = resolveClientIP({
+    'cf-connecting-ip': getHeader(event, 'cf-connecting-ip'),
+    'x-real-ip': getHeader(event, 'x-real-ip'),
+    'x-forwarded-for': getHeader(event, 'x-forwarded-for'),
+  }, getRequestIP(event, { xForwardedFor: false }) || '127.0.0.1')
 
   try {
     const response = await $fetch(`${apiBase}/api/v1/analyze`, {

@@ -1,12 +1,5 @@
 import { describe, it, expect } from 'vitest'
-
-function resolveClientIP(headers: Record<string, string | undefined>, socketRemoteAddress = '127.0.0.1'): string {
-  const rawIP = headers['cf-connecting-ip']
-    || headers['x-real-ip']
-    || headers['x-forwarded-for']
-    || socketRemoteAddress
-  return rawIP.split(',')[0].trim()
-}
+import { resolveClientIP } from '../server/utils/ip'
 
 describe('resolveClientIP security logic', () => {
   it('prioritizes cf-connecting-ip over forged x-forwarded-for', () => {

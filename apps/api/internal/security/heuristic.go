@@ -19,28 +19,28 @@ type ThreatCheckResult struct {
 	ApexDomain  string   `json:"apex_domain,omitempty"`
 }
 
-var legitimateBrandDomains = map[string][]string{
-	"bca":       {"bca.co.id", "klikbca.com", "mybca.bca.co.id"},
-	"mandiri":   {"bankmandiri.co.id", "livinbymandiri.co.id", "mandirikartukredit.com"},
-	"bri":       {"bri.co.id", "brimo.bri.co.id", "ib.bri.co.id"},
-	"bni":       {"bni.co.id", "bni-life.co.id"},
-	"cimb":      {"cimbniaga.co.id", "octoclicks.co.id"},
-	"dana":      {"dana.id"},
-	"ovo":       {"ovo.id"},
-	"gopay":     {"gojek.com", "gopay.co.id"},
-	"shopee":    {"shopee.co.id"},
-	"tokopedia": {"tokopedia.com"},
-	"blibli":    {"blibli.com"},
-	"pajak":     {"pajak.go.id"},
-	"bpjs":      {"bpjs-kesehatan.go.id", "bpjsketenagakerjaan.go.id"},
-	"pln":       {"pln.co.id"},
-	"telkomsel": {"telkomsel.com"},
-	"indihome":  {"indihome.co.id", "telkom.co.id"},
-	"kemenkes":  {"kemkes.go.id"},
-	"polri":     {"polri.go.id"},
-	"posindonesia": {"posindonesia.co.id"},
-	"jne":       {"jne.co.id"},
-	"jnt":       {"jet.co.id"},
+func hasBrandBoundary(s, brand string) bool {
+	start := 0
+	for {
+		idx := strings.Index(s[start:], brand)
+		if idx == -1 {
+			return false
+		}
+		pos := start + idx
+		endPos := pos + len(brand)
+
+		validBefore := pos == 0 || isBoundaryChar(s[pos-1])
+		validAfter := endPos == len(s) || isBoundaryChar(s[endPos])
+
+		if validBefore && validAfter {
+			return true
+		}
+		start = pos + 1
+	}
+}
+
+func isBoundaryChar(c byte) bool {
+	return c == '.' || c == '-' || c == '_' || c == '/' || c == '@' || c == ':' || c == '?' || c == '&' || c == '='
 }
 
 func CheckURLHeuristics(rawURL string) *ThreatCheckResult {
@@ -67,7 +67,7 @@ func CheckURLHeuristics(rawURL string) *ThreatCheckResult {
 		}
 		// If userInfo has brand or domain pattern, user was tricked to open evil host
 		for brand := range config.BrandProfiles {
-			if strings.Contains(userInfoStr, brand) || strings.Contains(rawLower, brand+"@") {
+			if hasBrandBoundary(userInfoStr, brand) || strings.Contains(rawLower, brand+"@") {
 				res.IsThreat = true
 				res.ThreatType = config.VerdictPhishing
 				res.TargetBrand = brand
@@ -104,7 +104,7 @@ func CheckURLHeuristics(rawURL string) *ThreatCheckResult {
 	if isIP {
 		// If raw IP has suspicious paths (e.g. bca, login, admin, apk)
 		for brand := range config.BrandProfiles {
-			if strings.Contains(pathLower, brand) {
+			if hasBrandBoundary(pathLower, brand) {
 				res.IsThreat = true
 				res.ThreatType = config.VerdictPhishing
 				res.TargetBrand = brand
@@ -123,9 +123,9 @@ func CheckURLHeuristics(rawURL string) *ThreatCheckResult {
 	}
 
 	// 5. Check Brand Impersonation & Subdomain Trap
-	for brand := range config.BrandProfiles {
-		brandPresentInHost := strings.Contains(host, brand)
-		brandPresentInPath := strings.Contains(pathLower, brand)
+	for brand, legitList := range config.BrandProfiles {
+		brandPresentInHost := hasBrandBoundary(host, brand)
+		brandPresentInPath := hasBrandBoundary(pathLower, brand)
 
 		if !brandPresentInHost && !brandPresentInPath {
 			continue
@@ -133,12 +133,10 @@ func CheckURLHeuristics(rawURL string) *ThreatCheckResult {
 
 		// Check if the host belongs to legitimate domains for this brand
 		isLegit := false
-		if legitList, ok := legitimateBrandDomains[brand]; ok {
-			for _, legitDomain := range legitList {
-				if host == legitDomain || strings.HasSuffix(host, "."+legitDomain) {
-					isLegit = true
-					break
-				}
+		for _, legitDomain := range legitList {
+			if host == legitDomain || strings.HasSuffix(host, "."+legitDomain) {
+				isLegit = true
+				break
 			}
 		}
 
@@ -158,7 +156,7 @@ func CheckURLHeuristics(rawURL string) *ThreatCheckResult {
 
 		isSubdomainTrap := false
 		// Subdomain trap: e.g. bca.co.id.login.xyz (contains .co.id. or official domain in non-apex position)
-		for _, legit := range legitimateBrandDomains[brand] {
+		for _, legit := range legitList {
 			if strings.Contains(host, legit+".") {
 				isSubdomainTrap = true
 				break

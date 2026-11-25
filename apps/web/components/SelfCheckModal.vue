@@ -66,6 +66,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useI18n } from '~/composables/useI18n'
+import { calculateDodgeOffset } from '~/utils/dodge'
 
 const props = defineProps<{
   visible: boolean
@@ -132,15 +133,7 @@ const triggerDodge = () => {
     return
   }
 
-  // Pre-calculated agile jump directions so it darts away unpredictably within modal bounds
-  const directions = [
-    { x: 35, y: -22 },
-    { x: -20, y: 18 },
-    { x: 45, y: 15 },
-    { x: -15, y: -20 }
-  ]
-
-  const nextDir = directions[(dodgeCount.value - 1) % directions.length]
+  const nextDir = calculateDodgeOffset(dodgeCount.value)
   const jitterX = Math.floor((Math.random() - 0.5) * 8)
   const jitterY = Math.floor((Math.random() - 0.5) * 6)
 

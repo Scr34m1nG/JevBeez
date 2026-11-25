@@ -16,7 +16,7 @@ const (
 )
 
 var (
-	injectionRegex = regexp.MustCompile(`(?i)(<script|javascript:|onerror\s*=|onload\s*=|union\s+select|waitfor\s+delay|pg_sleep\(|sleep\(|1=1--|'(\s*or\s*)'1'='1|;\s*cat\s+|\|\s*cat\s+|;\s*id\b|\|\s*id\b|\$\(id\)|\$\(cat|\bwhoami\b)`)
+	injectionRegex = regexp.MustCompile(`(?i)(<script|javascript:|onerror\s*=|onload\s*=|union\s+select|waitfor\s+delay|pg_sleep\(|sleep\(|1=1--|'(\s*or\s*)'1'='1|;\s*cat\s+|\|\s*cat\s+|;\s*id\b|\|\s*id\b|\$\(id\)|\$\(cat|;\s*whoami\b|\|\s*whoami\b|\$\(whoami\))`)
 	sensitiveFiles = []string{
 		"/etc/passwd",
 		"/etc/shadow",
@@ -27,7 +27,6 @@ var (
 		"/.aws",
 		"/id_rsa",
 		"wp-config",
-		"wp-login",
 		"phpmyadmin",
 		"eval-stdin",
 		".php",
@@ -57,8 +56,19 @@ func DetectExploit(rawURL string) (bool, string, string) {
 		}
 	}
 
-	// 1. Path traversal check
-	if strings.Contains(unescaped, "../") || strings.Contains(unescaped, "..\\") || strings.Contains(rawURL, "%2e%2e") {
+	// 1. Path traversal check: verify exact directory traversal sequences (/../ or \..\ or prefix/suffix)
+	isPathTraversal := strings.Contains(unescaped, "/../") ||
+		strings.Contains(unescaped, "/..\\") ||
+		strings.Contains(unescaped, "\\..\\") ||
+		strings.Contains(unescaped, "\\../") ||
+		strings.HasPrefix(unescaped, "../") ||
+		strings.HasPrefix(unescaped, "..\\") ||
+		strings.HasSuffix(unescaped, "/..") ||
+		strings.HasSuffix(unescaped, "\\..") ||
+		strings.Contains(rawURL, "%2e%2e%2f") ||
+		strings.Contains(rawURL, "%2e%2e/") ||
+		strings.Contains(rawURL, "/%2e%2e")
+	if isPathTraversal {
 		return true, ReasonPathTraversal, "Percobaan path traversal terdeteksi"
 	}
 
@@ -66,7 +76,7 @@ func DetectExploit(rawURL string) (bool, string, string) {
 	for _, file := range sensitiveFiles {
 		if strings.Contains(unescaped, file) {
 			if file == ".php" {
-				if strings.Contains(unescaped, "wp-login") || strings.Contains(unescaped, "wp-config") || strings.Contains(unescaped, "eval-stdin") || strings.Contains(unescaped, "c99.php") || strings.Contains(unescaped, "r57.php") || strings.Contains(unescaped, "wso.php") {
+				if strings.Contains(unescaped, "wp-config") || strings.Contains(unescaped, "eval-stdin") || strings.Contains(unescaped, "c99.php") || strings.Contains(unescaped, "r57.php") || strings.Contains(unescaped, "wso.php") {
 					return true, ReasonScannerProbe, "Percobaan probe file sensitif / webshell terdeteksi"
 				}
 				continue
