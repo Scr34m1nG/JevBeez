@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between mb-3">
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-        <span class="text-xs font-bold tracking-wider uppercase text-emerald-400">Proses Verifikasi AI</span>
+        <span class="text-xs font-bold tracking-wider uppercase text-emerald-400">Proses Analisis AI</span>
       </div>
       <span class="text-xs font-mono text-slate-400">Langkah {{ currentPhase }} dari 4</span>
     </div>
@@ -41,10 +41,10 @@ const props = defineProps<{
 const currentPhase = computed(() => Math.min(Math.max(props.phase || 1, 1), 4))
 
 const steps = computed(() => [
-  props.isUrlMode ? 'Membedah tautan berita & reputasi domain...' : 'Membedah klaim teks & membersihkan format broadcast...',
-  'Mencari rujukan fakta di media kredibel...',
-  'Menganalisis probabilitas fakta & bias via TypeSafe Jev...',
-  'Menyusun ringkasan bukti verifikasi...'
+  props.isUrlMode ? 'Membedah tautan & reputasi domain...' : 'Membedah konten teks & membersihkan format...',
+  'Mencari rujukan bukti di sumber kredibel...',
+  'Menganalisis probabilitas keputusan & bias via TypeSafe Jev...',
+  'Menyusun ringkasan analisis bukti...'
 ])
 
 const getStepClass = (stepNum: number) => {
