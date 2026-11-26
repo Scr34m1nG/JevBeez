@@ -15,8 +15,9 @@ import (
 )
 
 type FirecrawlScraper struct {
-	apiKey string
-	client *http.Client
+	apiKey   string
+	client   *http.Client
+	endpoint string
 }
 
 type firecrawlScrapeRequest struct {
@@ -37,8 +38,9 @@ type firecrawlScrapeResponse struct {
 
 func NewFirecrawlScraper(apiKey string) *FirecrawlScraper {
 	return &FirecrawlScraper{
-		apiKey: apiKey,
-		client: &http.Client{Timeout: config.HTTPClientTimeout},
+		apiKey:   apiKey,
+		client:   config.NewTrustedHTTPClient(),
+		endpoint: config.FirecrawlScrapeEndpoint,
 	}
 }
 
@@ -57,7 +59,12 @@ func (s *FirecrawlScraper) Scrape(ctx context.Context, targetURL string) (*model
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, config.FirecrawlScrapeEndpoint, bytes.NewReader(body))
+	endpoint := s.endpoint
+	if endpoint == "" {
+		endpoint = config.FirecrawlScrapeEndpoint
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}

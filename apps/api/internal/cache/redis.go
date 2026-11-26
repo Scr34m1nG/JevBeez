@@ -16,6 +16,7 @@ import (
 
 type CacheService struct {
 	client *redis.Client
+	l1     *MemoryCache
 }
 
 func NewRedisService(addr, password string, db int) (*CacheService, error) {
@@ -32,7 +33,19 @@ func NewRedisService(addr, password string, db int) (*CacheService, error) {
 		return nil, fmt.Errorf("failed to connect to redis at %s: %w", addr, err)
 	}
 
-	return &CacheService{client: client}, nil
+	return &CacheService{
+		client: client,
+		l1:     NewMemoryCache(500, 3*time.Minute),
+	}, nil
+}
+
+func NewMemoryOnlyService(l1 *MemoryCache) *CacheService {
+	if l1 == nil {
+		l1 = NewMemoryCache(500, 3*time.Minute)
+	}
+	return &CacheService{
+		l1: l1,
+	}
 }
 
 func (s *CacheService) Get(ctx context.Context, normalizedURL string) (*model.VerificationResult, error) {
@@ -46,9 +59,22 @@ func (s *CacheService) Set(ctx context.Context, normalizedURL string, result *mo
 }
 
 func (s *CacheService) GetByHash(ctx context.Context, hash string) (*model.VerificationResult, error) {
-	if s == nil || s.client == nil {
+	if s == nil {
 		return nil, nil
 	}
+
+	// 1. Check L1 Memory Cache first (< 1us)
+	if s.l1 != nil {
+		if val := s.l1.Get("cache:" + hash); val != nil {
+			return val, nil
+		}
+	}
+
+	if s.client == nil {
+		return nil, nil
+	}
+
+	// 2. Check L2 Redis Cache
 	key := fmt.Sprintf("jevbeez:cache:%s", hash)
 	val, err := s.client.Get(ctx, key).Result()
 	if err != nil {
@@ -63,13 +89,33 @@ func (s *CacheService) GetByHash(ctx context.Context, hash string) (*model.Verif
 		return nil, err
 	}
 	res.IsCached = true
+
+	// Backfill L1 Memory cache
+	if s.l1 != nil {
+		s.l1.Set("cache:"+hash, &res, 3*time.Minute)
+	}
+
 	return &res, nil
 }
 
 func (s *CacheService) SetByHash(ctx context.Context, hash string, result *model.VerificationResult, ttl time.Duration) error {
-	if s == nil || s.client == nil {
+	if s == nil || result == nil {
 		return nil
 	}
+
+	// Save to L1 Memory cache
+	if s.l1 != nil {
+		memTTL := ttl
+		if memTTL > 5*time.Minute {
+			memTTL = 5 * time.Minute
+		}
+		s.l1.Set("cache:"+hash, result, memTTL)
+	}
+
+	if s.client == nil {
+		return nil
+	}
+
 	key := fmt.Sprintf("jevbeez:cache:%s", hash)
 	data, err := json.Marshal(result)
 	if err != nil {
@@ -79,9 +125,20 @@ func (s *CacheService) SetByHash(ctx context.Context, hash string, result *model
 }
 
 func (s *CacheService) GetShare(ctx context.Context, hash string) (*model.VerificationResult, error) {
-	if s == nil || s.client == nil {
+	if s == nil {
 		return nil, nil
 	}
+
+	if s.l1 != nil {
+		if val := s.l1.Get("share:" + hash); val != nil {
+			return val, nil
+		}
+	}
+
+	if s.client == nil {
+		return nil, nil
+	}
+
 	key := fmt.Sprintf("jevbeez:share:%s", hash)
 	val, err := s.client.Get(ctx, key).Result()
 	if err != nil {
@@ -96,13 +153,27 @@ func (s *CacheService) GetShare(ctx context.Context, hash string) (*model.Verifi
 		return nil, err
 	}
 	res.IsCached = true
+
+	if s.l1 != nil {
+		s.l1.Set("share:"+hash, &res, 3*time.Minute)
+	}
+
 	return &res, nil
 }
 
 func (s *CacheService) SetShare(ctx context.Context, hash string, result *model.VerificationResult) error {
-	if s == nil || s.client == nil {
+	if s == nil || result == nil {
 		return nil
 	}
+
+	if s.l1 != nil {
+		s.l1.Set("share:"+hash, result, 5*time.Minute)
+	}
+
+	if s.client == nil {
+		return nil
+	}
+
 	key := fmt.Sprintf("jevbeez:share:%s", hash)
 	data, err := json.Marshal(result)
 	if err != nil {

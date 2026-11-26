@@ -1,6 +1,10 @@
 package config
 
-import "time"
+import (
+	"net/http"
+	"sync"
+	"time"
+)
 
 const (
 	DefaultPort              = "8080"
@@ -19,6 +23,10 @@ const (
 	MaxScrapeBodyBytes        = 2 * 1024 * 1024
 	MinArticleWordCount       = 80
 	MinSocialWordCount        = 3
+
+	MaxIdleConns        = 100
+	MaxIdleConnsPerHost = 20
+	IdleConnTimeout     = 90 * time.Second
 
 	PlatformTwitter   = "twitter"
 	PlatformTikTok    = "tiktok"
@@ -118,5 +126,29 @@ var BrandProfiles = map[string][]string{
 	"posindonesia": {"posindonesia.co.id"},
 	"jne":          {"jne.co.id"},
 	"jnt":          {"jet.co.id"},
+}
+
+var (
+	trustedTransportOnce sync.Once
+	trustedTransport     *http.Transport
+)
+
+func GetTrustedTransport() *http.Transport {
+	trustedTransportOnce.Do(func() {
+		trustedTransport = &http.Transport{
+			MaxIdleConns:          MaxIdleConns,
+			MaxIdleConnsPerHost:   MaxIdleConnsPerHost,
+			IdleConnTimeout:       IdleConnTimeout,
+			ResponseHeaderTimeout: ResponseHeaderTimeout,
+		}
+	})
+	return trustedTransport
+}
+
+func NewTrustedHTTPClient() *http.Client {
+	return &http.Client{
+		Transport: GetTrustedTransport(),
+		Timeout:   HTTPClientTimeout,
+	}
 }
 
