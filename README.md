@@ -471,7 +471,7 @@ go test -v -count=1 ./...
 cd apps/web
 bun test
 ```
-*Covers 47 test cases across 9 suites: URL detection, share formatting, threat detection parity, ADS verdicts, brand logo assets, XSS safety, honeypot traps, and Canvas mocks.*
+*Covers 48 test cases across 9 suites: URL detection, share formatting, threat detection parity, ADS verdicts, brand logo assets, XSS safety, honeypot traps, and Canvas mocks.*
 
 **Verify Production Frontend Build:**
 ```bash

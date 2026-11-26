@@ -51,6 +51,15 @@ describe('JevBeez Brand Logo & Assets', () => {
     const nuxtConfigPath = path.join(rootDir, 'nuxt.config.ts')
     const content = fs.readFileSync(nuxtConfigPath, 'utf8')
     expect(content).toContain("href: '/favicon.svg'")
+    expect(content).toContain("href: '/favicon-32x32.png'")
     expect(content).toContain("href: '/favicon.ico'")
+    expect(content).toContain("href: '/apple-touch-icon.png'")
+  })
+
+  it('favicon-32x32.png and apple-touch-icon.png exist in public directory', () => {
+    const png32 = path.join(rootDir, 'public', 'favicon-32x32.png')
+    const touchIcon = path.join(rootDir, 'public', 'apple-touch-icon.png')
+    expect(fs.existsSync(png32)).toBe(true)
+    expect(fs.existsSync(touchIcon)).toBe(true)
   })
 })
