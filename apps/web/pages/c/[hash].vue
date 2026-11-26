@@ -9,7 +9,7 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
-        <span>Periksa Berita Lain</span>
+        <span>{{ t('results.checkAnotherBtn') }}</span>
       </NuxtLink>
 
       <span class="inline-flex items-center gap-1.5 text-xs text-slate-500 font-mono">
@@ -58,9 +58,11 @@
 
 <script setup lang="ts">
 import type { VerificationResult } from '~/types'
+import { useI18n } from '~/composables/useI18n'
 import VerdictCard from '~/components/VerdictCard.vue'
 import EvidenceList from '~/components/EvidenceList.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const hash = route.params.hash as string
 
