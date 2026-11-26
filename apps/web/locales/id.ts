@@ -24,6 +24,7 @@ export const id = {
     cooldownNotice: 'Mohon tunggu jeda {time} detik sebelum analisis berikutnya (atau klik tombol untuk proses otomatis setelah jeda).',
     blockedTitle: 'Akses Ditolak: Alamat IP Anda Diblokir (24 Jam)',
     blockedReasonLabel: 'Alasan:',
+    blockedMessage: 'Sistem pertahanan JevBeez mendeteksi aktivitas eksploitasi berbahaya dari alamat IP Anda. Akses telah diblokir secara otomatis selama 24 jam demi keamanan sistem.',
     easterEggTitle: 'Waduh, Kena Prank Cermin! 🤖',
     easterEggBtn: 'Siap, coba web lain 🫡',
     queueAlertTitle: 'Input kamu udah masuk antrean:',
@@ -110,6 +111,21 @@ export const id = {
     taunt2: 'Wlee 😜 Kurang cepet ngeklik!',
     taunt3: 'Hampir aja kena! Coba kejar lagi 🏃‍♂️',
     taunt4: 'Lincah kan tombolnya? 🎯'
+  },
+  stepper: {
+    badge: 'Proses Analisis AI',
+    stepCount: 'Langkah {current} dari {total}',
+    step1Url: 'Membedah tautan & reputasi domain...',
+    step1Text: 'Membedah konten teks & membersihkan format...',
+    step2: 'Mencari rujukan bukti di sumber kredibel...',
+    step3: 'Menganalisis probabilitas keputusan & bias via TypeSafe Jev...',
+    step4: 'Menyusun ringkasan analisis bukti...'
+  },
+  archive: {
+    badge: 'Tautan Arsip Permanen',
+    loading: 'Memuat data hasil analisis arsip...',
+    notFoundTitle: 'Hasil Analisis Tidak Ditemukan',
+    notFoundDesc: 'Tautan arsip ini mungkin sudah kedaluwarsa (melebihi 30 hari) atau format tautan tidak valid.'
   },
   footer: {
     liveVerification: 'JevBeez • Analisis konten & keamanan tautan berbasis bukti real-time.',

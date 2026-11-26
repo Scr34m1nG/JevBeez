@@ -153,7 +153,7 @@
             <span>{{ t('form.blockedTitle') }}</span>
           </div>
           <p class="text-rose-200 leading-relaxed">
-            {{ errorMessage || 'Sistem pertahanan JevBeez mendeteksi aktivitas eksploitasi berbahaya dari alamat IP Anda. Akses telah diblokir secara otomatis selama 24 jam demi keamanan sistem.' }}
+            {{ errorMessage || t('form.blockedMessage') }}
           </p>
           <div v-if="blockedReason" class="text-xs text-rose-400 font-mono pt-1">
             {{ t('form.blockedReasonLabel') }} {{ blockedReason }}
