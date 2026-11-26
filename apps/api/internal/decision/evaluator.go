@@ -72,6 +72,22 @@ func round(val float64) float64 {
 	return math.Round(val*10) / 10
 }
 
+func (e *Evaluator) EvaluateAds(rawURL, destURL, destDomain string, chain []string) *model.VerificationResult {
+	return &model.VerificationResult{
+		Verdict:      config.VerdictAds,
+		Confidence:   95.0,
+		ArticleTitle: "Iklan Berbayar: " + destDomain,
+		ArticleURL:   rawURL,
+		ResolvedURL:  destURL,
+		RedirectHops: chain,
+		SourceDomain: destDomain,
+		Summary:      "Tautan ini adalah iklan berbayar yang mengarah ke marketplace " + destDomain + ". Karena bukan klaim berita, JevBeez tidak memverifikasi faktanya. Pastikan transaksi hanya dilakukan di dalam platform resmi.",
+		RedFlags:     []string{"Tautan iklan berbayar, bukan artikel berita."},
+		Evidences:    []model.Evidence{},
+		IsThreat:     false,
+	}
+}
+
 func (e *Evaluator) EvaluateThreat(in *model.ThreatEvaluationInput) *model.VerificationResult {
 	title := in.PageTitle
 	if title == "" {

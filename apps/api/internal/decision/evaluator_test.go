@@ -126,3 +126,32 @@ func TestEvaluator(t *testing.T) {
 		}
 	})
 }
+
+func TestEvaluateAds(t *testing.T) {
+	e := NewEvaluator()
+	res := e.EvaluateAds(
+		"https://www.google.com/pagead/aclk?adurl=...",
+		"https://www.ebay.com/itm/123",
+		"ebay.com",
+		[]string{"https://www.ebay.com/itm/123"},
+	)
+
+	if res.Verdict != config.VerdictAds {
+		t.Fatalf("expected ADS, got %s", res.Verdict)
+	}
+	if res.IsThreat {
+		t.Fatal("ADS must not be a threat")
+	}
+	if res.ArticleURL != "https://www.google.com/pagead/aclk?adurl=..." {
+		t.Errorf("expected original url preserved, got %s", res.ArticleURL)
+	}
+	if res.ResolvedURL != "https://www.ebay.com/itm/123" {
+		t.Errorf("expected resolved url, got %s", res.ResolvedURL)
+	}
+	if res.Confidence <= 0 {
+		t.Error("expected non-zero confidence")
+	}
+	if len(res.Evidences) != 0 {
+		t.Error("expected no evidences")
+	}
+}
