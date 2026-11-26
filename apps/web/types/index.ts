@@ -12,7 +12,7 @@ export interface JevJudgments {
 }
 
 export interface VerificationResult {
-  verdict: 'HOAX' | 'VALID' | 'MISLEADING' | 'UNVERIFIED' | 'PHISHING' | 'MALWARE' | 'SCAM'
+  verdict: 'HOAX' | 'VALID' | 'MISLEADING' | 'UNVERIFIED' | 'PHISHING' | 'MALWARE' | 'SCAM' | 'ADS'
   confidence: number
   judgments: JevJudgments
   article_title: string

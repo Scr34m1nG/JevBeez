@@ -47,3 +47,25 @@ describe('Threat detection verdict translations and parity', () => {
     expect(mockThreatResult.target_brand).toBe('bca')
   })
 })
+
+describe('ADS verdict for advertisement destinations', () => {
+  it('supports ADS verdict in both locales', () => {
+    expect((id.verdict as any).ads).toBeDefined()
+    expect((en.verdict as any).ads).toBeDefined()
+
+    const adsResult: VerificationResult = {
+      verdict: 'ADS',
+      confidence: 95,
+      judgments: { contradicted_by_evidence: 0, supported_by_evidence: 0, sensational_framing: 0 },
+      article_title: 'Iklan Berbayar: ebay.com',
+      article_url: 'https://www.google.com/pagead/aclk?adurl=...',
+      source_domain: 'ebay.com',
+      summary: 'Tautan ini adalah iklan berbayar.',
+      red_flags: ['Tautan iklan berbayar, bukan artikel berita.'],
+      evidences: [],
+      is_cached: false,
+      resolved_url: 'https://www.ebay.com/itm/123'
+    }
+    expect(adsResult.verdict).toBe('ADS')
+  })
+})

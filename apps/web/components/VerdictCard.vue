@@ -230,7 +230,7 @@
       </div>
 
       <!-- Standard Fact-Check: Decision Probability Vectors -->
-      <div v-if="!result.is_threat" class="pt-4 border-t border-slate-200">
+      <div v-if="!result.is_threat && result.verdict !== 'ADS'" class="pt-4 border-t border-slate-200">
         <div class="flex items-center justify-between gap-2 mb-3 text-xs">
           <span class="font-semibold text-slate-700">{{ t('results.detailedHeading') }}</span>
           <span class="font-mono text-slate-500">{{ t('nav.engineName') }}</span>
@@ -308,6 +308,7 @@ const verdictLabel = computed(() => {
     case 'PHISHING': return t('verdict.phishing')
     case 'MALWARE': return t('verdict.malware')
     case 'SCAM': return t('verdict.scam')
+    case 'ADS': return t('verdict.ads')
     case 'HOAX': return t('verdict.hoax')
     case 'VALID': return t('verdict.valid')
     case 'MISLEADING': return t('verdict.misleading')
@@ -320,6 +321,7 @@ const bannerClass = computed(() => {
     case 'PHISHING':
     case 'MALWARE': return 'bg-rose-100 border-rose-300 text-rose-950 font-bold'
     case 'SCAM': return 'bg-amber-100 border-amber-300 text-amber-950 font-bold'
+    case 'ADS': return 'bg-sky-50 border-sky-200 text-sky-950'
     case 'HOAX': return 'bg-rose-50 border-rose-200 text-rose-950'
     case 'VALID': return 'bg-emerald-50 border-emerald-200 text-emerald-950'
     case 'MISLEADING': return 'bg-amber-50 border-amber-200 text-amber-950'
@@ -332,6 +334,7 @@ const badgeClass = computed(() => {
     case 'PHISHING':
     case 'MALWARE': return 'bg-white border-rose-400 text-rose-900 shadow-sm'
     case 'SCAM': return 'bg-white border-amber-400 text-amber-900 shadow-sm'
+    case 'ADS': return 'bg-white border-sky-300 text-sky-800 shadow-sm'
     case 'HOAX': return 'bg-white border-rose-300 text-rose-800 shadow-sm'
     case 'VALID': return 'bg-white border-emerald-300 text-emerald-800 shadow-sm'
     case 'MISLEADING': return 'bg-white border-amber-300 text-amber-800 shadow-sm'

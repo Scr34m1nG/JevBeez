@@ -73,7 +73,8 @@ export const en: TranslationSchema = {
     unverified: 'Unverified Info',
     phishing: 'DANGER: PHISHING DETECTED',
     malware: 'DANGER: MALWARE / APK DETECTED',
-    scam: 'WARNING: SCAM DETECTED'
+    scam: 'WARNING: SCAM DETECTED',
+    ads: 'Paid Advertisement (Ads)'
   },
   threat: {
     threatBadge: 'Cyber Threat Detected',

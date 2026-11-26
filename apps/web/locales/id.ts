@@ -71,7 +71,8 @@ export const id = {
     unverified: 'Belum Bisa Dipastikan',
     phishing: 'BAHAYA: INDIKASI PHISHING',
     malware: 'BAHAYA: UNDUHAN MALWARE / APK',
-    scam: 'WASPADA: SITUS PENIPUAN (SCAM)'
+    scam: 'WASPADA: SITUS PENIPUAN (SCAM)',
+    ads: 'Iklan Berbayar (Ads)'
   },
   threat: {
     threatBadge: 'Ancaman Siber Terdeteksi',
