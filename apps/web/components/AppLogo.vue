@@ -8,58 +8,113 @@
     class="shrink-0"
   >
     <defs>
-      <linearGradient id="jb-logo-bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <!-- Dark Honeycomb Slate Gradient -->
+      <linearGradient id="jb-honey-bg" x1="32" y1="2" x2="32" y2="62" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="#1E293B" />
-        <stop offset="100%" stop-color="#0F172A" />
+        <stop offset="60%" stop-color="#0F172A" />
+        <stop offset="100%" stop-color="#020617" />
       </linearGradient>
 
-      <linearGradient id="jb-logo-amber" x1="20" y1="18" x2="44" y2="52" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stop-color="#FBBF24" />
+      <!-- Amber Gold Honeycomb Frame Gradient -->
+      <linearGradient id="jb-honey-gold" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#FDE047" />
+        <stop offset="35%" stop-color="#F59E0B" />
         <stop offset="100%" stop-color="#D97706" />
       </linearGradient>
 
-      <linearGradient id="jb-logo-wing-l" x1="10" y1="18" x2="28" y2="34" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stop-color="#BAE6FD" stop-opacity="0.9" />
-        <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.35" />
-      </linearGradient>
-
-      <linearGradient id="jb-logo-wing-r" x1="54" y1="18" x2="36" y2="34" gradientUnits="userSpaceOnUse">
-        <stop offset="0%" stop-color="#BAE6FD" stop-opacity="0.9" />
-        <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.35" />
-      </linearGradient>
+      <!-- Subtle Inner Honeycomb Glow -->
+      <radialGradient id="jb-honey-glow" cx="32" cy="32" r="28" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.18" />
+        <stop offset="100%" stop-color="#F59E0B" stop-opacity="0" />
+      </radialGradient>
     </defs>
 
-    <!-- Container Badge -->
-    <rect width="64" height="64" rx="14" fill="url(#jb-logo-bg)" />
-    <rect width="62" height="62" x="1" y="1" rx="13" stroke="#334155" stroke-width="1" stroke-opacity="0.6" />
+    <!-- Outer Honeycomb Hexagon Body (Rounded Vertices) -->
+    <path
+      d="M32 4.5
+         L55.5 18
+         A 2 2 0 0 1 56.5 19.7
+         L56.5 44.3
+         A 2 2 0 0 1 55.5 46
+         L32 59.5
+         A 2 2 0 0 1 31 59.5
+         L7.5 46
+         A 2 2 0 0 1 6.5 44.3
+         L6.5 19.7
+         A 2 2 0 0 1 7.5 18
+         L31 4.5
+         A 2 2 0 0 1 32 4.5 Z"
+      fill="url(#jb-honey-bg)"
+      stroke="url(#jb-honey-gold)"
+      stroke-width="2.5"
+      stroke-linejoin="round"
+    />
 
-    <!-- Antennae -->
-    <path d="M27 20C25 15 21 14 19 15" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" />
-    <circle cx="18" cy="15.5" r="1.75" fill="#FBBF24" />
+    <!-- Subtle Radial Amber Glow inside Honeycomb -->
+    <path
+      d="M32 7.5 L53.5 19.8 L53.5 44.2 L32 56.5 L10.5 44.2 L10.5 19.8 Z"
+      fill="url(#jb-honey-glow)"
+    />
 
-    <path d="M37 20C39 15 43 14 45 15" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" />
-    <circle cx="46" cy="15.5" r="1.75" fill="#FBBF24" />
+    <!-- Inner Honeycomb Geometric Pattern Lines -->
+    <path d="M10.5 19.8 L22 26.5 L22 39.5 L10.5 44.2" stroke="#F59E0B" stroke-width="1" stroke-opacity="0.22" fill="none" />
+    <path d="M53.5 19.8 L42 26.5 L42 39.5 L53.5 44.2" stroke="#F59E0B" stroke-width="1" stroke-opacity="0.22" fill="none" />
+    <path d="M32 7.5 L32 17.5 M22 26.5 L32 20.5 L42 26.5" stroke="#F59E0B" stroke-width="1" stroke-opacity="0.25" fill="none" />
+    <path d="M32 56.5 L32 46.5 M22 39.5 L32 45.5 L42 39.5" stroke="#F59E0B" stroke-width="1" stroke-opacity="0.25" fill="none" />
 
-    <!-- Wings -->
-    <path d="M28 27C21 21 11 23 12 31C13 36 21 35 28 32Z" fill="url(#jb-logo-wing-l)" stroke="#7DD3FC" stroke-width="1.25" stroke-linejoin="round" />
-    <path d="M36 27C43 21 53 23 52 31C51 36 43 35 36 32Z" fill="url(#jb-logo-wing-r)" stroke="#7DD3FC" stroke-width="1.25" stroke-linejoin="round" />
+    <!-- Inner Concentric Honeycomb Rim -->
+    <path
+      d="M32 10.5 L50.5 21.2 L50.5 42.8 L32 53.5 L13.5 42.8 L13.5 21.2 Z"
+      stroke="#FBBF24"
+      stroke-width="1"
+      stroke-opacity="0.35"
+      fill="none"
+    />
 
-    <!-- Bee Shield Body -->
-    <path d="M32 20C24 20 23 25 23 31C23 41 32 49 32 49C32 49 41 41 41 31C41 25 40 20 32 20Z" fill="url(#jb-logo-amber)" />
+    <!-- "JB" Monogram Bold High-Contrast Typography -->
+    <!-- Letter "J" -->
+    <path
+      d="M21 21.5
+         H28
+         V37
+         C28 40.2 25.8 42.5 22.5 42.5
+         C20.2 42.5 18 41.2 17 39.5
+         L19.5 37.8
+         C20.2 38.8 21.2 39.5 22.5 39.5
+         C24.1 39.5 25 38.5 25 36.8
+         V24.5
+         H21
+         V21.5 Z"
+      fill="#FFFFFF"
+    />
 
-    <!-- Dark Stripes -->
-    <path d="M23.6 28C26 29 38 29 40.4 28C40.8 30 40.8 32 40.4 33C37 34.5 27 34.5 23.6 33C23.2 31.5 23.2 29.5 23.6 28Z" fill="#0F172A" />
-    <path d="M25.2 37C27.5 38.2 36.5 38.2 38.8 37C38 39.5 36.5 41.5 34.5 43C33.5 43.5 30.5 43.5 29.5 43C27.5 41.5 26 39.5 25.2 37Z" fill="#0F172A" />
+    <!-- Letter "B" -->
+    <path
+      d="M32 21.5
+         H40.2
+         C43.5 21.5 45.5 23.2 45.5 26
+         C45.5 27.8 44.5 29.2 43 29.8
+         C45 30.5 46.2 32.2 46.2 34.5
+         C46.2 38.2 43.5 42.5 39.5 42.5
+         H32
+         V21.5 Z
+         M35.2 24.5
+         V30
+         H39.8
+         C41.6 30 42.6 29 42.6 27.2
+         C42.6 25.5 41.5 24.5 39.8 24.5
+         H35.2 Z
+         M35.2 33
+         V39.5
+         H40
+         C42 39.5 43.2 38.2 43.2 36.2
+         C43.2 34.2 42 33 40 33
+         H35.2 Z"
+      fill="#FFFFFF"
+    />
 
-    <!-- Eyes -->
-    <circle cx="28" cy="24" r="1.5" fill="#0F172A" />
-    <circle cx="36" cy="24" r="1.5" fill="#0F172A" />
-
-    <!-- Eye Catchlights -->
-    <circle cx="28.4" cy="23.6" r="0.5" fill="#FFFFFF" />
-    <circle cx="36.4" cy="23.6" r="0.5" fill="#FFFFFF" />
-
-    <!-- Stinger / Fact Check Apex -->
-    <path d="M32 47L32 51.5" stroke="#FBBF24" stroke-width="1.75" stroke-linecap="round" />
+    <!-- Amber Gold Dot Accent / Hive Core Spark -->
+    <circle cx="47.5" cy="18.5" r="1.75" fill="#FDE047" />
+    <circle cx="47.5" cy="18.5" r="3" stroke="#F59E0B" stroke-width="0.75" stroke-opacity="0.6" fill="none" />
   </svg>
 </template>

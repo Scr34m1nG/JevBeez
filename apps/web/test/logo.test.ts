@@ -14,8 +14,8 @@ describe('JevBeez Brand Logo & Assets', () => {
     expect(content).toContain('viewBox="0 0 64 64"')
     expect(content).toContain('role="img"')
     expect(content).toContain('aria-label="JevBeez Logo"')
-    expect(content).toContain('jb-logo-amber')
-    expect(content).toContain('jb-logo-bg')
+    expect(content).toContain('jb-honey-gold')
+    expect(content).toContain('jb-honey-bg')
   })
 
   it('favicon.svg exists in public directory and contains bee vector graphics', () => {
@@ -25,8 +25,8 @@ describe('JevBeez Brand Logo & Assets', () => {
     const content = fs.readFileSync(svgPath, 'utf8')
     expect(content).toContain('<svg')
     expect(content).toContain('xmlns="http://www.w3.org/2000/svg"')
-    expect(content).toContain('jb-amber')
-    expect(content).toContain('jb-bg')
+    expect(content).toContain('jb-honey-gold')
+    expect(content).toContain('jb-honey-bg')
   })
 
   it('favicon.ico exists and has valid ICO binary header', () => {
