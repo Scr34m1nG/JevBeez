@@ -1,6 +1,7 @@
 package config
 
 import (
+	"net/http"
 	"testing"
 )
 
@@ -69,5 +70,30 @@ func TestUnwrapperConfigValues(t *testing.T) {
 
 	if len(WrapperHostPatterns) == 0 {
 		t.Fatal("WrapperHostPatterns must not be empty")
+	}
+}
+
+func TestTrustedHTTPClient_ConnectionPooling(t *testing.T) {
+	client := NewTrustedHTTPClient()
+	if client == nil {
+		t.Fatalf("expected non-nil client")
+	}
+	if client.Timeout != HTTPClientTimeout {
+		t.Errorf("expected client timeout %v, got %v", HTTPClientTimeout, client.Timeout)
+	}
+
+	transport, ok := client.Transport.(*http.Transport)
+	if !ok {
+		t.Fatalf("expected *http.Transport, got %T", client.Transport)
+	}
+
+	if transport.MaxIdleConns != MaxIdleConns {
+		t.Errorf("expected MaxIdleConns %d, got %d", MaxIdleConns, transport.MaxIdleConns)
+	}
+	if transport.MaxIdleConnsPerHost != MaxIdleConnsPerHost {
+		t.Errorf("expected MaxIdleConnsPerHost %d, got %d", MaxIdleConnsPerHost, transport.MaxIdleConnsPerHost)
+	}
+	if transport.IdleConnTimeout != IdleConnTimeout {
+		t.Errorf("expected IdleConnTimeout %v, got %v", IdleConnTimeout, transport.IdleConnTimeout)
 	}
 }

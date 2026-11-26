@@ -64,6 +64,20 @@ export const useAnalyze = () => {
     loadingPhase.value = 4
   }
 
+  const handleSelfCheck = () => {
+    selfCheckCount.value++
+    isEasterEgg.value = true
+
+    if (selfCheckCount.value >= 3) {
+      showSelfCheckModal.value = true
+      error.value = '🛑 WKWK Ngotot banget ya! Tombol "Periksa Fakta" angkat tangan menyerah menghadapi Anda 🏳️🤣. Serius nih, yuk masukkan tautan berita dari web lain sekarang!'
+    } else if (selfCheckCount.value === 2) {
+      error.value = '👀 Masih ngeyel dicoba lagi? Udah dibilang jangan ngetes web ini sendiri, nanti server kami kena krisis identitas! 🤖💥 Hayuk buruan cari tautan berita lain!'
+    } else {
+      error.value = '🚨 INCEPTION DETECTED! Anda sedang mengecek website JevBeez di JevBeez sendiri 🪞. AI kami sempat krisis eksistensial menatap cermin... Tenang, kami 100% fakta & bebas hoax! Silakan coba periksa tautan berita dari situs atau media sosial lain ya.'
+    }
+  }
+
   const analyze = async (rawInput: string, deepDive = false) => {
     if (!rawInput || !rawInput.trim()) {
       error.value = 'Silakan masukkan tautan atau teks pesan yang ingin diverifikasi.'
@@ -91,6 +105,83 @@ export const useAnalyze = () => {
 
     try {
       const isUrl = isUrlInput(trimmed)
+
+      // Try streaming SSE first for faster TTBV and real-time updates
+      const sseSupported = typeof EventSource !== 'undefined' || typeof ReadableStream !== 'undefined'
+      if (sseSupported && typeof fetch !== 'undefined') {
+        const streamUrl = new URL('/api/analyze-stream', window.location.origin)
+        if (isUrl) {
+          streamUrl.searchParams.set('url', trimmed)
+          if (deepDive) streamUrl.searchParams.set('deep_dive', 'true')
+        } else {
+          streamUrl.searchParams.set('text', trimmed)
+        }
+
+        const response = await fetch(streamUrl.toString(), {
+          headers: {
+            'Accept': 'text/event-stream'
+          }
+        })
+
+        if (response.ok && response.body) {
+          const reader = response.body.getReader()
+          const decoder = new TextDecoder()
+          let buffer = ''
+
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            buffer += decoder.decode(value, { stream: true })
+
+            const parts = buffer.split('\n\n')
+            buffer = parts.pop() || ''
+
+            for (const part of parts) {
+              if (!part.trim()) continue
+              let eventType = 'message'
+              let dataStr = ''
+
+              for (const line of part.split('\n')) {
+                if (line.startsWith('event: ')) {
+                  eventType = line.slice(7).trim()
+                } else if (line.startsWith('data: ')) {
+                  dataStr = line.slice(6).trim()
+                }
+              }
+
+              if (!dataStr) continue
+
+              try {
+                const parsed = JSON.parse(dataStr)
+                if (eventType === 'progress') {
+                  if (parsed.phase === 'extracting') loadingPhase.value = 2
+                  else if (parsed.phase === 'searching') loadingPhase.value = 3
+                  else if (parsed.phase === 'evaluating') loadingPhase.value = 4
+                } else if (eventType === 'error') {
+                  if (parsed.blocked) {
+                    isBlocked.value = true
+                    blockedReason.value = parsed.reason || 'Aktivitas Berbahaya'
+                  }
+                  throw new Error(parsed.error || 'Terjadi kesalahan saat memverifikasi artikel.')
+                } else if (eventType === 'verdict') {
+                  isEasterEgg.value = false
+                  result.value = parsed as VerificationResult
+                  if (!result.value.is_cached) {
+                    startCooldown(15)
+                  }
+                  return
+                }
+              } catch (e: any) {
+                if (e.message && e.message.includes('Akses ditolak')) throw e
+              }
+            }
+          }
+
+          if (result.value) return
+        }
+      }
+
+      // Fallback to standard POST REST endpoint
       const payload = isUrl
         ? { url: trimmed, deep_dive: deepDive }
         : { text: trimmed }
@@ -134,17 +225,7 @@ export const useAnalyze = () => {
 
         const isSelf = data?.data?.code === 'SELF_CHECK_EASTER_EGG' || (data?.data?.error && data.data.error.includes('INCEPTION'))
         if (isSelf) {
-          selfCheckCount.value++
-          isEasterEgg.value = true
-
-          if (selfCheckCount.value >= 3) {
-            showSelfCheckModal.value = true
-            error.value = '🛑 WKWK Ngotot banget ya! Tombol "Periksa Fakta" angkat tangan menyerah menghadapi Anda 🏳️🤣. Serius nih, yuk masukkan tautan berita dari web lain sekarang!'
-          } else if (selfCheckCount.value === 2) {
-            error.value = '👀 Masih ngeyel dicoba lagi? Udah dibilang jangan ngetes web ini sendiri, nanti server kami kena krisis identitas! 🤖💥 Hayuk buruan cari tautan berita lain!'
-          } else {
-            error.value = '🚨 INCEPTION DETECTED! Anda sedang mengecek website JevBeez di JevBeez sendiri 🪞. AI kami sempat krisis eksistensial menatap cermin... Tenang, kami 100% fakta & bebas hoax! Silakan coba periksa tautan berita dari situs atau media sosial lain ya.'
-          }
+          handleSelfCheck()
           return
         }
 

@@ -18,14 +18,16 @@ import (
 	"jevbeez/api/internal/scraper"
 	"jevbeez/api/internal/search"
 	"jevbeez/api/internal/security"
+	"sync"
 )
 
 type AnalyzeHandler struct {
-	cache     *cache.CacheService
-	scraper   *scraper.ScraperService
-	searcher  *search.SearchManager
-	jevClient *jev.Client
-	evaluator *decision.Evaluator
+	cache         *cache.CacheService
+	scraper       *scraper.ScraperService
+	searcher      *search.SearchManager
+	jevClient     *jev.Client
+	evaluator     *decision.Evaluator
+	activeStreams sync.Map
 }
 
 func NewAnalyzeHandler(

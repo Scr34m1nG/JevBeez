@@ -9,7 +9,11 @@ const dictionaries: Record<Locale, TranslationSchema> = { id, en }
 
 const currentLocale = ref<Locale>('id')
 
+let initialized = false
+
 function initLocale() {
+  if (initialized) return
+  initialized = true
   if (typeof useCookie === 'function') {
     try {
       const cookie = useCookie<Locale>(LOCALE_STORAGE_KEY, { default: () => 'id' })
@@ -29,8 +33,6 @@ function initLocale() {
   }
 }
 
-initLocale()
-
 function resolveKey(dict: any, keys: string[]): string | null {
   let current: any = dict
   for (const k of keys) {
@@ -44,6 +46,7 @@ function resolveKey(dict: any, keys: string[]): string | null {
 }
 
 export function useI18n() {
+  initLocale()
   const locale = computed(() => currentLocale.value)
   const isId = computed(() => currentLocale.value === 'id')
   const isEn = computed(() => currentLocale.value === 'en')

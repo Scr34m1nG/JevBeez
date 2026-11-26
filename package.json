@@ -1,4 +1,11 @@
 {
+  "name": "jevbeez",
+  "private": true,
+  "scripts": {
+    "dev": "bun --cwd apps/web dev",
+    "build": "bun --cwd apps/web build",
+    "test": "bun --cwd apps/web test"
+  },
   "dependencies": {},
   "devDependencies": {
     "playwright": "^1.65.1"

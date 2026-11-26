@@ -37,7 +37,7 @@ type systemOneResponse struct {
 func NewClient(apiKey string) *Client {
 	return &Client{
 		apiKey: apiKey,
-		client: &http.Client{Timeout: config.HTTPClientTimeout},
+		client: config.NewTrustedHTTPClient(),
 	}
 }
 

@@ -7,6 +7,7 @@ import (
 
 	"jevbeez/api/internal/config"
 	"jevbeez/api/internal/model"
+	"jevbeez/api/internal/security"
 )
 
 var (
@@ -29,12 +30,9 @@ func NewScraperService(firecrawlKey string) *ScraperService {
 }
 
 func (s *ScraperService) Extract(ctx context.Context, targetURL string) (*model.Article, error) {
-	var article *model.Article
-	var err error
-
 	platform, isSocial := DetectSocialPlatform(targetURL)
 	if isSocial {
-		article, err = s.social.Scrape(ctx, targetURL, platform)
+		article, err := s.social.Scrape(ctx, targetURL, platform)
 		if err != nil {
 			return nil, err
 		}
@@ -44,22 +42,41 @@ func (s *ScraperService) Extract(ctx context.Context, targetURL string) (*model.
 		return article, nil
 	}
 
-	if s.firecrawl.apiKey != "" {
-		article, err = s.firecrawl.Scrape(ctx, targetURL)
-	}
-
-	if article == nil || err != nil {
-		article, err = s.local.Scrape(ctx, targetURL)
-		if err != nil {
-			return nil, err
+	// 1. Local-first: Fast, zero-cost HTTP scraping
+	localArticle, localErr := s.local.Scrape(ctx, targetURL)
+	if localErr == nil {
+		if valErr := s.validateArticle(localArticle); valErr == nil {
+			return localArticle, nil
 		}
 	}
 
-	if err := s.validateArticle(article); err != nil {
-		return nil, err
+	// Strict SSRF guard: Never fallback to Firecrawl if private IP was targeted
+	if errors.Is(localErr, security.ErrPrivateIPBlocked) || errors.Is(localErr, security.ErrInvalidIPAddress) {
+		return nil, localErr
 	}
 
-	return article, nil
+	// 2. Fallback to Firecrawl for SPA / Cloudflare-protected pages
+	if s.firecrawl.apiKey != "" {
+		fcArticle, fcErr := s.firecrawl.Scrape(ctx, targetURL)
+		if fcErr == nil {
+			if valErr := s.validateArticle(fcArticle); valErr == nil {
+				return fcArticle, nil
+			}
+		}
+	}
+
+	if localArticle != nil {
+		if err := s.validateArticle(localArticle); err != nil {
+			return nil, err
+		}
+		return localArticle, nil
+	}
+
+	if localErr != nil {
+		return nil, localErr
+	}
+
+	return nil, ErrEmptyArticle
 }
 
 func (s *ScraperService) validateArticle(article *model.Article) error {
