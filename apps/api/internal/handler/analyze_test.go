@@ -200,3 +200,87 @@ func TestAnalyzeHandler_GetCheckByHash_NotFound(t *testing.T) {
 		t.Fatalf("expected status 404 for missing hash in nil cache, got %d", resp.StatusCode)
 	}
 }
+
+func TestAnalyzeHandler_WrappedScamLinkReturnsScam(t *testing.T) {
+	app, _ := setupTestApp()
+	payload, _ := json.Marshal(model.AnalyzeRequest{
+		URL: "https://www.google.com/pagead/aclk?sa=L&adurl=https%3A%2F%2Fvk.com%2Faway.php%3Fto%3Dhttps%3A%2F%2Fbaf9105c4584fac832929f959728944d.cavemin.com%2Fsttodm%2F",
+	})
+
+	req := httptest.NewRequest("POST", "/api/analyze", bytes.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.StatusCode != fiber.StatusOK {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+
+	var result model.VerificationResult
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		t.Fatalf("decode failed: %v", err)
+	}
+	if result.Verdict != config.VerdictScam {
+		t.Fatalf("expected SCAM, got %s", result.Verdict)
+	}
+	if len(result.RedirectHops) == 0 {
+		t.Error("expected redirect chain recorded")
+	}
+}
+
+func TestAnalyzeHandler_WrappedEcommerceReturnsAds(t *testing.T) {
+	app, _ := setupTestApp()
+	payload, _ := json.Marshal(model.AnalyzeRequest{
+		URL: "https://www.google.com/pagead/aclk?sa=L&adurl=https%3A%2F%2Fwww.ebay.com%2Fitm%2F123",
+	})
+
+	req := httptest.NewRequest("POST", "/api/analyze", bytes.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.StatusCode != fiber.StatusOK {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+
+	var result model.VerificationResult
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		t.Fatalf("decode failed: %v", err)
+	}
+	if result.Verdict != config.VerdictAds {
+		t.Fatalf("expected ADS, got %s", result.Verdict)
+	}
+	if result.IsThreat {
+		t.Error("ADS must not be a threat")
+	}
+	if result.ResolvedURL != "https://www.ebay.com/itm/123" {
+		t.Errorf("expected resolved ebay url, got %s", result.ResolvedURL)
+	}
+}
+
+func TestAnalyzeHandler_WrappedBrandSpoofStaysPhishing(t *testing.T) {
+	app, _ := setupTestApp()
+	payload, _ := json.Marshal(model.AnalyzeRequest{
+		URL: "https://www.google.com/pagead/aclk?sa=L&adurl=https%3A%2F%2Fbca.co.id.login-promo.xyz%2Fauth",
+	})
+
+	req := httptest.NewRequest("POST", "/api/analyze", bytes.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.StatusCode != fiber.StatusOK {
+		t.Fatalf("expected 200, got %d", resp.StatusCode)
+	}
+
+	var result model.VerificationResult
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		t.Fatalf("decode failed: %v", err)
+	}
+	if result.Verdict != config.VerdictPhishing {
+		t.Fatalf("expected PHISHING, got %s", result.Verdict)
+	}
+}

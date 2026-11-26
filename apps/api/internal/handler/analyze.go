@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -116,17 +117,34 @@ func (h *AnalyzeHandler) handleURL(c *fiber.Ctx, clientIP string, req model.Anal
 
 	targetURL := normalizedURL
 	var redirectHops []string
-	if security.IsShortener(normalizedURL) {
-		unrolled, hops, sErr := security.ResolveShortener(c.Context(), normalizedURL, config.MaxShortenerHops)
+	if unwrap := security.UnwrapRedirectChain(normalizedURL); unwrap.Depth > 0 {
+		targetURL = unwrap.FinalURL
+		redirectHops = append(redirectHops, unwrap.Chain...)
+	}
+
+	if security.IsShortener(targetURL) {
+		unrolled, hops, sErr := security.ResolveShortener(c.Context(), targetURL, config.MaxShortenerHops)
 		if sErr == nil && unrolled != "" {
 			targetURL = unrolled
-			redirectHops = hops
+			redirectHops = append(redirectHops, hops...)
 		}
 	}
 
 	threatCheck := security.CheckURLHeuristics(targetURL)
 	if !threatCheck.IsThreat && targetURL != normalizedURL {
 		threatCheck = security.CheckURLHeuristics(normalizedURL)
+	}
+
+	if !threatCheck.IsThreat && security.IsEcommerceURL(targetURL) {
+		destDomain := targetURL
+		if parsed, pErr := url.Parse(targetURL); pErr == nil {
+			destDomain = parsed.Hostname()
+		}
+		result := h.evaluator.EvaluateAds(rawURL, targetURL, destDomain, redirectHops)
+		result.ShareHash = shareHash
+		_ = h.cache.SetByHash(c.Context(), shareHash, result, config.DefaultCacheTTL)
+		_ = h.cache.SetShare(c.Context(), shareHash, result)
+		return c.JSON(result)
 	}
 
 	if threatCheck.IsThreat {
@@ -172,7 +190,7 @@ func (h *AnalyzeHandler) handleURL(c *fiber.Ctx, clientIP string, req model.Anal
 		return c.JSON(result)
 	}
 
-	article, err := h.scraper.Extract(c.Context(), normalizedURL)
+	article, err := h.scraper.Extract(c.Context(), targetURL)
 	if err != nil {
 		if errors.Is(err, security.ErrPrivateIPBlocked) || errors.Is(err, security.ErrInvalidIPAddress) {
 			_ = h.cache.BlockIP(c.Context(), clientIP, security.ReasonSSRFAttempt, normalizedURL, config.DefaultBlockDuration)
@@ -181,6 +199,21 @@ func (h *AnalyzeHandler) handleURL(c *fiber.Ctx, clientIP string, req model.Anal
 				"blocked": true,
 				"reason":  security.ReasonSSRFAttempt,
 			})
+		}
+
+		if len(redirectHops) > 0 && errors.Is(err, scraper.ErrEmptyArticle) {
+			result := h.evaluator.EvaluateThreat(&model.ThreatEvaluationInput{
+				RawURL:       rawURL,
+				ResolvedURL:  targetURL,
+				RedirectHops: redirectHops,
+				ThreatType:   config.VerdictScam,
+				Confidence:   80.0,
+				Reasons:      []string{"Tautan dibungkus redirector dan halaman tujuan tidak memiliki konten yang dapat dibaca (cloaking)."},
+			})
+			result.ShareHash = shareHash
+			_ = h.cache.SetByHash(c.Context(), shareHash, result, config.DefaultCacheTTL)
+			_ = h.cache.SetShare(c.Context(), shareHash, result)
+			return c.JSON(result)
 		}
 
 		errMsg := err.Error()
