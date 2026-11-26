@@ -5,8 +5,7 @@ import (
 	"jevbeez/api/internal/config"
 )
 
-func TestCheckURLHeuristics_MalwareAPK(t *testing.T) {
-	urls := []string{
+func TestCheckURLHeuristics_MalwareAPK(t *testing.T) {	urls := []string{
 		"https://undangan-nikah-digital.xyz/surat_undangan.apk",
 		"http://cek-resi-jnt.top/paket_tracking.exe",
 		"https://surat-tilang.buzz/dokumen_tilang.apk?v=1",
@@ -97,6 +96,34 @@ func TestCheckURLHeuristics_LegitimateURL(t *testing.T) {
 		res := CheckURLHeuristics(u)
 		if res.IsThreat {
 			t.Errorf("expected legitimate url %s NOT to be flagged as threat, but got reasons: %v", u, res.Reasons)
+		}
+	}
+}
+
+func TestCheckURLHeuristics_HexSubdomainScam(t *testing.T) {
+	res := CheckURLHeuristics("https://baf9105c4584fac832929f959728944d.cavemin.com/sttodm/")
+	if !res.IsThreat {
+		t.Fatal("expected hex subdomain to be flagged")
+	}
+	if res.ThreatType != config.VerdictScam {
+		t.Fatalf("expected SCAM, got %s", res.ThreatType)
+	}
+	if len(res.Reasons) == 0 {
+		t.Fatal("expected at least one reason")
+	}
+}
+
+func TestCheckURLHeuristics_ShortHexLabelIgnored(t *testing.T) {
+	res := CheckURLHeuristics("https://abc123.news.com/article")
+	if res.IsThreat {
+		t.Fatal("short hex-like label must not be flagged")
+	}
+}
+
+func TestCheckURLHeuristics_EcommerceNotThreat(t *testing.T) {
+	for _, u := range []string{"https://www.ebay.com/itm/1", "https://shopee.co.id/product/1"} {
+		if res := CheckURLHeuristics(u); res.IsThreat {
+			t.Errorf("%s must not be a threat, got %s", u, res.ThreatType)
 		}
 	}
 }

@@ -182,5 +182,26 @@ func CheckURLHeuristics(rawURL string) *ThreatCheckResult {
 		}
 	}
 
+	// 6. Check for obfuscated hex subdomain (common in cloaked scam links)
+	for _, label := range strings.Split(host, ".") {
+		if len(label) >= config.MinHexSubdomainLength && isHexLabel(label) {
+			res.IsThreat = true
+			res.ThreatType = config.VerdictScam
+			res.Confidence = 82.0
+			res.Reasons = append(res.Reasons, "Subdomain berupa deretan karakter heksadesimal acak, pola umum penyamaran tautan penipuan agar lolos dari daftar blokir.")
+			return res
+		}
+	}
+
 	return res
+}
+
+func isHexLabel(label string) bool {
+	for i := 0; i < len(label); i++ {
+		c := label[i]
+		if (c < '0' || c > '9') && (c < 'a' || c > 'f') {
+			return false
+		}
+	}
+	return true
 }
