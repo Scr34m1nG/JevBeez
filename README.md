@@ -79,7 +79,9 @@ The proliferation of online disinformation, viral WhatsApp broadcasts, fake news
   - **Cyber Threat Verifications**:
     - `PHISHING`: Fake login portals or credential-harvesting websites.
     - `MALWARE`: Malicious executables or deceptive APK dropper links.
-    - `SCAM`: Fraudulent schemes, fake lotteries, or impersonation campaigns.
+    - `SCAM`: Fraudulent schemes, fake lotteries, cloaked ad redirects, or impersonation campaigns.
+  - **Commercial Classifications**:
+    - `ADS`: Commercial marketplace or paid advertisement link (e.g., eBay, Amazon, Shopee, Tokopedia) unrolled from ad-tracking networks; classified as commercial traffic to prevent false hoax claims.
 - 🎣 **Zero-Contact Threat Detection Engine**:
   - Protects users immediately by terminating before contacting rogue servers when fatal anomalies are discovered.
   - Boundary-aware brand profile matching preventing false positives on legitimate domains (`lenovo.com`, `cambridge.org`).
@@ -145,6 +147,7 @@ The proliferation of online disinformation, viral WhatsApp broadcasts, fake news
    | - 24h IP Bans   |            |  - SSRF Safe Scraper   |
    | - Rate Limits   |            |  - Heuristic Engine    |
    +-----------------+            |  - Shortener Resolver  |
+                                  |  - Ad Wrapper Unpacker |
                                   +------------------------+
 ```
 
@@ -160,7 +163,7 @@ The proliferation of online disinformation, viral WhatsApp broadcasts, fake news
 | **Text Processing**| Go standard `regexp` (RE2) | Anti-ReDoS linear time broadcast cleaning & query extraction |
 | **Decision Model** | TypeSafe Jev AI | Non-hallucinatory System One calibrated probabilistic evaluation |
 | **Search & Evidence** | Tavily Search & Firecrawl | Primary source discovery and live multi-source web extraction |
-| **Heuristics & Sandbox**| Go standard `net/http` & `x/net/html` | Zero-contact heuristic analysis & 100KB sandboxed form audit |
+| **Heuristics & Sandbox**| Go standard `net/http` & `net/url` | Zero-contact heuristic analysis, offline ad wrapper unrolling, & sandboxed form audit |
 | **Card Generation**| HTML5 Canvas API | 100% client-side graphic card rendering without headless browsers |
 | **Caching Layer** | Redis 7 Alpine | Deduplication, permalinks (`SET NX`), IP bans, and rate limiters |
 | **Containerization** | Docker & Docker Compose | Multi-container reproducible deployment |
@@ -357,6 +360,67 @@ Analyzes a URL or a WhatsApp broadcast message for factual verification or cyber
 }
 ```
 
+#### Example Response: Paid Advertisement / Marketplace Link (`200 OK`)
+```json
+{
+  "verdict": "ADS",
+  "confidence": 95,
+  "judgments": {
+    "supported_by_evidence": 0,
+    "contradicted_by_evidence": 0,
+    "sensational_framing": 0
+  },
+  "article_title": "Iklan Berbayar: www.ebay.com",
+  "article_url": "https://www.google.com/pagead/aclk?sa=L&adurl=https%3A%2F%2Fwww.ebay.com%2Fitm%2F123",
+  "source_domain": "www.ebay.com",
+  "summary": "Tautan ini adalah iklan berbayar yang mengarah ke marketplace www.ebay.com. Karena bukan klaim berita, JevBeez tidak memverifikasi faktanya. Pastikan transaksi hanya dilakukan di dalam platform resmi.",
+  "red_flags": [
+    "Tautan iklan berbayar, bukan artikel berita."
+  ],
+  "evidences": [],
+  "share_hash": "3e2d1c0b9a8f7e6d5c4b3a2109876543",
+  "is_cached": false,
+  "is_threat": false,
+  "resolved_url": "https://www.ebay.com/itm/123",
+  "redirect_hops": [
+    "https://www.ebay.com/itm/123"
+  ]
+}
+```
+
+#### Example Response: Cloaked Ad Scam (`200 OK`)
+```json
+{
+  "verdict": "SCAM",
+  "confidence": 82,
+  "judgments": {
+    "supported_by_evidence": 0,
+    "contradicted_by_evidence": 0,
+    "sensational_framing": 0
+  },
+  "article_title": "Peringatan Waspada: Indikasi Situs Penipuan (Scam)",
+  "article_url": "https://www.google.com/pagead/aclk?sa=L&adurl=https%3A%2F%2Fvk.com%2Faway.php%3Fto%3Dhttps%3A%2F%2Fbaf9105c4584fac832929f959728944d.cavemin.com%2Fsttodm%2F",
+  "source_domain": "cavemin.com",
+  "summary": "Tautan ini terindikasi kuat sebagai situs penipuan dengan rekayasa sosial, iming-iming hadiah palsu, atau pemerasan digital.",
+  "red_flags": [
+    "Subdomain berupa deretan karakter heksadesimal acak, pola umum penyamaran tautan penipuan agar lolos dari daftar blokir."
+  ],
+  "evidences": [],
+  "share_hash": "c7b6a594837261504f3e2d1c0b9a8f7e",
+  "is_cached": false,
+  "is_threat": true,
+  "threat_type": "SCAM",
+  "threat_reasons": [
+    "Subdomain berupa deretan karakter heksadesimal acak, pola umum penyamaran tautan penipuan agar lolos dari daftar blokir."
+  ],
+  "resolved_url": "https://baf9105c4584fac832929f959728944d.cavemin.com/sttodm/",
+  "redirect_hops": [
+    "https://vk.com/away.php?to=https://baf9105c4584fac832929f959728944d.cavemin.com/sttodm/",
+    "https://baf9105c4584fac832929f959728944d.cavemin.com/sttodm/"
+  ]
+}
+```
+
 ---
 
 ### 3. `GET /api/check/:hash`
@@ -407,7 +471,7 @@ go test -v -count=1 ./...
 cd apps/web
 bun test
 ```
-*Covers 41 test cases across 8 suites: URL detection, share formatting, XSS safety, honeypot traps, and Canvas mocks.*
+*Covers 42 test cases across 8 suites: URL detection, share formatting, threat detection parity, ADS verdicts, XSS safety, honeypot traps, and Canvas mocks.*
 
 **Verify Production Frontend Build:**
 ```bash
