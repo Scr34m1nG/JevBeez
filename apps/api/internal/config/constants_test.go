@@ -35,3 +35,39 @@ func TestThreatConstants(t *testing.T) {
 		t.Errorf("expected MaxSandboxPayloadBytes to be 102400, got %d", MaxSandboxPayloadBytes)
 	}
 }
+
+func TestUnwrapperConfigValues(t *testing.T) {
+	if VerdictAds != "ADS" {
+		t.Fatalf("expected ADS verdict, got %s", VerdictAds)
+	}
+	if MaxUnwrapDepth != 3 {
+		t.Fatalf("expected MaxUnwrapDepth 3, got %d", MaxUnwrapDepth)
+	}
+	if MinHexSubdomainLength != 16 {
+		t.Fatalf("expected MinHexSubdomainLength 16, got %d", MinHexSubdomainLength)
+	}
+
+	params := map[string]bool{}
+	for _, p := range WrapperParams {
+		params[p] = true
+	}
+	for _, want := range []string{"adurl", "to", "u", "q", "url", "redirect"} {
+		if !params[want] {
+			t.Errorf("missing wrapper param %q", want)
+		}
+	}
+
+	shops := map[string]bool{}
+	for _, d := range EcommerceDomains {
+		shops[d] = true
+	}
+	for _, want := range []string{"ebay.com", "amazon.com", "shopee.co.id", "tokopedia.com", "lazada.co.id"} {
+		if !shops[want] {
+			t.Errorf("missing ecommerce domain %q", want)
+		}
+	}
+
+	if len(WrapperHostPatterns) == 0 {
+		t.Fatal("WrapperHostPatterns must not be empty")
+	}
+}

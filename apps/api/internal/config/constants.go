@@ -54,6 +54,10 @@ const (
 	MaxShortenerHops       = 5
 	MaxSandboxPayloadBytes = 100 * 1024
 	SandboxTimeout         = 3 * time.Second
+
+	VerdictAds            = "ADS"
+	MaxUnwrapDepth        = 3
+	MinHexSubdomainLength = 16
 )
 
 var DangerousExtensions = []string{
@@ -69,6 +73,27 @@ var ShortenerDomains = []string{
 	"s.id", "link.id", "tribun.link", "heylink.me", "lynk.id", "desty.page",
 	"bit.ly", "tinyurl.com", "t.co", "is.gd", "cutt.ly", "rebrand.ly", "rb.gy",
 	"shorturl.at", "ow.ly", "buff.ly", "qr.ae", "v.gd", "soo.gd", "rotf.lol",
+}
+
+var WrapperParams = []string{
+	"adurl", "url", "u", "q", "to", "redirect", "redirect_uri", "redirect_url",
+	"dest", "destination", "target", "continue", "goto", "next", "link", "out", "r",
+}
+
+var WrapperHostPatterns = []string{
+	"google.com/pagead/", "googleadservices.com", "google.com/url",
+	"doubleclick.net", "vk.com/away.php", "l.facebook.com/l.php",
+	"lm.facebook.com/l.php", "l.instagram.com", "out.reddit.com",
+	"linkedin.com/redir", "youtube.com/redirect",
+}
+
+var EcommerceDomains = []string{
+	"ebay.com", "ebay.co.uk", "amazon.com", "amazon.co.id", "amazon.co.uk", "amazon.de", "amazon.sg",
+	"shopee.co.id", "shopee.sg", "shopee.com.my", "shopee.ph", "shopee.co.th",
+	"tokopedia.com", "blibli.com", "bukalapak.com", "lazada.co.id", "lazada.sg", "lazada.com.my",
+	"aliexpress.com", "aliexpress.us", "alibaba.com", "temu.com", "shein.com",
+	"zalora.co.id", "jd.id", "elevenia.co.id", "etsy.com", "walmart.com", "target.com",
+	"rakuten.com", "olx.co.id", "carousell.com", "carousell.co.id", "bhphotovideo.com",
 }
 
 var BrandProfiles = map[string][]string{
