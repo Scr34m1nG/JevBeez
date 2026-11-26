@@ -37,7 +37,7 @@ type firecrawlSearchResponse struct {
 func NewFirecrawlSearchProvider(apiKey string) *FirecrawlSearchProvider {
 	return &FirecrawlSearchProvider{
 		apiKey: apiKey,
-		client: &http.Client{Timeout: config.HTTPClientTimeout},
+		client: config.NewTrustedHTTPClient(),
 	}
 }
 

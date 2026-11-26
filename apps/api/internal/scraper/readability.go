@@ -20,8 +20,12 @@ type LocalScraper struct {
 }
 
 func NewLocalScraper() *LocalScraper {
+	return NewLocalScraperWithClient(security.NewSafeHTTPClient())
+}
+
+func NewLocalScraperWithClient(client *http.Client) *LocalScraper {
 	return &LocalScraper{
-		client: security.NewSafeHTTPClient(),
+		client: client,
 	}
 }
 

@@ -37,7 +37,7 @@ type tavilyResponse struct {
 func NewTavilyProvider(apiKey string) *TavilyProvider {
 	return &TavilyProvider{
 		apiKey: apiKey,
-		client: &http.Client{Timeout: config.HTTPClientTimeout},
+		client: config.NewTrustedHTTPClient(),
 	}
 }
 

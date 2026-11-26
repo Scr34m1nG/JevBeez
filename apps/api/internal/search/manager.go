@@ -37,6 +37,9 @@ func NewSearchManager(tavilyKey, firecrawlKey string) (*SearchManager, error) {
 }
 
 func (m *SearchManager) SearchGrounding(ctx context.Context, article *model.Article) ([]model.Evidence, error) {
+	if m == nil || len(m.providers) == 0 {
+		return nil, ErrNoSearchProvider
+	}
 	query := m.buildQuery(article)
 	if query == "" {
 		return nil, errors.New("query pencarian tidak dapat dibentuk")
@@ -45,6 +48,9 @@ func (m *SearchManager) SearchGrounding(ctx context.Context, article *model.Arti
 }
 
 func (m *SearchManager) SearchQuery(ctx context.Context, query string) ([]model.Evidence, error) {
+	if m == nil || len(m.providers) == 0 {
+		return nil, ErrNoSearchProvider
+	}
 	if strings.TrimSpace(query) == "" {
 		return []model.Evidence{}, nil
 	}

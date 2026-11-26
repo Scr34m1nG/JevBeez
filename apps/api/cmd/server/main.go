@@ -132,6 +132,7 @@ func main() {
 	}
 
 	app.Post("/api/v1/analyze", analyzeHandler.Handle)
+	app.Get("/api/v1/analyze/stream", analyzeHandler.StreamHandle)
 	app.Get("/api/check/:hash", analyzeHandler.GetCheckByHash)
 	app.Get("/api/v1/check/:hash", analyzeHandler.GetCheckByHash)
 

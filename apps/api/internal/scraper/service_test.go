@@ -2,6 +2,7 @@ package scraper
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -97,5 +98,139 @@ func TestScraperService_SocialDoesNotFallback(t *testing.T) {
 	}
 	if err != ErrSocialLoginRequired && err != ErrSocialContentUnavailable {
 		t.Logf("got expected social error: %v", err)
+	}
+}
+
+func TestScraperService_LocalFirstStrategy(t *testing.T) {
+	// 1. Mock local server serving valid article HTML
+	htmlContent := `<!DOCTYPE html><html><head><title>Berita Penting Hari Ini</title></head><body><article>`
+	for i := 0; i < 90; i++ {
+		htmlContent += "berita fakta terverifikasi kata ke "
+	}
+	htmlContent += `</article></body></html>`
+
+	localServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Write([]byte(htmlContent))
+	}))
+	defer localServer.Close()
+
+	// 2. Firecrawl server that fails if called
+	firecrawlCalled := false
+	firecrawlServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		firecrawlCalled = true
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer firecrawlServer.Close()
+
+	service := NewScraperService("test-firecrawl-key")
+	service.local = NewLocalScraperWithClient(localServer.Client())
+	service.firecrawl.client = firecrawlServer.Client()
+	service.firecrawl.endpoint = firecrawlServer.URL
+
+	article, err := service.Extract(context.Background(), localServer.URL+"/news/article-1")
+	if err != nil {
+		t.Fatalf("expected successful extract via local, got error: %v", err)
+	}
+
+	if article == nil || article.Title == "" {
+		t.Fatalf("expected valid article, got nil or empty")
+	}
+
+	if firecrawlCalled {
+		t.Fatalf("expected Firecrawl NOT to be called when local scraper succeeds, but it was called")
+	}
+}
+
+func TestScraperService_FallbackToFirecrawlWhenLocalFails(t *testing.T) {
+	// Local server returns 403 Forbidden
+	localServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusForbidden)
+	}))
+	defer localServer.Close()
+
+	firecrawlMarkdown := "# Berita Dari Firecrawl\n\n"
+	for i := 0; i < 90; i++ {
+		firecrawlMarkdown += "konten valid dari firecrawl kata ke "
+	}
+
+	firecrawlCalled := false
+	firecrawlServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		firecrawlCalled = true
+		w.Header().Set("Content-Type", "application/json")
+		resp := firecrawlScrapeResponse{
+			Success: true,
+		}
+		resp.Data.Markdown = firecrawlMarkdown
+		resp.Data.Metadata.Title = "Berita Dari Firecrawl"
+		_ = json.NewEncoder(w).Encode(resp)
+	}))
+	defer firecrawlServer.Close()
+
+	service := NewScraperService("test-firecrawl-key")
+	service.local = NewLocalScraperWithClient(localServer.Client())
+	service.firecrawl.client = firecrawlServer.Client()
+	service.firecrawl.endpoint = firecrawlServer.URL
+
+	article, err := service.Extract(context.Background(), localServer.URL+"/news/article-spa")
+	if err != nil {
+		t.Fatalf("expected fallback to firecrawl to succeed, got: %v", err)
+	}
+
+	if !firecrawlCalled {
+		t.Fatalf("expected Firecrawl to be called as fallback, but it was not")
+	}
+
+	if article.Title != "Berita Dari Firecrawl" {
+		t.Fatalf("expected title 'Berita Dari Firecrawl', got '%s'", article.Title)
+	}
+}
+
+func TestScraperService_SSRFDoesNotFallback(t *testing.T) {
+	firecrawlCalled := false
+	firecrawlServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		firecrawlCalled = true
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer firecrawlServer.Close()
+
+	service := NewScraperService("test-firecrawl-key")
+	service.firecrawl.client = firecrawlServer.Client()
+	service.firecrawl.endpoint = firecrawlServer.URL
+
+	// Default local scraper uses NewSafeHTTPClient which blocks 127.0.0.1 (private IP)
+	_, err := service.Extract(context.Background(), "http://127.0.0.1:8080/admin")
+	if err == nil {
+		t.Fatalf("expected SSRF error, got nil")
+	}
+
+	if firecrawlCalled {
+		t.Fatalf("expected Firecrawl NOT to be called when SSRF is detected, but it was called")
+	}
+}
+
+func BenchmarkLocalScraper_Extract(b *testing.B) {
+	htmlContent := `<!DOCTYPE html><html><head><title>Detik News: Kebijakan Baru Transportasi Publik</title></head><body><article>`
+	for i := 0; i < 150; i++ {
+		htmlContent += "<p>Pemerintah provinsi mengumumkan pembaruan tarif integrasi transportasi publik untuk mendukung mobilitas perkotaan yang berkelanjutan dan efisien bagi masyarakat.</p>"
+	}
+	htmlContent += `</article></body></html>`
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Write([]byte(htmlContent))
+	}))
+	defer server.Close()
+
+	scraper := NewLocalScraperWithClient(server.Client())
+	ctx := context.Background()
+
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		_, err := scraper.Scrape(ctx, server.URL+"/berita/1")
+		if err != nil {
+			b.Fatalf("unexpected error: %v", err)
+		}
 	}
 }
