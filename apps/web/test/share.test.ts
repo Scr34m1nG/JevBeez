@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  generateShareText,
   generateWhatsAppShareText,
   buildWhatsAppShareUrl,
   escapeHtml,
@@ -7,8 +8,8 @@ import {
 } from '../utils/share'
 import type { VerificationResult } from '../types'
 
-describe('WhatsApp Sharing & Formatted Text Generator', () => {
-  it('generates formatted text with bold asterisks and permalink for standard fact-check', () => {
+describe('Universal Sharing & Formatted Text Generator', () => {
+  it('generates formatted text with bold asterisks and permalink for standard analysis', () => {
     const mockResult: Partial<VerificationResult> = {
       verdict: 'HOAX',
       confidence: 95,
@@ -18,7 +19,7 @@ describe('WhatsApp Sharing & Formatted Text Generator', () => {
       is_threat: false
     }
 
-    const text = generateWhatsAppShareText(mockResult, {
+    const text = generateShareText(mockResult, {
       permalinkBase: 'https://jevbeez.hityo.cloud'
     })
 
@@ -26,7 +27,7 @@ describe('WhatsApp Sharing & Formatted Text Generator', () => {
     expect(text).toContain('*Status:* HOAX')
     expect(text).toContain('*Tingkat Keyakinan:* 95%')
     expect(text).toContain('*Klaim / Judul:* "Vaksin Flu Menyebabkan Kemandulan Permanen"')
-    expect(text).toContain('*Ringkasan Fakta:*')
+    expect(text).toContain('*Ringkasan Analisis:*')
     expect(text).toContain('Klaim ini bertentangan dengan bukti ilmiah dari WHO dan Kemenkes RI.')
 
     // Check permalink inclusion
@@ -45,7 +46,7 @@ describe('WhatsApp Sharing & Formatted Text Generator', () => {
       share_hash: 'threat123hash'
     }
 
-    const text = generateWhatsAppShareText(mockThreat)
+    const text = generateShareText(mockThreat)
 
     expect(text).toContain('🚨 *PERINGATAN ANCAMAN SIBER (JevBeez Security)*')
     expect(text).toContain('*Status:* PHISHING')
@@ -54,7 +55,7 @@ describe('WhatsApp Sharing & Formatted Text Generator', () => {
     expect(text).toContain('https://jevbeez.hityo.cloud/check?id=threat123hash')
   })
 
-  it('generates formatted text for text broadcast verification mode', () => {
+  it('generates formatted text for text content analysis mode', () => {
     const mockTextMode: Partial<VerificationResult> = {
       verdict: 'UNVERIFIED',
       confidence: 50,
@@ -64,15 +65,15 @@ describe('WhatsApp Sharing & Formatted Text Generator', () => {
       share_hash: 'text9988hash'
     }
 
-    const text = generateWhatsAppShareText(mockTextMode)
+    const text = generateShareText(mockTextMode)
 
-    expect(text).toContain('🔍 *HASIL VERIFIKASI PESAN TERUSAN (JevBeez AI)*')
+    expect(text).toContain('🔍 *HASIL ANALISIS KONTEN (JevBeez AI)*')
     expect(text).toContain('*Status:* UNVERIFIED')
     expect(text).toContain('https://jevbeez.hityo.cloud/check?id=text9988hash')
   })
 
-  it('builds properly encoded WhatsApp share URL', () => {
-    const sampleMessage = '🔍 *HASIL CEK FAKTA JEVBEEZ*\n\n*Status:* HOAX\n*Tautan:* https://jevbeez.hityo.cloud'
+  it('builds properly encoded WhatsApp share URL for fallback compatibility', () => {
+    const sampleMessage = '🔍 *HASIL ANALISIS JEVBEEZ*\n\n*Status:* HOAX\n*Tautan:* https://jevbeez.hityo.cloud'
     const shareUrl = buildWhatsAppShareUrl(sampleMessage)
 
     expect(shareUrl.startsWith('https://api.whatsapp.com/send?text=')).toBe(true)

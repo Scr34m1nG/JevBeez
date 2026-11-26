@@ -70,17 +70,17 @@ export const useAnalyze = () => {
 
     if (selfCheckCount.value >= 3) {
       showSelfCheckModal.value = true
-      error.value = '🛑 WKWK Ngotot banget ya! Tombol "Periksa Fakta" angkat tangan menyerah menghadapi Anda 🏳️🤣. Serius nih, yuk masukkan tautan berita dari web lain sekarang!'
+      error.value = '🛑 WKWK Ngotot banget ya! Tombol "Analisis Sekarang" angkat tangan menyerah menghadapi Anda 🏳️🤣. Serius nih, yuk masukkan tautan atau konten lain sekarang!'
     } else if (selfCheckCount.value === 2) {
-      error.value = '👀 Masih ngeyel dicoba lagi? Udah dibilang jangan ngetes web ini sendiri, nanti server kami kena krisis identitas! 🤖💥 Hayuk buruan cari tautan berita lain!'
+      error.value = '👀 Masih dicoba lagi? Udah dibilang jangan ngetes web ini sendiri, nanti server kami kena krisis identitas! 🤖💥 Hayuk buruan masukkan tautan atau konten lain!'
     } else {
-      error.value = '🚨 INCEPTION DETECTED! Anda sedang mengecek website JevBeez di JevBeez sendiri 🪞. AI kami sempat krisis eksistensial menatap cermin... Tenang, kami 100% fakta & bebas hoax! Silakan coba periksa tautan berita dari situs atau media sosial lain ya.'
+      error.value = '🚨 INCEPTION DETECTED! Anda sedang menganalisis website JevBeez di JevBeez sendiri 🪞. AI kami sempat krisis eksistensial menatap cermin... Tenang, sistem kami 100% aman dan terverifikasi! Silakan periksa tautan atau konten lain ya.'
     }
   }
 
   const analyze = async (rawInput: string, deepDive = false) => {
     if (!rawInput || !rawInput.trim()) {
-      error.value = 'Silakan masukkan tautan atau teks pesan yang ingin diverifikasi.'
+      error.value = 'Silakan masukkan tautan atau teks konten yang ingin dianalisis.'
       return
     }
 

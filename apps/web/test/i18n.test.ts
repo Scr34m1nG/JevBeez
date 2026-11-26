@@ -27,19 +27,19 @@ describe('i18n locales dictionary schema & parity', () => {
     expect(idStr.toLowerCase()).not.toContain('antrekan')
     expect(id.form.cooldownWaiting).toContain('Lagi antre')
     expect(id.form.cooldownWaitBtn).toContain('Tunggu sebentar')
-    expect(id.verdict.valid).toBe('Beneran Fakta (Akurat)')
-    expect(id.verdict.hoax).toBe('Terbukti Hoax / Palsu')
+    expect(id.verdict.valid).toBe('Terverifikasi Valid (Akurat)')
+    expect(id.verdict.hoax).toBe('Terbukti Palsu / Tidak Akurat')
     expect(id.verdict.misleading).toBe('Menyesatkan / Misleading')
     expect(id.verdict.unverified).toBe('Belum Bisa Dipastikan')
   })
 
   it('has appropriate English translations', () => {
-    expect(en.nav.brandBadge).toBe('Fact Check')
+    expect(en.nav.brandBadge).toBe('AI Analyzer')
     expect(en.nav.systemActive).toBe('System Active')
-    expect(en.hero.title).toBe('Verify Claims & News Facts')
-    expect(en.form.checkBtn).toBe('Fact-Check')
-    expect(en.verdict.valid).toBe('Verified Fact')
-    expect(en.verdict.hoax).toBe('Confirmed Hoax / Fake')
+    expect(en.hero.title).toBe('Verify Content, Claims & Web Links')
+    expect(en.form.checkBtn).toBe('Analyze Now')
+    expect(en.verdict.valid).toBe('Verified Valid (Accurate)')
+    expect(en.verdict.hoax).toBe('Confirmed False / Inaccurate')
   })
 })
 
@@ -52,14 +52,14 @@ describe('useI18n composable', () => {
     expect(locale.value).toBe('id')
     expect(isId.value).toBe(true)
     expect(isEn.value).toBe(false)
-    expect(t('hero.title')).toBe('Cek Kebenaran Fakta & Berita')
+    expect(t('hero.title')).toBe('Verifikasi Konten, Teks & Tautan Web')
     expect(t('form.cooldownWaiting', { time: 12 })).toBe('Lagi antre (12s)...')
 
     setLocale('en')
     expect(locale.value).toBe('en')
     expect(isId.value).toBe(false)
     expect(isEn.value).toBe(true)
-    expect(t('hero.title')).toBe('Verify Claims & News Facts')
+    expect(t('hero.title')).toBe('Verify Content, Claims & Web Links')
     expect(t('form.cooldownWaiting', { time: 12 })).toBe('Queued (12s)...')
 
     // Reset back to id
@@ -72,8 +72,6 @@ describe('useI18n composable', () => {
     const { setLocale, t } = useI18n()
 
     setLocale('en')
-    // If a nested key exists in id but missing in en, it should resolve to id's value
-    // Let's test with a simulated fallback
-    expect(t('hero.title')).toBe('Verify Claims & News Facts')
+    expect(t('hero.title')).toBe('Verify Content, Claims & Web Links')
   })
 })

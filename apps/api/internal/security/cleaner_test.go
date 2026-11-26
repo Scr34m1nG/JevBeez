@@ -175,7 +175,7 @@ func TestZeroEvidence_ShortCircuitBypassesJev(t *testing.T) {
 		Content:      "Narasi ini tidak memiliki grounding atau rujukan artikel media manapun.",
 		URL:          "text:a1b2c3d4",
 		WordCount:    10,
-		SourceDomain: "whatsapp",
+		SourceDomain: "direct_text",
 	}
 
 	evidences := []model.Evidence{} // 0 evidence returned by search provider
