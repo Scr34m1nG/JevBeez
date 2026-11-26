@@ -86,6 +86,9 @@ The proliferation of online disinformation, viral WhatsApp broadcasts, fake news
   - Covers Indonesian & global institutions: BCA, Mandiri, BRI, BNI, DANA, OVO, Shopee, Tokopedia, Gojek, Grab, etc.
 - 🔗 **Safe Shortener Unroller**:
   - Traces up to 5 redirection hops with strict SSRF loopback protection and HTTP 405/501 fallback.
+- 🧩 **Ad & Wrapper Unpacker**:
+  - Unwraps nested redirector parameters (`adurl`, `to`, `u`, `q`, etc.) up to 3 levels with zero network contact, decoding up to double URL-encoded payloads.
+  - Flags obfuscated hexadecimal subdomains and empty cloaked landing pages as `SCAM`, and tags links resolving to known marketplaces (eBay, Amazon, Shopee, Tokopedia, etc.) as `ADS`.
 - 🧪 **Sandboxed Deep Dive Content Audit**:
   - Users can optionally trigger deep content inspection to verify `<form>` input targets and Telegram bot exfiltration webhooks in a constrained sandbox.
 - 💬 **1-Click WhatsApp Debunk Generator**:
