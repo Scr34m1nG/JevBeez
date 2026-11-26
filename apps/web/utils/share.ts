@@ -26,10 +26,10 @@ export function sanitizeHtml(str: string): string {
 }
 
 /**
- * Generates WhatsApp formatted text with bold markdown (*bold*), emojis, and permalink.
+ * Generates universal formatted text with clean markdown (*bold*), emojis, and permalink.
  * Guarantees malicious payloads (<script>, <img ...>) are sanitized/escaped so no XSS is possible.
  */
-export function generateWhatsAppShareText(
+export function generateShareText(
   result: Partial<VerificationResult>,
   options: ShareOptions = {}
 ): string {
@@ -67,15 +67,15 @@ export function generateWhatsAppShareText(
       `🔗 *Verifikasi & Laporan Lengkap:*`,
       permalink,
       ``,
-      `_Verifikasi fakta & keamanan tautan via JevBeez AI_`
+      `_Verifikasi konten & keamanan tautan via JevBeez AI_`
     ]
     return lines.join('\n')
   }
 
-  // Standard Fact-Check or Broadcast Text
+  // Universal Content / Link Analysis
   const header = result.is_text_mode
-    ? `🔍 *HASIL VERIFIKASI PESAN TERUSAN (JevBeez AI)*`
-    : `🔍 *HASIL CEK FAKTA JEVBEEZ*`
+    ? `🔍 *HASIL ANALISIS KONTEN (JevBeez AI)*`
+    : `🔍 *HASIL ANALISIS KONTEN & TAUTAN (JevBeez AI)*`
 
   const lines = [
     header,
@@ -84,17 +84,22 @@ export function generateWhatsAppShareText(
     `*Tingkat Keyakinan:* ${confidence}%`,
     `*Klaim / Judul:* "${safeTitle}"`,
     ``,
-    `*Ringkasan Fakta:*`,
+    `*Ringkasan Analisis:*`,
     safeSummary,
     ``,
     `🔗 *Laporan Lengkap & Sumber Bukti:*`,
     permalink,
     ``,
-    `_Cek fakta & bongkar hoax mandiri di JevBeez AI_`
+    `_Verifikasi konten & keamanan tautan via JevBeez AI_`
   ]
 
   return lines.join('\n')
 }
+
+/**
+ * Backward compatibility alias for generateShareText.
+ */
+export const generateWhatsAppShareText = generateShareText
 
 /**
  * Builds the WhatsApp share URL with properly encoded message text.

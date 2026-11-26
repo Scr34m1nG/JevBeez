@@ -62,7 +62,7 @@ func (e *Evaluator) Evaluate(article *model.Article, evidences []model.Evidence,
 	default:
 		result.Verdict = config.VerdictUnverified
 		result.Confidence = round(math.Max(c, math.Max(s, sf)) * 100)
-		result.Summary = fmt.Sprintf("Bukti yang tersedia belum cukup konklusif untuk menyatakan artikel ini 100%% valid atau hoax (Probabilitas bantahan: %.0f%%, dukungan: %.0f%%).", c*100, s*100)
+		result.Summary = fmt.Sprintf("Bukti yang tersedia belum cukup konklusif untuk menyatakan konten ini sepenuhnya valid atau tidak akurat (Probabilitas bantahan: %.0f%%, dukungan: %.0f%%).", c*100, s*100)
 	}
 
 	return result
@@ -81,8 +81,8 @@ func (e *Evaluator) EvaluateAds(rawURL, destURL, destDomain string, chain []stri
 		ResolvedURL:  destURL,
 		RedirectHops: chain,
 		SourceDomain: destDomain,
-		Summary:      "Tautan ini adalah iklan berbayar yang mengarah ke marketplace " + destDomain + ". Karena bukan klaim berita, JevBeez tidak memverifikasi faktanya. Pastikan transaksi hanya dilakukan di dalam platform resmi.",
-		RedFlags:     []string{"Tautan iklan berbayar, bukan artikel berita."},
+		Summary:      "Tautan ini adalah iklan berbayar yang mengarah ke marketplace " + destDomain + ". Tautan ini bukan merupakan klaim informasi atau konten yang dianalisis oleh JevBeez. Pastikan transaksi hanya dilakukan di dalam platform resmi.",
+		RedFlags:     []string{"Tautan iklan berbayar, bukan konten klaim atau berita."},
 		Evidences:    []model.Evidence{},
 		IsThreat:     false,
 	}

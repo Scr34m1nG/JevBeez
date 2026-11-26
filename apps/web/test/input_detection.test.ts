@@ -32,7 +32,7 @@ describe('detectInputMode & URL vs Text classification', () => {
     })
   })
 
-  describe('Text / WhatsApp broadcast classification', () => {
+  describe('Text / Natural language content classification', () => {
     it('classifies raw sentence texts with spaces as text', () => {
       const sentence = 'Waspada virus corona varian baru menyebar lewat udara di Jakarta'
       expect(detectInputMode(sentence)).toBe('text')
@@ -40,7 +40,7 @@ describe('detectInputMode & URL vs Text classification', () => {
       expect(isUrlInput(sentence)).toBe(false)
     })
 
-    it('classifies WhatsApp broadcast messages as text', () => {
+    it('classifies broadcast and claim messages as text', () => {
       const broadcast = 'Info dari dokter RSPAD: jangan minum es setelah makan bakso karena membekukan lemak. Viralkan ke 10 grup!'
       expect(detectInputMode(broadcast)).toBe('text')
     })

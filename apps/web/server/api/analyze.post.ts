@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'INCEPTION_SELF_CHECK',
         data: {
           code: 'SELF_CHECK_EASTER_EGG',
-          error: '🚨 INCEPTION DETECTED! Anda sedang mengecek website JevBeez di JevBeez sendiri 🪞. AI kami sudah menatap cermin dan yakin kami 100% fakta bukan hoax 😎. Silakan coba periksa tautan berita dari situs atau media sosial lain!'
+          error: '🚨 INCEPTION DETECTED! Anda sedang menganalisis website JevBeez di JevBeez sendiri 🪞. AI kami sudah menatap cermin dan yakin sistem kami 100% aman dan terverifikasi 😎. Silakan coba periksa tautan atau konten lain!'
         }
       })
     }

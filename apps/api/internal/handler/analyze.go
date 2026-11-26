@@ -307,15 +307,15 @@ func (h *AnalyzeHandler) handleText(c *fiber.Ctx, clientIP string, rawText strin
 			Confidence:   50.0,
 			ArticleTitle: title,
 			ArticleURL:   "",
-			SourceDomain: "Pesan Terusan (WhatsApp/Broadcast)",
-			Summary:      "Tidak ditemukan bukti rujukan atau klarifikasi di media kredibel mengenai klaim pesan ini.",
-			RedFlags:     []string{"Klaim tidak memiliki rekam jejak rujukan di media arus utama kredibel."},
+			SourceDomain: "Input Teks Langsung",
+			Summary:      "Tidak ditemukan bukti rujukan atau klarifikasi di sumber kredibel mengenai isi klaim konten ini.",
+			RedFlags:     []string{"Klaim konten tidak memiliki rekam jejak rujukan di sumber kredibel."},
 			Evidences:    []model.Evidence{},
 			ShareHash:    shareHash,
 			IsTextMode:   true,
 			CleanedText:  cleanedText,
-			IsSocial:     true,
-			Platform:     "whatsapp",
+			IsSocial:     false,
+			Platform:     "Teks / Konten",
 		}
 
 		_ = h.cache.SetByHash(c.Context(), shareHash, result, config.UnverifiedCacheTTL)
@@ -337,16 +337,16 @@ func (h *AnalyzeHandler) handleText(c *fiber.Ctx, clientIP string, rawText strin
 		Title:        title,
 		Content:      cleanedText,
 		URL:          "",
-		SourceDomain: "Pesan Terusan (WhatsApp/Broadcast)",
+		SourceDomain: "Input Teks Langsung",
 		WordCount:    len(strings.Fields(cleanedText)),
-		IsSocial:     true,
-		Platform:     "whatsapp",
+		IsSocial:     false,
+		Platform:     "Teks / Konten",
 	}
 
 	judgments, err := h.jevClient.Evaluate(c.Context(), article, evidences)
 	if err != nil {
 		return c.Status(http.StatusServiceUnavailable).JSON(fiber.Map{
-			"error": "Layanan evaluasi fakta sedang mengalami gangguan",
+			"error": "Layanan evaluasi konten sedang mengalami gangguan",
 		})
 	}
 
@@ -354,7 +354,7 @@ func (h *AnalyzeHandler) handleText(c *fiber.Ctx, clientIP string, rawText strin
 	result.ShareHash = shareHash
 	result.IsTextMode = true
 	result.CleanedText = cleanedText
-	result.SourceDomain = "Pesan Terusan (WhatsApp/Broadcast)"
+	result.SourceDomain = "Input Teks Langsung"
 
 	cacheTTL := config.DefaultCacheTTL
 	if result.Verdict == config.VerdictUnverified {

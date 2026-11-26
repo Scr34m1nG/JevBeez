@@ -342,7 +342,7 @@ func (h *AnalyzeHandler) streamText(ctx context.Context, w *bufio.Writer, client
 
 	_ = sendSSE(w, "progress", fiber.Map{
 		"phase":   "searching",
-		"message": "Mencari bukti terkait klaim pesan...",
+		"message": "Mencari bukti terkait klaim konten...",
 	})
 
 	evidences, err := h.searcher.SearchQuery(ctx, searchQuery)
@@ -356,7 +356,7 @@ func (h *AnalyzeHandler) streamText(ctx context.Context, w *bufio.Writer, client
 	pseudoArticle := &model.Article{
 		Title:        cleanedText,
 		Content:      cleanedText,
-		SourceDomain: "Pesan Berantai / WhatsApp",
+		SourceDomain: "Input Teks Langsung",
 		URL:          "",
 		WordCount:    len(strings.Fields(cleanedText)),
 	}

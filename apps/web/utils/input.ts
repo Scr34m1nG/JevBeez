@@ -2,7 +2,7 @@ export type InputMode = 'url' | 'text'
 
 /**
  * Detects whether an input string is a URL (including domain without protocol)
- * or a raw natural language sentence / WhatsApp broadcast text.
+ * or a raw natural language sentence / content text.
  */
 export function detectInputMode(input: string): InputMode {
   if (!input) return 'text'

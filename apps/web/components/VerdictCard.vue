@@ -77,31 +77,34 @@
 
         <!-- Action Buttons -->
         <div class="mt-5 pt-4 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-          <!-- WhatsApp Sharing Button -->
+          <!-- Universal Share Result Button -->
           <button
-            @click="shareToWhatsApp"
+            @click="handleShareResult"
             type="button"
-            class="py-2.5 px-3 rounded-lg bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors min-h-[42px]"
+            class="py-2.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors min-h-[42px]"
           >
-            <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.044c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.112.551 4.095 1.517 5.819l-1.617 5.909 6.046-1.587c1.664.908 3.568 1.423 5.597 1.423 6.627 0 12-5.373 12-12s-5.373-12-12-12z" />
+            <svg v-if="!copiedShare" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
-            <span>{{ t('results.shareWhatsApp') }}</span>
-          </button>
-
-          <!-- Salin Format WA Button -->
-          <button
-            @click="copyWaFormat"
-            type="button"
-            class="py-2.5 px-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 border border-emerald-200 shadow-sm transition-colors min-h-[42px]"
-          >
-            <svg v-if="!copiedWa" class="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-            </svg>
-            <svg v-else class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-else class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
-            <span>{{ copiedWa ? t('results.copiedWaBtn') : t('results.copyWaBtn') }}</span>
+            <span>{{ copiedShare ? t('results.sharedBtn') : t('results.shareBtn') }}</span>
+          </button>
+
+          <!-- Salin Ringkasan Teks Button -->
+          <button
+            @click="copyFormattedText"
+            type="button"
+            class="py-2.5 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors min-h-[42px]"
+          >
+            <svg v-if="!copiedText" class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>
+            <svg v-else class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>{{ copiedText ? t('results.copiedTextBtn') : t('results.copyTextBtn') }}</span>
           </button>
 
           <!-- Download Evidence Card Button -->
@@ -109,12 +112,12 @@
             @click="downloadEvidenceCardAction"
             :disabled="isDownloadingCard"
             type="button"
-            class="py-2.5 px-3 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-colors min-h-[42px]"
+            class="py-2.5 px-3 rounded-lg bg-white hover:bg-slate-100 text-slate-800 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-300 shadow-sm transition-colors min-h-[42px]"
           >
-            <svg v-if="!isDownloadingCard" class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-if="!isDownloadingCard" class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            <span v-else class="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            <span v-else class="w-3.5 h-3.5 border-2 border-slate-400 border-t-slate-800 rounded-full animate-spin"></span>
             <span>{{ isDownloadingCard ? t('results.downloadingCardBtn') : t('results.downloadCardBtn') }}</span>
           </button>
 
@@ -285,7 +288,7 @@
 import { computed, ref } from 'vue'
 import type { VerificationResult } from '~/types'
 import { useI18n } from '~/composables/useI18n'
-import { generateWhatsAppShareText, buildWhatsAppShareUrl } from '~/utils/share'
+import { generateShareText } from '~/utils/share'
 import { drawEvidenceCard, downloadCanvasAsImage } from '~/utils/canvas'
 
 const props = defineProps<{
@@ -299,7 +302,8 @@ defineEmits<{
 
 const { t } = useI18n()
 const copied = ref(false)
-const copiedWa = ref(false)
+const copiedShare = ref(false)
+const copiedText = ref(false)
 const isDownloadingCard = ref(false)
 const cardCanvasRef = ref<HTMLCanvasElement | null>(null)
 
@@ -360,19 +364,37 @@ const copySummary = async () => {
   } catch {}
 }
 
-const copyWaFormat = async () => {
-  const text = generateWhatsAppShareText(props.result)
+const copyFormattedText = async () => {
+  const text = generateShareText(props.result)
   try {
     await navigator.clipboard.writeText(text)
-    copiedWa.value = true
-    setTimeout(() => { copiedWa.value = false }, 2500)
+    copiedText.value = true
+    setTimeout(() => { copiedText.value = false }, 2500)
   } catch {}
 }
 
-const shareToWhatsApp = () => {
-  const message = generateWhatsAppShareText(props.result)
-  const shareUrl = buildWhatsAppShareUrl(message)
-  window.open(shareUrl, '_blank')
+const handleShareResult = async () => {
+  const text = generateShareText(props.result)
+  const shareUrl = props.result.share_hash
+    ? `${window.location.origin}/check?id=${props.result.share_hash}`
+    : window.location.href
+
+  if (typeof navigator !== 'undefined' && navigator.share) {
+    try {
+      await navigator.share({
+        title: `JevBeez - ${props.result.verdict}`,
+        text: props.result.summary || text,
+        url: shareUrl
+      })
+      return
+    } catch {}
+  }
+
+  try {
+    await navigator.clipboard.writeText(shareUrl)
+    copiedShare.value = true
+    setTimeout(() => { copiedShare.value = false }, 2500)
+  } catch {}
 }
 
 const downloadEvidenceCardAction = () => {

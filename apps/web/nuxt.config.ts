@@ -26,11 +26,11 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'JevBeez - AI Fact Checker & Hoax Detector',
+      title: 'JevBeez - AI Content & Threat Analyzer',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Pendeteksi hoax dan disinformasi berita berbasis AI TypeSafe Jev & real-time search grounding.' }
+        { name: 'description', content: 'Analisis kredibilitas konten, verifikasi klaim, dan deteksi ancaman tautan siber secara universal berbasis AI TypeSafe Jev & real-time search grounding.' }
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },

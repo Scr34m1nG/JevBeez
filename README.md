@@ -2,9 +2,9 @@
 
 # 🛡️ JevBeez
 
-**Automated Evidence-Grounded Fact-Checking & Cyber Threat Detection Engine**
+**Automated AI Content & Threat Analyzer**
 
-*Combatting digital disinformation, viral WhatsApp hoaxes, phishing, and malware threats using calibrated System One probabilistic decision models (TypeSafe Jev) and real-time empirical web evidence grounding.*
+*Combatting digital misinformation, deceptive content, malicious links, phishing, and malware threats using calibrated System One probabilistic decision models (TypeSafe Jev) and real-time empirical web evidence grounding.*
 
 [![Go Version](https://img.shields.io/badge/Go-1.23-00ADD8?style=flat-square&logo=go)](https://golang.org)
 [![Nuxt](https://img.shields.io/badge/Nuxt-4.x-00DC82?style=flat-square&logo=nuxtdotjs)](https://nuxt.com)
@@ -20,18 +20,18 @@
 
 ## 📸 User Interface
 
-### 1. Smart Fact-Check & Threat Intelligence Workbench
-Modern editorial interface featuring zero-friction smart input detection (auto-switches between URL link and raw WhatsApp broadcast message) with live system status indicator:
+### 1. Smart Content & Threat Intelligence Workbench
+Modern editorial interface featuring zero-friction smart input detection (auto-switches between URL link and raw text content) with live system status indicator:
 
 ![JevBeez Workbench](docs/screenshots/hero.png)
 
-### 2. Auto-Detect WhatsApp Broadcast Text Mode
-Pasting raw hoax messages automatically toggles text mode, enforces character limits (up to 1,000 runes), and prepares the broadcast claim for RE2 linear-time sanitization:
+### 2. Auto-Detect Text & Content Mode
+Pasting raw claims or forwarded messages automatically toggles text mode, enforces character limits (up to 1,000 runes), and prepares the claim for RE2 linear-time sanitization:
 
-![JevBeez WhatsApp Text Mode](docs/screenshots/smart-input-text.png)
+![JevBeez Text Mode](docs/screenshots/smart-input-text.png)
 
 ### 3. Analysis Dossier & Multi-Source Evidence Grounding
-Displays transparent verification verdicts, calibrated confidence scores, probabilistic decision vectors (TypeSafe Jev), cited web sources, instant 1-click WhatsApp debunk generator, and downloadable client-side evidence card:
+Displays transparent verification verdicts, calibrated confidence scores, probabilistic decision vectors (TypeSafe Jev), cited web sources, instant universal share & copy formatting, and downloadable client-side evidence card:
 
 ![JevBeez Verdict Dossier](docs/screenshots/verdict-analysis.png)
 
@@ -39,26 +39,26 @@ Displays transparent verification verdicts, calibrated confidence scores, probab
 
 ## 🌟 Overview
 
-The proliferation of online disinformation, viral WhatsApp broadcasts, fake news, deceptive scams, and credential-harvesting phishing campaigns often spreads faster than manual debunking can keep up. Furthermore, standard Large Language Models (LLMs) frequently suffer from **hallucinations**, presenting fabricated statements with false confidence.
+The proliferation of online misinformation, deceptive claims, malicious links, deceptive scams, and credential-harvesting phishing campaigns often spreads faster than manual analysis can keep up. Furthermore, standard Large Language Models (LLMs) frequently suffer from **hallucinations**, presenting fabricated statements with false confidence.
 
-**JevBeez** provides a robust, enterprise-grade fact-checking and cyber threat mitigation platform built on a defense-in-depth hybrid architecture:
-1. **Smart Unified Input & Broadcast Cleaner**: Automatically differentiates between web links and viral text messages. Raw broadcasts are cleaned using pure Go RE2 linear regex to strip WhatsApp noise, fake authority hooks, forwarding tags, and phone numbers without LLM costs.
+**JevBeez** provides a robust, enterprise-grade content verification and cyber threat analysis platform built on a defense-in-depth hybrid architecture:
+1. **Smart Unified Input & Content Cleaner**: Automatically differentiates between web links and raw text content. Raw text inputs are cleaned using pure Go RE2 linear regex to strip message noise, fake authority hooks, forwarding tags, and phone numbers without LLM costs.
 2. **Multi-Platform Scraper & Content Extractor**: Securely parses article claims and social media URLs (Twitter/X, TikTok, YouTube, Instagram, Threads, Facebook) using SSRF-safe scrapers and OEMBED protocols.
 3. **Safe Shortener Resolver**: Unrolls obfuscated redirect chains (`s.id`, `bit.ly`, `tinyurl.com`, `link.id`, etc.) via lightweight HTTP header hops with fallback safe GET without downloading untrusted payloads.
 4. **Zero-Contact Threat Heuristics (<20ms)**: Instantly detects brand impersonation, boundary-token spoofing, homoglyphs, raw IP hosts, high-risk TLDs, and executable dropper files (`.apk`, `.exe`) without contacting the malicious target server.
 5. **Sandboxed Deep Dive Inspector**: On-demand isolated inspection streaming a maximum of 100KB with strict 3-second timeouts to identify credential-theft forms (PIN, OTP, CVV, passwords) and external data exfiltration.
-6. **Multi-Source Evidence Grounding**: Performs live internet fact-finding across authoritative news outlets and independent fact-checking databases via Tavily & Firecrawl.
+6. **Multi-Source Evidence Grounding**: Performs live internet discovery across authoritative news outlets and independent verification databases via Tavily & Firecrawl.
 7. **System One Decision Engine (TypeSafe Jev)**: Evaluates claim validity through mathematically calibrated probabilities rather than unconstrained generative text.
-8. **Permanent Archive Permalinks & Share Tools**: Instant 30-day permalink caching (`/c/:hash`), 1-click WhatsApp debunk messages, and 100% client-side HTML5 Canvas evidence card generation.
+8. **Permanent Archive Permalinks & Share Tools**: Instant 30-day permalink caching (`/c/:hash`), universal share & formatted summary tools, and 100% client-side HTML5 Canvas evidence card generation.
 
 ---
 
 ## ✨ Core Features
 
 - 📝 **Smart Unified Input (Auto-Detect Link vs Text)**:
-  - Automatically identifies whether user pasted a web URL (`[🔗 Mode Tautan]`) or a raw viral broadcast message (`[📝 Mode Teks Pesan]`).
+  - Automatically identifies whether user pasted a web URL (`[🔗 Mode Tautan]`) or raw text content (`[📝 Mode Teks / Konten]`).
   - Seamless zero-friction workflow without manual tab toggles.
-- 🧹 **Pure Go WhatsApp Broadcast Cleaner (RE2 Linear Time)**:
+- 🧹 **Pure Go Text Content Cleaner (RE2 Linear Time)**:
   - Strips forwarding tags (*"Forwarded as received"*, *"Diteruskan"*), fake authority hooks (*"Info dari dokter RSPAD/IDI"*), viral exhortations (*"Sebarkan ke 10 grup"*), phone numbers, and formatting noise.
   - Formulates concise search queries (< 100 runes) snapped to clean word boundaries.
   - Guaranteed linear-time execution: **0% ReDoS vulnerability** and zero network I/O (**Zero SSRF risk** in Text Mode).
@@ -93,8 +93,8 @@ The proliferation of online disinformation, viral WhatsApp broadcasts, fake news
   - Flags obfuscated hexadecimal subdomains and empty cloaked landing pages as `SCAM`, and tags links resolving to known marketplaces (eBay, Amazon, Shopee, Tokopedia, etc.) as `ADS`.
 - 🧪 **Sandboxed Deep Dive Content Audit**:
   - Users can optionally trigger deep content inspection to verify `<form>` input targets and Telegram bot exfiltration webhooks in a constrained sandbox.
-- 💬 **1-Click WhatsApp Debunk Generator**:
-  - Generates ready-to-paste WhatsApp messages with bold headers (`*bold*`), concise factual summaries, cited references, and permanent archive links.
+- 💬 **Universal Share & Formatted Summary Generator**:
+  - Generates ready-to-share formatted messages with bold markdown (`*bold*`), concise summaries, cited references, and permanent archive links via native Web Share API or 1-click clipboard copy.
 - 🖼️ **Client-Side HTML5 Canvas Evidence Card**:
   - One-click `.png` evidence card generator rendered 100% inside the user's browser with **zero server CPU overhead, zero external dependencies, and zero XSS vulnerability**.
 - 🗄️ **30-Day Permanent Archive Permalinks (`/c/:hash`)**:
@@ -126,7 +126,7 @@ The proliferation of online disinformation, viral WhatsApp broadcasts, fake news
                               |   - Smart Input Detection     |
                               |   - Edge Honeypot Trap        |
                               |   - Client HTML5 Canvas Card  |
-                              |   - WhatsApp Debunk Builder   |
+                              |   - Universal Share Builder   |
                               +---------------+---------------+
                                               |
                                               | Internal Network (Proxy)
@@ -268,7 +268,7 @@ Verifies backend service operational health.
 ---
 
 ### 2. `POST /api/v1/analyze`
-Analyzes a URL or a WhatsApp broadcast message for factual verification or cyber threats.
+Analyzes a URL or text content for veracity verification or cyber threats.
 
 **Request Headers:**
 - `Content-Type: application/json`
@@ -281,22 +281,22 @@ Analyzes a URL or a WhatsApp broadcast message for factual verification or cyber
 }
 ```
 
-#### Option B: Broadcast Text Analysis Request
+#### Option B: Text Content Analysis Request
 ```json
 {
-  "text": "Diteruskan berkali-kali: Info dari dokter RSPAD bagi-bagi obat gratis klik link ini..."
+  "text": "Pemerintah membagikan bantuan sosial gratis sebesar 5 juta rupiah melalui portal resmi..."
 }
 ```
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
 | `url` | `string` | Optional* | Target web or social media URL to analyze |
-| `text` | `string` | Optional* | Raw broadcast text or claim message (min 25 runes, max 1000 runes) |
+| `text` | `string` | Optional* | Raw text content or claim message (min 25 runes, max 1000 runes) |
 | `deep_dive` | `boolean` | No | When `true`, executes sandboxed form & DOM inspection (Default: `false`) |
 
 *\*Either `url` or `text` must be provided.*
 
-#### Example Response: Standard Fact-Checking (`200 OK`)
+#### Example Response: Standard Analysis (`200 OK`)
 ```json
 {
   "verdict": "VALID",
