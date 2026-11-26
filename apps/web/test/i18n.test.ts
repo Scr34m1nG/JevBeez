@@ -40,6 +40,10 @@ describe('i18n locales dictionary schema & parity', () => {
     expect(en.form.checkBtn).toBe('Analyze Now')
     expect(en.verdict.valid).toBe('Verified Valid (Accurate)')
     expect(en.verdict.hoax).toBe('Confirmed False / Inaccurate')
+    expect(en.stepper.badge).toBe('AI Analysis Process')
+    expect(id.stepper.badge).toBe('Proses Analisis AI')
+    expect(en.archive.badge).toBe('Permanent Archive Link')
+    expect(id.archive.badge).toBe('Tautan Arsip Permanen')
   })
 })
 

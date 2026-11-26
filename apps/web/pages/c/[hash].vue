@@ -14,14 +14,14 @@
 
       <span class="inline-flex items-center gap-1.5 text-xs text-slate-500 font-mono">
         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span>Tautan Arsip Permanen</span>
+        <span>{{ t('archive.badge') }}</span>
       </span>
     </div>
 
     <!-- Loading State -->
     <div v-if="pending" class="w-full max-w-3xl p-8 rounded-xl bg-white border border-slate-200 text-center space-y-4 shadow-sm animate-pulse">
       <div class="w-8 h-8 mx-auto border-3 border-slate-300 border-t-slate-800 rounded-full animate-spin"></div>
-      <p class="text-sm font-medium text-slate-600">Memuat data hasil verifikasi arsip...</p>
+      <p class="text-sm font-medium text-slate-600">{{ t('archive.loading') }}</p>
     </div>
 
     <!-- Error / Not Found State -->
@@ -31,16 +31,16 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
       </div>
-      <h2 class="text-lg font-bold text-slate-900">Hasil Verifikasi Tidak Ditemukan</h2>
+      <h2 class="text-lg font-bold text-slate-900">{{ t('archive.notFoundTitle') }}</h2>
       <p class="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-        Tautan bukti ini mungkin sudah kedaluwarsa (melebihi 30 hari) atau format tautan tidak valid.
+        {{ t('archive.notFoundDesc') }}
       </p>
       <div class="pt-2">
         <NuxtLink
           to="/"
           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition-colors shadow-sm"
         >
-          <span>Mulai Cek Fakta Baru</span>
+          <span>{{ t('results.checkAnotherBtn') }}</span>
         </NuxtLink>
       </div>
     </div>

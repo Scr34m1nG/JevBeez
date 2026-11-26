@@ -3,9 +3,9 @@
     <div class="flex items-center justify-between mb-3">
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-        <span class="text-xs font-bold tracking-wider uppercase text-emerald-400">Proses Analisis AI</span>
+        <span class="text-xs font-bold tracking-wider uppercase text-emerald-400">{{ t('stepper.badge') }}</span>
       </div>
-      <span class="text-xs font-mono text-slate-400">Langkah {{ currentPhase }} dari 4</span>
+      <span class="text-xs font-mono text-slate-400">{{ t('stepper.stepCount', { current: currentPhase, total: 4 }) }}</span>
     </div>
 
     <div class="space-y-2.5">
@@ -32,19 +32,22 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from '~/composables/useI18n'
 
 const props = defineProps<{
   phase: number
   isUrlMode?: boolean
 }>()
 
+const { t } = useI18n()
+
 const currentPhase = computed(() => Math.min(Math.max(props.phase || 1, 1), 4))
 
 const steps = computed(() => [
-  props.isUrlMode ? 'Membedah tautan & reputasi domain...' : 'Membedah konten teks & membersihkan format...',
-  'Mencari rujukan bukti di sumber kredibel...',
-  'Menganalisis probabilitas keputusan & bias via TypeSafe Jev...',
-  'Menyusun ringkasan analisis bukti...'
+  props.isUrlMode ? t('stepper.step1Url') : t('stepper.step1Text'),
+  t('stepper.step2'),
+  t('stepper.step3'),
+  t('stepper.step4')
 ])
 
 const getStepClass = (stepNum: number) => {

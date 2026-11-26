@@ -26,6 +26,7 @@ export const en: TranslationSchema = {
     cooldownNotice: 'Please wait {time} seconds before the next check (or click the button to automatically check after the cooldown).',
     blockedTitle: 'Access Denied: Your IP is Blocked (24 Hours)',
     blockedReasonLabel: 'Reason:',
+    blockedMessage: 'JevBeez defense system detected malicious exploit activity from your IP address. Access has been automatically blocked for 24 hours for system security.',
     easterEggTitle: 'Whoops, Mirror Inception! 🤖',
     easterEggBtn: 'Got it, check another site 🫡',
     queueAlertTitle: 'Input is in queue:',
@@ -112,6 +113,21 @@ export const en: TranslationSchema = {
     taunt2: 'Haha 😜 Too slow on the click!',
     taunt3: 'Almost got it! Try again 🏃‍♂️',
     taunt4: 'Nimble button, right? 🎯'
+  },
+  stepper: {
+    badge: 'AI Analysis Process',
+    stepCount: 'Step {current} of {total}',
+    step1Url: 'Analyzing link & domain reputation...',
+    step1Text: 'Analyzing text content & sanitizing format...',
+    step2: 'Searching for evidence across credible sources...',
+    step3: 'Evaluating decision probabilities & bias via TypeSafe Jev...',
+    step4: 'Compiling evidence analysis summary...'
+  },
+  archive: {
+    badge: 'Permanent Archive Link',
+    loading: 'Loading archived analysis data...',
+    notFoundTitle: 'Analysis Result Not Found',
+    notFoundDesc: 'This archived link may have expired (older than 30 days) or the URL format is invalid.'
   },
   footer: {
     liveVerification: 'JevBeez • Real-time evidence-grounded content & link analysis.',
